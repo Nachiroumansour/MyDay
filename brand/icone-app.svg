@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="MyDay">
+  <rect width="64" height="64" rx="14" fill="#2C3A80"/>
+  <g transform="rotate(-9 32 32)">
+    <rect x="21" y="14" width="22" height="33" rx="3" fill="#FFFFFF"/>
+    <circle cx="32" cy="25" r="4.4" fill="#2C3A80"/>
+    <rect x="24" y="34" width="16" height="2.1" rx="1.05" fill="#2C3A80" opacity="0.85"/>
+    <rect x="24" y="39" width="10.5" height="2.1" rx="1.05" fill="#2C3A80" opacity="0.55"/>
+  </g>
+</svg>
