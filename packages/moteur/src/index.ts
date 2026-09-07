@@ -11,3 +11,4 @@ export { CataloguePolices, chargerPolicesDepuisDossier } from './rendu/polices.j
 export type { PoliceChargee } from './rendu/polices.js'
 export { calculerPlacement, insererPhoto } from './gabarit/photo.js'
 export type { Photo } from './gabarit/photo.js'
+export { apposerFiligrane } from './gabarit/filigrane.js'
