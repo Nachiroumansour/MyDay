@@ -6,6 +6,7 @@ import type { PoliceChargee } from '../src/rendu/polices.js'
 const policeFictive: PoliceChargee = {
   nom: 'Fictive',
   mesurer: (texte, taille) => texte.length * taille * 0.5,
+  tracer: (texte, x, y, taille) => `M${x} ${y}h${texte.length * taille * 0.5}`,
 }
 
 const cadre = { x: 0, y: 0, largeur: 200, hauteur: 60 }

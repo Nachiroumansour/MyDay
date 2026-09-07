@@ -2,6 +2,9 @@ import { DOMParser as ParseurXml, XMLSerializer as SerialiseurXml } from '@xmldo
 
 const SUR_NAVIGATEUR = typeof globalThis.DOMParser !== 'undefined'
 
+/** xmldom expose ses propres types de nœud, incompatibles avec ceux du DOM. */
+type NoeudXmldom = Parameters<InstanceType<typeof SerialiseurXml>['serializeToString']>[0]
+
 /**
  * Analyse une source SVG en `Document` DOM standard.
  * Le navigateur utilise son parseur natif, Node passe par xmldom : le reste du
@@ -18,7 +21,7 @@ export function serialiserDocument(doc: Document): string {
   if (SUR_NAVIGATEUR) {
     return new globalThis.XMLSerializer().serializeToString(doc)
   }
-  return new SerialiseurXml().serializeToString(doc as unknown as Node)
+  return new SerialiseurXml().serializeToString(doc as unknown as NoeudXmldom)
 }
 
 /** Tous les éléments portant `data-champ`, dans l'ordre du document. */

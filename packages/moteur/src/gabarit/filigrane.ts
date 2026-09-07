@@ -22,10 +22,17 @@ function dimensions(doc: Document): Boite {
 
 /**
  * Surimpose une trame de mentions en diagonale.
+ * `police` doit être une famille présente dans le catalogue, sans quoi la
+ * vectorisation laissera la mention en `<text>` et le serveur risque de ne pas
+ * la dessiner du tout — un aperçu sans filigrane est une fuite du catalogue.
  * Le pas est calculé sur la plus grande dimension du document pour que la
  * couverture soit complète quelles que soient les proportions du gabarit.
  */
-export function apposerFiligrane(doc: Document, mention = 'MyDay'): void {
+export function apposerFiligrane(
+  doc: Document,
+  mention = 'MyDay',
+  police = 'sans-serif',
+): void {
   const { largeur, hauteur } = dimensions(doc)
   const taille = Math.max(largeur, hauteur) / 14
   const pasX = taille * 7
@@ -42,7 +49,7 @@ export function apposerFiligrane(doc: Document, mention = 'MyDay'): void {
       texte.setAttribute('x', String(x))
       texte.setAttribute('y', String(y))
       texte.setAttribute('transform', `rotate(-30 ${x} ${y})`)
-      texte.setAttribute('font-family', 'sans-serif')
+      texte.setAttribute('font-family', police)
       texte.setAttribute('font-size', String(taille))
       texte.setAttribute('font-weight', '700')
       texte.setAttribute('fill', '#14161D')
