@@ -36,7 +36,7 @@ produisent enfin des données exploitables.
 |---|---|---|---|
 | Nature du produit | Fichier PNG/PDF livré sur WhatsApp | **Lien d'invitation vivant** + fichiers | Rétention, viralité, données, rampe vers la Phase 2 |
 | Support | App React Native + Expo | **Web-first, PWA, une seule base de code** | Le partage passe par WhatsApp : l'invité arrive forcément sur le web. Un install de 60 Mo pour un achat unique casse le tunnel |
-| Stack | NestJS + MongoDB | **Next.js (App Router) + PostgreSQL/Prisma** | Rendu serveur nécessaire pour la page invité (perf, aperçu de partage) ; le RSVP est fortement relationnel |
+| Stack | NestJS + MongoDB | **Next.js (App Router) + PostgreSQL/Drizzle** | Rendu serveur nécessaire pour la page invité (perf, aperçu de partage) ; le RSVP est fortement relationnel |
 | Paiement | Avant livraison | **Paywall au dernier moment** : création et aperçu gratuits, on paie pour publier | Effet de dotation : le client a vu son résultat avant qu'on lui demande de l'argent |
 | Découverte | Questionnaire de 3-5 questions **avant** de voir un modèle | **Galerie d'abord**, guidage visuel optionnel et permanent | Le questionnaire est une friction avant toute preuve de valeur, et il tue le coup de cœur |
 | Personnalisation | Dans l'éditeur uniquement | **Dès l'accueil** : le catalogue entier s'affiche aux prénoms du client | Guidage, conversion, et remède au « site vide » |
@@ -253,8 +253,13 @@ Réservé aux graphistes et à l'administration.
 
 ## 7. Modèle de données
 
-PostgreSQL via Prisma. Les structures variables (valeurs de champs, définitions de gabarit)
+PostgreSQL via Drizzle. Les structures variables (valeurs de champs, définitions de gabarit)
 vivent en JSON dans des colonnes dédiées.
+
+Drizzle plutôt que Prisma : la CLI Prisma traîne des dépendances vulnérables hors de portée d'un
+override, embarque des pilotes qu'on n'utilise pas, et pèse lourd en environnement sans serveur.
+Drizzle produit des migrations en SQL lisible et un client minuscule, ce qui sert directement le
+budget de performance de la page invité (§4.5).
 
 ```
 User            id, phone, name, email?, createdAt
@@ -299,13 +304,19 @@ réservations pourront se rattacher. Aucune migration ne sera nécessaire.
 ## 8. Architecture technique
 
 - **Next.js (App Router) + TypeScript + Tailwind**, déployé sur Vercel.
-- **PostgreSQL + Prisma.** Le RSVP, les cérémonies et les invités sont relationnels ; les champs
+- **PostgreSQL + Drizzle.** Le RSVP, les cérémonies et les invités sont relationnels ; les champs
   variables restent en JSON.
 - **Cloudinary** pour les médias et les fichiers produits.
 - **Rendu SVG** : dans le navigateur pour la galerie et l'aperçu (substitution de nœuds dans le
   gabarit, aucun appel serveur) ; côté serveur avec `resvg-js` puis `pdf-lib` pour le PNG 300 dpi
   et le PDF de livraison. Le rendu HD s'exécute en tâche de fond, déclenché par le webhook de
   paiement.
+- **Le texte est vectorisé en tracés avant tout rendu**, par `opentype.js`. `resvg-js` ignore les
+  polices qu'on lui passe en mémoire et n'honore pas `loadSystemFonts: false` — vérifié à
+  l'implémentation : une famille inexistante rend le même fichier que Great Vibes. Sans
+  vectorisation, les calligraphies des gabarits disparaîtraient de la carte livrée sur un serveur
+  Linux nu. La vectorisation supprime cette dépendance, rend le navigateur et le serveur identiques
+  par construction, et empêche d'extraire le texte d'un gabarit.
 - **Paiement** derrière une interface unique `PaymentProvider` — Wave et Orange Money au lancement,
   carte bancaire branchable pour la diaspora sans toucher au reste.
 - **WhatsApp Business Cloud API** pour la livraison, les relances de brouillon et les rappels.
@@ -489,9 +500,10 @@ L'ordre est dicté par le risque, pas par le confort.
 
 ## 13. Risques
 
-- **Fidélité du rendu SVG.** Certains effets Figma et Canva ne survivent pas à un export SVG
-  standard. Traité au jalon 0 ; en cas d'échec, la parade est un cahier de contraintes imposé aux
-  graphistes plutôt qu'un moteur plus complexe.
+- **Fidélité du rendu SVG.** ~~Traité au jalon 0.~~ **Levé** — le jalon 0 a effectivement trouvé le
+  défaut annoncé, sous une forme plus grave que prévu : `resvg-js` ignorait les polices fournies.
+  La vectorisation du texte (§8) le résout définitivement. Reste à surveiller que les effets Figma
+  et Canva survivent à l'export SVG, ce qui relève du cahier de contraintes imposé aux graphistes.
 - **Accès aux API marchands Wave et Orange Money.** KYC entreprise et homologation, souvent
   sous-estimés en délai. À engager en parallèle du jalon 1, pas au jalon 5.
 - **Compte Meta Business vérifié** pour WhatsApp Cloud API. Même logique : démarche lancée tôt.
