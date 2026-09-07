@@ -185,7 +185,7 @@ Attendu : ÉCHEC — le paquet n'existe pas encore.
     "@types/node": "^22.10.0",
     "@types/opentype.js": "^1.3.8",
     "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "vitest": "^4.1.11"
   }
 }
 ```
@@ -2148,7 +2148,7 @@ Attendu : ÉCHEC — l'application n'existe pas.
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
     "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "vitest": "^4.1.11"
   }
 }
 ```
@@ -2727,3 +2727,40 @@ git commit -m "Base PostgreSQL et schéma du socle, événement multi-cérémoni
 | 6 | Tableau de bord des réponses et relances | blocs 2 et 5 |
 | 7 | Liens nominatifs, livre d'or, galerie photo, cagnotte | bloc 6 |
 | 8 | Back-office des gabarits, catalogue complet, durcissement | tous |
+
+---
+
+## Écarts constatés à l'exécution
+
+Le plan a été suivi tâche par tâche. Cinq points ont dû en dévier, tous
+documentés dans les commits correspondants.
+
+| Point | Ce que prévoyait le plan | Ce qui a été fait | Pourquoi |
+|---|---|---|---|
+| **Polices** | `resvg-js` reçoit les polices en mémoire | **Le texte est vectorisé en tracés** par `opentype.js` avant tout rendu | `resvg-js` 2.6.2 ignore les `fontBuffers` et n'honore pas `loadSystemFonts: false` — vérifié : une famille inexistante rend le même fichier que Great Vibes. Sur un serveur nu, les calligraphies auraient disparu de la carte livrée |
+| **Taille de rendu** | Option `fitTo` de resvg | **La taille est écrite sur la balise racine** | `fitTo` est silencieusement ignoré dès qu'on passe des `fontBuffers` |
+| **Zone photo vide** | Non prévu | **La zone est retirée** quand le client ne met pas de photo | Un `<rect>` SVG sans `fill` se rend en noir plein : la carte affichait un carré noir. Trouvé par l'épreuve visuelle, invisible aux tests |
+| **ORM** | Prisma | **Drizzle** | La CLI Prisma traîne des dépendances vulnérables hors de portée d'un override et embarque des pilotes inutilisés. Drizzle produit du SQL lisible et un client minuscule |
+| **Next.js** | 15 | **16** | La 15 épingle un `postcss` vulnérable dans son propre arbre |
+
+Deux ajouts non prévus, tous deux justifiés par ce qu'ils ont rattrapé :
+
+- **Vitest est passé en 4.1** — les versions du plan portaient une faille haute
+  et une critique dans le serveur de développement. L'audit est à zéro et les
+  tests sont cinq fois plus rapides.
+- **`tsc --noEmit` fait désormais partie de la commande de test** — il a
+  immédiatement rattrapé deux erreurs de type que les tests ne voyaient pas.
+
+### Ce qui reste ouvert
+
+- **Quatre alertes `moderate`** subsistent, toutes la même faille `esbuild`
+  atteinte par `@esbuild-kit/esm-loader` dans `drizzle-kit`. C'est un outil de
+  migration en ligne de commande, qui ne sert jamais rien sur le réseau ; le
+  correctif proposé est de redescendre `drizzle-kit` de plusieurs versions
+  majeures. Laissé en l'état, à revoir quand `drizzle-kit` aura migré vers `tsx`.
+- **Le port PostgreSQL est 5435**, les ports 5432 à 5434 étant déjà pris sur la
+  machine de développement.
+- **Le budget de 60 Ko de JavaScript pour la page invité** n'est pas encore
+  vérifiable : l'accueil actuel charge 103 Ko, qui sont le socle React et Next.
+  La page invité du bloc 2 devra donc être construite avec une hydratation
+  strictement limitée aux îlots interactifs, comme la spec §4.5 l'exige.

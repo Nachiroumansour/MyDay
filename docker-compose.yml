@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: myday-db
+    environment:
+      POSTGRES_USER: myday
+      POSTGRES_PASSWORD: myday
+      POSTGRES_DB: myday
+    ports:
+      # 5435 : les ports 5432 à 5434 sont pris par un autre projet de la machine.
+      - '5435:5432'
+    volumes:
+      - donnees-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U myday']
+      interval: 5s
+      retries: 10
+
+volumes:
+  donnees-postgres:

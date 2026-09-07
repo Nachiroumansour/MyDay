@@ -1,0 +1,31 @@
+{
+  "name": "@myday/web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "tsc --noEmit && vitest run",
+    "verifier": "tsc --noEmit",
+    "bdd:generer": "drizzle-kit generate",
+    "bdd:migrer": "drizzle-kit migrate"
+  },
+  "dependencies": {
+    "@myday/moteur": "*",
+    "next": "^16.3.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "drizzle-orm": "^0.45.2",
+    "postgres": "^3.4.9"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.11",
+    "drizzle-kit": "^0.31.10"
+  }
+}
