@@ -88,3 +88,16 @@ export function insererPhoto(doc: Document, idChamp: string, photo: Photo): void
 
   zone.parentNode?.replaceChild(groupe, zone)
 }
+
+/**
+ * Retire une zone photo que le client n'a pas remplie.
+ *
+ * Un `<rect>` SVG sans attribut `fill` se rend en noir plein : laisser la zone
+ * en place noircirait le milieu de la carte. On la traite donc comme un champ
+ * texte vide — elle disparaît.
+ */
+export function retirerZonePhoto(doc: Document, idChamp: string): void {
+  const zone = elementsDeChamp(doc).find((e) => e.getAttribute('data-champ') === idChamp)
+  if (!zone || zone.getAttribute('data-type') !== 'image') return
+  zone.parentNode?.removeChild(zone)
+}

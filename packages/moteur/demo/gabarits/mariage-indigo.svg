@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900"
+     data-largeur-mm="127" data-hauteur-mm="190.5">
+  <rect width="600" height="900" fill="#F7F8FA"/>
+  <rect x="28" y="28" width="544" height="844" fill="none" stroke="#2C3A80" stroke-width="1.5"/>
+  <text x="300" y="150" text-anchor="middle" font-family="Marcellus" font-size="22"
+        letter-spacing="6" fill="#2C3A80">INVITATION</text>
+  <text data-champ="nom_1" data-type="texte" data-cadre="60,230,480,80" data-max-longueur="18"
+        x="300" y="250" text-anchor="middle" font-family="GreatVibes" font-size="72"
+        fill="#14161D">Awa</text>
+  <text x="300" y="310" text-anchor="middle" font-family="Marcellus" font-size="26"
+        fill="#2C3A80">&amp;</text>
+  <text data-champ="nom_2" data-type="texte" data-cadre="60,330,480,80" data-max-longueur="18"
+        x="300" y="380" text-anchor="middle" font-family="GreatVibes" font-size="72"
+        fill="#14161D">Moussa</text>
+  <rect data-champ="zone_photo" data-type="image" x="200" y="430" width="200" height="200"/>
+  <text data-champ="date" data-type="date" data-cadre="60,680,480,40"
+        x="300" y="700" text-anchor="middle" font-family="Marcellus" font-size="28"
+        fill="#14161D">14 mars 2027</text>
+  <text data-champ="lieu" data-type="texte" data-cadre="60,730,480,40" data-max-longueur="40"
+        x="300" y="750" text-anchor="middle" font-family="Marcellus" font-size="20"
+        fill="#5A6070">Dakar</text>
+</svg>

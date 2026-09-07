@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { analyserDocument, serialiserDocument } from '../src/dom.js'
-import { calculerPlacement, insererPhoto } from '../src/gabarit/photo.js'
+import { calculerPlacement, insererPhoto, retirerZonePhoto } from '../src/gabarit/photo.js'
 import { RECADRAGE_NEUTRE } from '../src/types.js'
 
 const cadre = { x: 100, y: 200, largeur: 300, hauteur: 300 }
@@ -83,5 +83,25 @@ describe('insererPhoto', () => {
     expect(() =>
       insererPhoto(doc, 'inexistant', { source: 'x', largeur: 10, hauteur: 10 }),
     ).not.toThrow()
+  })
+})
+
+describe('retirerZonePhoto', () => {
+  const gabarit = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900">
+    <rect data-champ="zone_photo" data-type="image" x="100" y="200" width="300" height="300"/>
+  </svg>`
+
+  it('retire la zone laissée vide', () => {
+    // Un rect SVG sans fill se rend en noir plein : une zone photo non
+    // remplie noircirait la carte.
+    const doc = analyserDocument(gabarit)
+    retirerZonePhoto(doc, 'zone_photo')
+    expect(serialiserDocument(doc)).not.toContain('data-champ="zone_photo"')
+  })
+
+  it('ignore un identifiant inconnu sans lever', () => {
+    const doc = analyserDocument(gabarit)
+    expect(() => retirerZonePhoto(doc, 'inexistant')).not.toThrow()
+    expect(serialiserDocument(doc)).toContain('data-champ="zone_photo"')
   })
 })
