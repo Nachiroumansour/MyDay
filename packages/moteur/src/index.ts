@@ -5,3 +5,4 @@ export { analyserGabarit, ErreurGabarit } from './gabarit/analyse.js'
 export function versionMoteur(): string {
   return '1.0.0'
 }
+export { remplirTextes } from './gabarit/remplissage.js'
