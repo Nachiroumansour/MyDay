@@ -2,8 +2,14 @@
   "name": "myday",
   "private": true,
   "type": "module",
-  "workspaces": ["packages/*", "apps/*"],
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "test": "npm test --workspaces --if-present"
+  },
+  "overrides": {
+    "postcss": "^8.5.23"
   }
 }

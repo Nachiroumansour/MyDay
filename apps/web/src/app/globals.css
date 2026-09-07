@@ -1,0 +1,58 @@
+:root {
+  --fond: #F7F8FA;
+  --surface: #FFFFFF;
+  --trait: #E3E6EC;
+  --encre: #14161D;
+  --encre-douce: #5A6070;
+
+  --mariage: #2C3A80;
+  --bapteme: #1F6B4A;
+  --anniversaire: #C9700F;
+
+  /* Prend la couleur du type d'événement en cours. */
+  --evenement: var(--encre);
+
+  --marge-laterale: 20px;
+  --largeur-maximale: 1100px;
+
+  --duree-courte: 120ms;
+  --duree-scene: 320ms;
+  --pose-carte: 60ms;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--fond);
+  color: var(--encre);
+}
+
+body {
+  font-family: var(--police-interface), system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.625;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -0.02em; text-wrap: balance; }
+h1 { font-size: 40px; line-height: 1.1; }
+h2 { font-size: 24px; line-height: 1.25; font-weight: 500; }
+p  { margin: 0; max-width: 66ch; }
+
+.legende { font-size: 14px; line-height: 1.43; color: var(--encre-douce); }
+
+:focus-visible {
+  outline: 2px solid var(--evenement);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
