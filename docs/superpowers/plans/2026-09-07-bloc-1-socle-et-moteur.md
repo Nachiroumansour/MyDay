@@ -185,7 +185,7 @@ Attendu : ÉCHEC — le paquet n'existe pas encore.
     "@types/node": "^22.10.0",
     "@types/opentype.js": "^1.3.8",
     "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "vitest": "^4.1.11"
   }
 }
 ```
@@ -2148,7 +2148,7 @@ Attendu : ÉCHEC — l'application n'existe pas.
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
     "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "vitest": "^4.1.11"
   }
 }
 ```
