@@ -30,6 +30,10 @@ export interface Brouillon {
   codeVestimentaire: string | null
   motDesHotes: string | null
   telephoneHote: string | null
+  livreOrOuvert: boolean
+  galerieOuverte: boolean
+  cagnotteOuverte: boolean
+  cagnotteMot: string | null
   statut: 'brouillon' | 'publie' | 'archive'
   gabarit: {
     id: string
@@ -109,6 +113,10 @@ export async function brouillonParSecret(secret: string): Promise<Brouillon | un
       codeVestimentaire: evenements.codeVestimentaire,
       motDesHotes: evenements.motDesHotes,
       telephoneHote: evenements.telephoneHote,
+      livreOrOuvert: evenements.livreOrOuvert,
+      galerieOuverte: evenements.galerieOuverte,
+      cagnotteOuverte: evenements.cagnotteOuverte,
+      cagnotteMot: evenements.cagnotteMot,
       statut: evenements.statut,
       gabaritId: gabarits.id,
       gabaritSlug: gabarits.slug,
@@ -143,6 +151,10 @@ export async function brouillonParSecret(secret: string): Promise<Brouillon | un
     codeVestimentaire: ligne.codeVestimentaire,
     motDesHotes: ligne.motDesHotes,
     telephoneHote: ligne.telephoneHote,
+    livreOrOuvert: ligne.livreOrOuvert,
+    galerieOuverte: ligne.galerieOuverte,
+    cagnotteOuverte: ligne.cagnotteOuverte,
+    cagnotteMot: ligne.cagnotteMot,
     statut: ligne.statut,
     gabarit: {
       id: ligne.gabaritId,

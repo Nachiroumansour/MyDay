@@ -193,6 +193,79 @@ async function parcoursCreation(page: Page): Promise<void> {
   )
 }
 
+/** Les modules ouverts aux invités : liens nominatifs, livre d'or, galerie. */
+async function parcoursModules(page: Page): Promise<void> {
+  await page.goto(`${base}/creer/anniversaire-prune?n1=Sokhna&d=2027-10-10`, {
+    waitUntil: 'domcontentloaded',
+  })
+  await page.waitForURL('**/brouillon/**')
+  const secret = page.url().split('/brouillon/')[1]!.split(/[?#]/)[0]!
+
+  // Une cérémonie, sans quoi la publication est refusée.
+  await page.goto(`${base}/brouillon/${secret}/programme`, { waitUntil: 'domcontentloaded' })
+  await page.getByLabel('Nom de la cérémonie').fill('Soirée')
+  await page.getByLabel('Date', { exact: true }).fill('2027-10-10')
+  await page.getByLabel('De', { exact: true }).fill('20:00')
+  await page.getByLabel('Lieu', { exact: true }).fill('Chez Sokhna')
+  await page.getByRole('button', { name: 'Ajouter cette cérémonie' }).click()
+  await page.waitForLoadState('networkidle')
+
+  await page.goto(`${base}/brouillon/${secret}`, { waitUntil: 'domcontentloaded' })
+  await page.getByLabel('Lieu', { exact: true }).fill('Dakar')
+  await page.getByRole('button', { name: 'Enregistrer', exact: true }).click()
+  await page.waitForLoadState('networkidle')
+
+  // Ouvrir le livre d'or et la galerie.
+  await page.goto(`${base}/brouillon/${secret}/details`, { waitUntil: 'domcontentloaded' })
+  await page.getByLabel(/livre d’or/i).check()
+  await page.getByLabel(/galerie partagée/i).check()
+  await page.getByRole('button', { name: 'Enregistrer ces réglages' }).click()
+  await page.waitForLoadState('networkidle')
+
+  // Ajouter un invité nommé.
+  await page.goto(`${base}/brouillon/${secret}/invites`, { waitUntil: 'domcontentloaded' })
+  await page.getByLabel(/Collez votre liste/).fill('Aminata Diallo, 77 123 45 67')
+  await page.getByRole('button', { name: 'Ajouter à la liste' }).click()
+  await page.waitForLoadState('networkidle')
+  verifier('l’invité nommé est ajouté', (await page.getByText('Aminata Diallo').count()) > 0)
+
+  const lienNominatif = await page.locator('a[href*="/i/"]').first().getAttribute('href')
+  verifier('un lien nominatif est produit', Boolean(lienNominatif))
+
+  // Publier.
+  await page.goto(`${base}/brouillon/${secret}/publier`, { waitUntil: 'domcontentloaded' })
+  await page.getByRole('button', { name: /^Payer avec / }).click()
+  await page.waitForURL('**/paiement/simule**')
+  await page.getByRole('button', { name: 'Payer', exact: true }).click()
+  await page.waitForURL('**/publier**')
+
+  // Le lien nominatif accueille l'invité par son nom.
+  await page.goto(`${base}${lienNominatif}`, { waitUntil: 'domcontentloaded' })
+  verifier(
+    'l’enveloppe accueille l’invité par son nom',
+    (await page.getByText('Pour Aminata Diallo').count()) > 0,
+  )
+  await page.getByRole('button', { name: 'Passer' }).click()
+  verifier(
+    'sa réponse est déjà pré-remplie',
+    (await page.getByLabel('Votre nom').inputValue()) === 'Aminata Diallo',
+  )
+
+  // Le livre d'or.
+  await page.getByLabel('Signez votre mot').fill('Moussa Fall')
+  await page.getByLabel('Votre mot pour les hôtes').fill('Très heureux pour toi !')
+  await page.getByRole('button', { name: 'Laisser mon mot' }).click()
+  await page.waitForLoadState('networkidle')
+  verifier('le mot du livre d’or est reçu', (await page.getByText('Merci pour votre mot.').count()) > 0)
+
+  // Les hôtes le retrouvent en modération.
+  await page.goto(`${base}/brouillon/${secret}/moderation`, { waitUntil: 'domcontentloaded' })
+  verifier(
+    'les hôtes retrouvent le mot en modération',
+    (await page.getByText('Très heureux pour toi !').count()) > 0,
+  )
+}
+
 async function main(): Promise<void> {
   const navigateur = await chromium.launch({ channel: 'chrome' })
   const contexte = await navigateur.newContext({
@@ -210,6 +283,7 @@ async function main(): Promise<void> {
     await parcours(page)
     await parcoursClient(page)
     await parcoursCreation(page)
+    await parcoursModules(page)
   } finally {
     await navigateur.close()
   }

@@ -234,6 +234,50 @@ html[data-enveloppe='vue'] .voile { display: none; }
 .signature { font-size: 13px; color: var(--encre-douce); }
 .signature a { color: var(--encre); text-decoration: none; border-bottom: 1px solid var(--trait); }
 
+/* ---------- Modules ouverts aux invités ---------- */
+
+.mots { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 20px; }
+
+.mot-invite {
+  padding-left: 14px;
+  border-left: 2px solid var(--trait);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mot-invite p { font-size: 16px; }
+.mot-signature { font-size: 13px; color: var(--encre-douce); }
+
+.grille-photos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.grille-photos img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border: 1px solid var(--trait);
+}
+
+@media (min-width: 560px) {
+  .grille-photos { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ---------- Salutation nominative ---------- */
+
+.pour-vous {
+  font-size: 15px;
+  color: var(--encre-douce);
+  text-align: center;
+}
+
 @media (min-width: 720px) { .hero { padding-top: 64px; } }
 
 @media (prefers-reduced-motion: reduce) {

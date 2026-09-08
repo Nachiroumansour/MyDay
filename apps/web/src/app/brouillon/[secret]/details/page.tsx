@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { brouillonParSecret } from '@/serveur/bdd/brouillons'
 import { sauverDetails } from '../actions'
+import { reglerOuvertures } from '../modules-actions'
 import styles from '../editeur.module.css'
 
 export default async function EtapeDetails({
@@ -77,6 +78,48 @@ export default async function EtapeDetails({
         <div className={styles.actions}>
           <button type="submit" className="bouton">
             Enregistrer
+          </button>
+        </div>
+      </form>
+
+      <form action={reglerOuvertures} className={styles.formulaire}>
+        <input type="hidden" name="secret" value={secret} />
+        <h2 className={styles.titre} style={{ fontSize: 20 }}>
+          Ce que vous ouvrez à vos invités
+        </h2>
+
+        <label className={styles.curseur}>
+          <input type="checkbox" name="livreOr" defaultChecked={brouillon.livreOrOuvert} />
+          Un livre d’or — vos invités vous laissent un mot
+        </label>
+
+        <label className={styles.curseur}>
+          <input type="checkbox" name="galerie" defaultChecked={brouillon.galerieOuverte} />
+          Une galerie partagée — ils déposent leurs photos
+        </label>
+
+        <label className={styles.curseur}>
+          <input type="checkbox" name="cagnotte" defaultChecked={brouillon.cagnotteOuverte} />
+          Une cagnotte — ils participent par Wave ou Orange Money
+        </label>
+
+        <div className={styles.champ}>
+          <label className="etiquette-champ" htmlFor="cagnotteMot">
+            Un mot sur la cagnotte
+          </label>
+          <textarea
+            id="cagnotteMot"
+            name="cagnotteMot"
+            className="saisie"
+            rows={2}
+            defaultValue={brouillon.cagnotteMot ?? ''}
+            placeholder="Votre présence nous suffit ; pour ceux qui insistent, voici de quoi participer."
+          />
+        </div>
+
+        <div className={styles.actions}>
+          <button type="submit" className="bouton-contour">
+            Enregistrer ces réglages
           </button>
         </div>
       </form>

@@ -26,6 +26,10 @@ export interface EvenementVue {
   motDesHotes: string | null
   photoUrl: string | null
   telephoneHote: string | null
+  livreOrOuvert: boolean
+  galerieOuverte: boolean
+  cagnotteOuverte: boolean
+  cagnotteMot: string | null
   ceremonies: CeremonieVue[]
   gabarit: { sourceSvg: string; nom: string }
   valeursChamps: Record<string, string>
@@ -47,6 +51,10 @@ export async function evenementPublie(slug: string): Promise<EvenementVue | unde
       motDesHotes: evenements.motDesHotes,
       photoUrl: evenements.photoUrl,
       telephoneHote: evenements.telephoneHote,
+      livreOrOuvert: evenements.livreOrOuvert,
+      galerieOuverte: evenements.galerieOuverte,
+      cagnotteOuverte: evenements.cagnotteOuverte,
+      cagnotteMot: evenements.cagnotteMot,
       valeursChamps: evenements.valeursChamps,
       recadrage: evenements.recadrage,
       gabaritSvg: gabarits.sourceSvg,
@@ -74,6 +82,10 @@ export async function evenementPublie(slug: string): Promise<EvenementVue | unde
     motDesHotes: ligne.motDesHotes,
     photoUrl: ligne.photoUrl,
     telephoneHote: ligne.telephoneHote,
+    livreOrOuvert: ligne.livreOrOuvert,
+    galerieOuverte: ligne.galerieOuverte,
+    cagnotteOuverte: ligne.cagnotteOuverte,
+    cagnotteMot: ligne.cagnotteMot,
     ceremonies: programme,
     gabarit: { sourceSvg: ligne.gabaritSvg, nom: ligne.gabaritNom },
     valeursChamps: (ligne.valeursChamps ?? {}) as Record<string, string>,

@@ -34,9 +34,11 @@ interface Props {
   titre: string
   initiales: string
   couleur: string
+  /** Nom de l'invité, quand il ouvre son lien nominatif. */
+  invite?: string
 }
 
-export default function Enveloppe({ slug, titre, initiales, couleur }: Props) {
+export default function Enveloppe({ slug, titre, initiales, couleur, invite }: Props) {
   return (
     <div
       id="enveloppe"
@@ -50,7 +52,7 @@ export default function Enveloppe({ slug, titre, initiales, couleur }: Props) {
         Passer
       </button>
 
-      <p className="voile-intro">Une invitation pour vous</p>
+      <p className="voile-intro">{invite ? `Pour ${invite}` : 'Une invitation pour vous'}</p>
       <p className="voile-noms">{titre}</p>
 
       <button type="button" className="pli" data-role="ouvrir" aria-label="Ouvrir l’invitation">
