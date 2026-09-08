@@ -10,7 +10,6 @@ import {
   enregistrerDetails,
   enregistrerPhoto,
   modifierCeremonie,
-  publierBrouillon,
   retirerCeremonie,
 } from '@/serveur/bdd/brouillons'
 import { enregistrerMedia, ErreurMedia } from '@/serveur/stockage'
@@ -129,16 +128,3 @@ export async function sauverDetails(donnees: FormData): Promise<void> {
   revalidatePath(`/brouillon/${secret}/details`)
 }
 
-/**
- * Publication. Elle sera placée derrière le paiement au bloc 5 ; pour l'instant
- * elle est ouverte, ce que la page annonce clairement.
- */
-export async function publier(donnees: FormData): Promise<void> {
-  const secret = texte(donnees, 'secret')
-  const brouillon = await brouillonParSecret(secret)
-  if (!brouillon || brouillon.ceremonies.length === 0) {
-    redirect(`/brouillon/${secret}/programme?erreur=sans-ceremonie`)
-  }
-  await publierBrouillon(secret)
-  redirect(`/brouillon/${secret}/publier?publie=1`)
-}

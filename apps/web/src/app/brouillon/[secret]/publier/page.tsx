@@ -1,14 +1,13 @@
 import { notFound } from 'next/navigation'
 import { formaterDateLongue } from '@/lib/dates'
-import { manquants } from '@/lib/redaction'
-import { libelleChamp } from '@/lib/redaction'
+import { libelleChamp, manquants } from '@/lib/redaction'
 import { brouillonParSecret } from '@/serveur/bdd/brouillons'
-import { publier } from '../actions'
+import { dernierPaiement, paiementReussiPour } from '@/serveur/bdd/paiements'
+import { bdd } from '@/serveur/bdd/client'
+import { evenements } from '@/serveur/bdd/schema'
+import { fournisseursDisponibles, montantAffichable } from '@/serveur/paiement'
+import { eq } from 'drizzle-orm'
 import styles from '../editeur.module.css'
-
-function formaterPrix(montant: number): string {
-  return `${montant.toLocaleString('fr-FR')} F CFA`
-}
 
 export default async function EtapePublier({
   params,
@@ -22,18 +21,24 @@ export default async function EtapePublier({
   const brouillon = await brouillonParSecret(secret)
   if (!brouillon) notFound()
 
-  const publie = brouillon.statut === 'publie' || requete.publie === '1'
-  const aRemplir = manquants(brouillon.champs, brouillon.valeursChamps)
-  const sansCeremonie = brouillon.ceremonies.length === 0
-  const lien = `/e/${brouillon.slug}`
+  const paye = await paiementReussiPour(brouillon.id)
+  const enLigne = brouillon.statut === 'publie' && paye
 
-  if (publie) {
+  if (enLigne) {
+    const [fichiers] = await bdd
+      .select({ png: evenements.fichierPng, pdf: evenements.fichierPdf })
+      .from(evenements)
+      .where(eq(evenements.id, brouillon.id))
+      .limit(1)
+
+    const lien = `/e/${brouillon.slug}`
+
     return (
       <div className={styles.formulaire}>
         <h1 className={styles.titre}>C’est en ligne.</h1>
         <p className={styles.introduction}>
-          Votre invitation est publiée. Partagez ce lien dans vos groupes WhatsApp : vos
-          invités l’ouvriront sans rien installer.
+          Partagez ce lien dans vos groupes WhatsApp : vos invités l’ouvriront sans rien
+          installer.
         </p>
 
         <p className={styles.rappel}>{lien}</p>
@@ -54,6 +59,26 @@ export default async function EtapePublier({
           </a>
         </div>
 
+        {(fichiers?.png || fichiers?.pdf) && (
+          <>
+            <h2 className={styles.titre} style={{ fontSize: 20 }}>
+              Vos fichiers
+            </h2>
+            <div className={styles.actions}>
+              {fichiers.png && (
+                <a className="bouton-contour" href={fichiers.png} download>
+                  Carte en haute définition
+                </a>
+              )}
+              {fichiers.pdf && (
+                <a className="bouton-contour" href={fichiers.pdf} download>
+                  PDF imprimable
+                </a>
+              )}
+            </div>
+          </>
+        )}
+
         <p className={styles.compteur}>
           Gardez cette adresse pour revenir modifier votre invitation :{' '}
           <code>/brouillon/{secret}</code>
@@ -62,7 +87,12 @@ export default async function EtapePublier({
     )
   }
 
+  const aRemplir = manquants(brouillon.champs, brouillon.valeursChamps)
+  const sansCeremonie = brouillon.ceremonies.length === 0
   const pret = aRemplir.length === 0 && !sansCeremonie
+  const moyens = fournisseursDisponibles()
+  const attente = await dernierPaiement(brouillon.id)
+  const erreur = typeof requete.erreur === 'string' ? requete.erreur : undefined
 
   return (
     <div className={styles.formulaire}>
@@ -109,22 +139,58 @@ export default async function EtapePublier({
         </p>
       )}
 
+      {requete.retour === 'echec' && (
+        <p className={styles.avertissement}>
+          Le paiement n’a pas abouti. Rien ne vous a été débité — vous pouvez réessayer.
+        </p>
+      )}
+      {erreur && <p className={styles.avertissement}>{erreur}</p>}
+      {requete.retour === 'succes' && !paye && (
+        <p className={styles.rappel}>
+          Votre paiement est en cours de confirmation. Rechargez cette page dans un instant.
+        </p>
+      )}
+
       <p className={styles.rappel}>
-        {formaterPrix(brouillon.gabarit.prix)} — le lien d’invitation, le suivi des réponses,
-        et vos fichiers en haute définition.
+        {montantAffichable(brouillon.gabarit.prix)} — le lien d’invitation, le suivi des
+        réponses, et vos fichiers en haute définition. Vous n’avez rien payé jusqu’ici.
       </p>
 
-      <form action={publier}>
-        <input type="hidden" name="secret" value={secret} />
-        <button type="submit" className="bouton" disabled={!pret}>
-          Publier mon invitation
-        </button>
-      </form>
-
-      <p className={styles.compteur}>
-        Le paiement Wave et Orange Money n’est pas encore branché : la publication est
-        ouverte le temps du développement.
-      </p>
+      {pret ? (
+        <div className={styles.formulaire}>
+          <h2 className={styles.titre} style={{ fontSize: 20 }}>
+            Comment souhaitez-vous payer ?
+          </h2>
+          {moyens.length === 0 ? (
+            <p className={styles.avertissement}>
+              Aucun moyen de paiement n’est disponible pour le moment.
+            </p>
+          ) : (
+            <div className={styles.actions}>
+              {moyens.map((moyen) => (
+                <form key={moyen.nom} method="post" action={`/brouillon/${secret}/payer`}>
+                  <input type="hidden" name="fournisseur" value={moyen.nom} />
+                  <button type="submit" className="bouton">
+                    Payer avec {moyen.libelle}
+                  </button>
+                </form>
+              ))}
+            </div>
+          )}
+          {attente?.statut === 'en_attente' && attente.urlPaiement && (
+            <p className={styles.compteur}>
+              Un paiement est déjà ouvert.{' '}
+              <a className="lien-sobre" href={attente.urlPaiement}>
+                Le reprendre
+              </a>
+            </p>
+          )}
+        </div>
+      ) : (
+        <p className={styles.compteur}>
+          Complétez ce qui manque ci-dessus pour pouvoir publier.
+        </p>
+      )}
     </div>
   )
 }

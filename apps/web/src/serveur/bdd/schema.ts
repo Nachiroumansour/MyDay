@@ -27,6 +27,25 @@ export const statutGabaritEnum = pgEnum('statut_gabarit', ['brouillon', 'actif',
 
 export const statutEvenementEnum = pgEnum('statut_evenement', ['brouillon', 'publie', 'archive'])
 
+export const statutPaiementEnum = pgEnum('statut_paiement', [
+  'en_attente',
+  'reussi',
+  'echoue',
+  'annule',
+])
+
+export const fournisseurEnum = pgEnum('fournisseur_paiement', [
+  'wave',
+  'orange_money',
+  'simule',
+])
+
+export const statutLivraisonEnum = pgEnum('statut_livraison', [
+  'en_attente',
+  'envoyee',
+  'echouee',
+])
+
 export const graphistes = pgTable('graphistes', {
   id: identifiant(),
   nom: text('nom').notNull(),
@@ -83,10 +102,52 @@ export const evenements = pgTable(
     statut: statutEvenementEnum('statut').notNull().default('brouillon'),
     publieLe: timestamp('publie_le', { withTimezone: true }),
     telephoneHote: text('telephone_hote'),
+    /** Fichiers livrés, produits une fois le paiement confirmé. */
+    fichierPng: text('fichier_png'),
+    fichierPdf: text('fichier_pdf'),
     creeLe: timestamp('cree_le', { withTimezone: true }).notNull().defaultNow(),
     modifieLe: timestamp('modifie_le', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [index('evenements_statut').on(table.statut)],
+)
+
+export const paiements = pgTable(
+  'paiements',
+  {
+    id: identifiant(),
+    evenementId: text('evenement_id')
+      .notNull()
+      .references(() => evenements.id, { onDelete: 'cascade' }),
+    fournisseur: fournisseurEnum('fournisseur').notNull(),
+    /** Référence de la session chez le fournisseur : la clé d'idempotence. */
+    reference: text('reference').notNull().unique(),
+    montant: integer('montant').notNull(),
+    devise: text('devise').notNull().default('XOF'),
+    statut: statutPaiementEnum('statut').notNull().default('en_attente'),
+    urlPaiement: text('url_paiement'),
+    /** Charge utile du fournisseur, gardée telle quelle pour les litiges. */
+    charge: jsonb('charge'),
+    creeLe: timestamp('cree_le', { withTimezone: true }).notNull().defaultNow(),
+    confirmeLe: timestamp('confirme_le', { withTimezone: true }),
+  },
+  (table) => [index('paiements_evenement').on(table.evenementId, table.statut)],
+)
+
+export const livraisons = pgTable(
+  'livraisons',
+  {
+    id: identifiant(),
+    evenementId: text('evenement_id')
+      .notNull()
+      .references(() => evenements.id, { onDelete: 'cascade' }),
+    canal: text('canal').notNull(),
+    destinataire: text('destinataire').notNull(),
+    statut: statutLivraisonEnum('statut').notNull().default('en_attente'),
+    erreur: text('erreur'),
+    creeLe: timestamp('cree_le', { withTimezone: true }).notNull().defaultNow(),
+    envoyeeLe: timestamp('envoyee_le', { withTimezone: true }),
+  },
+  (table) => [index('livraisons_evenement').on(table.evenementId)],
 )
 
 export const ceremonies = pgTable(

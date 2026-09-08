@@ -148,11 +148,25 @@ async function parcoursCreation(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'Enregistrer', exact: true }).click()
   await page.waitForLoadState('networkidle')
 
-  // La publication.
+  // Le paiement, puis la publication.
   await page.goto(`${base}/brouillon/${secret}/publier`, { waitUntil: 'domcontentloaded' })
-  await page.getByRole('button', { name: 'Publier mon invitation' }).click()
+  verifier(
+    'rien n’est publié avant paiement',
+    (await page.getByText('C’est en ligne.').count()) === 0,
+  )
+
+  await page.getByRole('button', { name: /^Payer avec / }).click()
+  await page.waitForURL('**/paiement/simule**')
+  verifier('le client est envoyé vers le paiement', page.url().includes('/paiement/simule'))
+
+  await page.getByRole('button', { name: 'Payer', exact: true }).click()
+  await page.waitForURL('**/publier**')
   await page.waitForLoadState('networkidle')
-  verifier('l’invitation est publiée', (await page.getByText('C’est en ligne.').count()) > 0)
+  verifier('l’invitation est publiée après paiement', (await page.getByText('C’est en ligne.').count()) > 0)
+  verifier(
+    'les fichiers haute définition sont livrés',
+    (await page.getByRole('link', { name: 'PDF imprimable' }).count()) === 1,
+  )
 
   const lien = await page.locator('a[href^="/e/"]').first().getAttribute('href')
   verifier('un lien d’invitation est donné', Boolean(lien))
