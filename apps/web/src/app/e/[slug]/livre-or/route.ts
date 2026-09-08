@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { identifiantAppelant, limiteurMessages } from '@/serveur/limitation'
 import { evenementPublie } from '@/serveur/bdd/evenements'
 import { deposerMessage } from '@/serveur/bdd/modules'
 
@@ -7,6 +8,13 @@ export async function POST(
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params
+
+  // Un envoi en rafale sur un formulaire public est freiné avant d'atteindre
+  // la base.
+  if (!limiteurMessages.autorise(`${slug}:${identifiantAppelant(requete)}`)) {
+    redirect(`/e/${slug}?trop=1#livre-or`)
+  }
+
   const evenement = await evenementPublie(slug)
   if (!evenement?.livreOrOuvert) redirect(`/e/${slug}`)
 

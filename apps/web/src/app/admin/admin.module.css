@@ -1,0 +1,43 @@
+.coquille { padding: 32px 0 72px; display: flex; flex-direction: column; gap: 28px; }
+
+.tete { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+.titre { font-size: 28px; letter-spacing: -0.025em; }
+.introduction { color: var(--encre-douce); font-size: 15px; max-width: 60ch; }
+
+.onglets { display: flex; gap: 4px; border-bottom: 1px solid var(--trait); overflow-x: auto; }
+.onglet {
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--encre-douce);
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.ongletActif { composes: onglet; color: var(--encre); border-bottom-color: var(--encre); }
+
+.tableau { width: 100%; overflow-x: auto; }
+.tableau table { border-collapse: collapse; width: 100%; font-size: 15px; min-width: 700px; }
+.tableau th, .tableau td {
+  text-align: left;
+  padding: 12px 16px 12px 0;
+  border-bottom: 1px solid var(--trait);
+  vertical-align: top;
+}
+.tableau th { font-size: 13px; font-weight: 500; color: var(--encre-douce); }
+
+.pastille { display: inline-block; padding: 3px 9px; border: 1px solid var(--trait); font-size: 12px; }
+.pastilleActive { composes: pastille; border-color: var(--evenement); color: var(--evenement); }
+
+.formulaire { display: flex; flex-direction: column; gap: 20px; max-width: 560px; }
+.champ { display: flex; flex-direction: column; gap: 6px; }
+.aide { font-size: 13px; color: var(--encre-douce); }
+.erreur { font-size: 14px; color: #b3261e; padding-left: 14px; border-left: 2px solid #b3261e; }
+.succes { font-size: 14px; padding-left: 14px; border-left: 2px solid var(--evenement); }
+
+.apercuDepot { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
+.apercuDepot img { width: 240px; border: 1px solid var(--trait); }
+
+.actionsLigne { display: flex; gap: 10px; flex-wrap: wrap; }
+.lienAction { appearance: none; background: none; border: none; padding: 0; font: inherit; font-size: 14px; color: var(--encre); cursor: pointer; text-decoration: underline; }
