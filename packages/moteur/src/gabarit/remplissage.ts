@@ -1,5 +1,5 @@
-import { elementsDeChamp } from '../dom.js'
-import type { ValeursChamps } from '../types.js'
+import { elementsDeChamp } from '../dom'
+import type { ValeursChamps } from '../types'
 
 function premierTspan(element: Element): Element | undefined {
   const tspans = element.getElementsByTagName('tspan')

@@ -1,5 +1,5 @@
 import { PDFDocument } from 'pdf-lib'
-import type { DimensionsPhysiques } from './png.js'
+import type { DimensionsPhysiques } from './png'
 
 const POINTS_PAR_MM = 72 / 25.4
 

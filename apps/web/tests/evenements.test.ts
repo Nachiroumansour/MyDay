@@ -4,7 +4,7 @@ import {
   estTypeEvenement,
   libelleEvenement,
   TYPES_EVENEMENT,
-} from '../src/lib/evenements.js'
+} from '../src/lib/evenements'
 
 describe('types d’événement', () => {
   it('en compte exactement trois', () => {

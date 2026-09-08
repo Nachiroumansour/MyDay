@@ -1,8 +1,8 @@
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { analyserDocument, serialiserDocument } from '../src/dom.js'
-import { vectoriserTextes } from '../src/gabarit/vectorisation.js'
-import { chargerPolicesDepuisDossier } from '../src/rendu/polices.js'
+import { analyserDocument, serialiserDocument } from '../src/dom'
+import { vectoriserTextes } from '../src/gabarit/vectorisation'
+import { chargerPolicesDepuisDossier } from '../src/rendu/polices'
 
 const dossier = fileURLToPath(new URL('../demo/polices', import.meta.url))
 const catalogue = await chargerPolicesDepuisDossier(dossier)

@@ -1,0 +1,29 @@
+.barre {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--trait);
+  width: 100%;
+  max-width: 720px;
+}
+
+.compacte {
+  composes: barre;
+  padding: 16px;
+}
+
+.champ {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+@media (min-width: 620px) {
+  .barre {
+    grid-template-columns: 1fr 1fr 1fr auto;
+    align-items: end;
+  }
+  .barre button { height: 46px; }
+}

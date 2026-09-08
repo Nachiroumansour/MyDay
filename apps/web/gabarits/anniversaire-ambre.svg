@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900"
+     data-largeur-mm="127" data-hauteur-mm="190.5">
+  <rect width="600" height="900" fill="#F7F8FA"/>
+  <rect x="0" y="0" width="600" height="10" fill="#C9700F"/>
+  <rect x="0" y="890" width="600" height="10" fill="#C9700F"/>
+  <text x="300" y="190" text-anchor="middle" font-family="Marcellus" font-size="20"
+        letter-spacing="7" fill="#C9700F">ANNIVERSAIRE</text>
+  <text data-champ="nom_1" data-type="texte" data-cadre="60,280,480,110" data-max-longueur="18"
+        x="300" y="330" text-anchor="middle" font-family="GreatVibes" font-size="84"
+        fill="#14161D">Fatou</text>
+  <rect data-champ="zone_photo" data-type="image" x="185" y="420" width="230" height="230"/>
+  <text data-champ="date" data-type="date" data-cadre="60,700,480,42"
+        x="300" y="720" text-anchor="middle" font-family="Marcellus" font-size="30"
+        fill="#14161D">14 mars 2027</text>
+  <text data-champ="lieu" data-type="texte" data-cadre="60,750,480,40" data-max-longueur="40"
+        x="300" y="770" text-anchor="middle" font-family="Marcellus" font-size="20"
+        fill="#5A6070">Dakar</text>
+</svg>

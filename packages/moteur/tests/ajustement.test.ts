@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { ajusterAuCadre, PLANCHER_ECHELLE } from '../src/gabarit/ajustement.js'
-import type { PoliceChargee } from '../src/rendu/polices.js'
+import { ajusterAuCadre, PLANCHER_ECHELLE } from '../src/gabarit/ajustement'
+import type { PoliceChargee } from '../src/rendu/polices'
 
 /** Police fictive : chaque caractère fait exactement une demi-taille de large. */
 const policeFictive: PoliceChargee = {

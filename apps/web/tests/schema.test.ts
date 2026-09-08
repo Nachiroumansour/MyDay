@@ -8,8 +8,8 @@ import {
   invites,
   reponses,
   typeEvenementEnum,
-} from '../src/serveur/bdd/schema.js'
-import { TYPES_EVENEMENT } from '../src/lib/evenements.js'
+} from '../src/serveur/bdd/schema'
+import { TYPES_EVENEMENT } from '../src/lib/evenements'
 
 describe('schéma de la base', () => {
   it('déclare les six tables du bloc 1', () => {

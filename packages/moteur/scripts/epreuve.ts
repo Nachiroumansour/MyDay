@@ -1,10 +1,10 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
-import { analyserDocument } from '../src/dom.js'
-import { composerCarte } from '../src/composition.js'
-import { dimensionsPhysiques, pixelsPourDpi, rendrePng, DPI_LIVRAISON } from '../src/rendu/png.js'
-import { rendrePdf } from '../src/rendu/pdf.js'
-import { chargerPolicesDepuisDossier } from '../src/rendu/polices.js'
+import { analyserDocument } from '../src/dom'
+import { composerCarte } from '../src/composition'
+import { dimensionsPhysiques, pixelsPourDpi, rendrePng, DPI_LIVRAISON } from '../src/rendu/png'
+import { rendrePdf } from '../src/rendu/pdf'
+import { chargerPolicesDepuisDossier } from '../src/rendu/polices'
 
 const racine = fileURLToPath(new URL('..', import.meta.url))
 const sortie = `${racine}epreuve`

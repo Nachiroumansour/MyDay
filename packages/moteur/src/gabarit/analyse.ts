@@ -1,5 +1,5 @@
-import { elementsDeChamp } from '../dom.js'
-import type { Cadre, ChampGabarit, TypeChamp } from '../types.js'
+import { elementsDeChamp } from '../dom'
+import type { Cadre, ChampGabarit, TypeChamp } from '../types'
 
 export class ErreurGabarit extends Error {
   constructor(message: string) {

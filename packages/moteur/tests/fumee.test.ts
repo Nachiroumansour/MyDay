@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { versionMoteur } from '../src/index.js'
+import { versionMoteur } from '../src/index'
 
 describe('paquet moteur', () => {
   it('expose sa version', () => {

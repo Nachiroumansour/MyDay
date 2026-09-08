@@ -10,22 +10,30 @@
     "test": "tsc --noEmit && vitest run",
     "verifier": "tsc --noEmit",
     "bdd:generer": "drizzle-kit generate",
-    "bdd:migrer": "drizzle-kit migrate"
+    "bdd:migrer": "drizzle-kit migrate",
+    "bdd:semer": "tsx scripts/semer.ts",
+    "capturer": "tsx scripts/capturer.ts",
+    "verifier:parcours": "tsx scripts/verifier-parcours.ts",
+    "mesurer": "tsx scripts/mesurer-poids.ts"
   },
   "dependencies": {
     "@myday/moteur": "*",
-    "next": "^16.3.4",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
     "drizzle-orm": "^0.45.2",
-    "postgres": "^3.4.9"
+    "next": "^16.3.4",
+    "postgres": "^3.4.9",
+    "preact": "^10.29.8",
+    "preact-render-to-string": "^6.7.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
+    "drizzle-kit": "^0.31.10",
+    "playwright": "^1.63.0",
+    "tsx": "^4.19.2",
     "typescript": "^5.7.2",
-    "vitest": "^4.1.11",
-    "drizzle-kit": "^0.31.10"
+    "vitest": "^4.1.11"
   }
 }

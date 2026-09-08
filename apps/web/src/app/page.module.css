@@ -1,0 +1,158 @@
+.hero {
+  padding: 56px 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.titre {
+  font-size: clamp(34px, 9vw, 52px);
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+}
+
+.sous-titre {
+  font-size: 17px;
+  color: var(--encre-douce);
+  max-width: 46ch;
+}
+
+/* Trois vraies cartes du catalogue, inclinées comme des cartons qu'on tient
+   en main. Elles se posent en séquence à l'ouverture. */
+.cartes {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  max-width: 660px;
+}
+
+.carte {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-decoration: none;
+  animation: poser 460ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.carte:nth-child(1) { animation-delay: 0ms; }
+.carte:nth-child(2) { animation-delay: 60ms; }
+.carte:nth-child(3) { animation-delay: 120ms; }
+
+.carte img {
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.carte:nth-child(1) img { transform: rotate(-2.2deg); }
+.carte:nth-child(2) img { transform: rotate(1deg); }
+.carte:nth-child(3) img { transform: rotate(2.6deg); }
+
+.carte:hover img,
+.carte:focus-visible img { transform: rotate(0deg) translateY(-4px); }
+
+.nom-type {
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+}
+
+@keyframes poser {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carte { animation: none; }
+  .carte img { transition: none; }
+}
+
+/* ---------- Sections ---------- */
+
+.section {
+  padding: 56px 0;
+  border-top: 1px solid var(--trait);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.titre-section {
+  font-size: 26px;
+  letter-spacing: -0.025em;
+}
+
+.introduction {
+  color: var(--encre-douce);
+  max-width: 58ch;
+}
+
+/* ---------- Collections ---------- */
+
+.collections {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  align-items: stretch;
+}
+
+.collections > li { display: flex; }
+
+.collection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px;
+  border: 1px solid var(--trait);
+  text-decoration: none;
+  transition: border-color var(--duree-courte);
+}
+
+.collection:hover { border-color: var(--evenement); }
+
+.collection strong { font-size: 16px; font-weight: 600; }
+.collection span { font-size: 14px; color: var(--encre-douce); }
+
+/* ---------- Créateurs ---------- */
+
+.createurs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 28px;
+}
+
+.createur { display: flex; flex-direction: column; gap: 6px; }
+.createur strong { font-size: 17px; font-weight: 600; }
+.createur p { font-size: 15px; color: var(--encre-douce); }
+.createur span { font-size: 13px; color: var(--encre-douce); }
+
+/* ---------- Étapes ---------- */
+
+.etapes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 28px;
+  counter-reset: etape;
+}
+
+.etape {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 16px;
+  border-left: 2px solid var(--trait);
+}
+
+.etape strong { font-size: 17px; font-weight: 600; }
+.etape p { font-size: 15px; color: var(--encre-douce); }

@@ -16,3 +16,4 @@ npm-debug.log*
 coverage/
 .vercel/
 epreuve/
+captures/

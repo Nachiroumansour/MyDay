@@ -1,5 +1,5 @@
 import { Resvg } from '@resvg/resvg-js'
-import { analyserDocument, serialiserDocument } from '../dom.js'
+import { analyserDocument, serialiserDocument } from '../dom'
 
 /** Résolution d'impression exigée par la spec (critère d'acceptation 7). */
 export const DPI_LIVRAISON = 300
