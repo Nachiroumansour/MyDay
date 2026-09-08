@@ -450,16 +450,86 @@ html[data-enveloppe='vue'] .voile { display: none; }
 }
 
 .compteur {
-  display: inline-flex;
-  align-items: baseline;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 10px;
-  padding: 10px 20px;
-  border-radius: var(--rayon-plein);
-  background: rgba(255,255,255,.14);
 }
 
-.compteur-valeur { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.grille-compteur {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.unite {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 12px 12px 10px;
+  border-radius: var(--rayon);
+  background: rgba(255,255,255,.15);
+  min-width: 64px;
+}
+
+.unite-nom {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.72);
+}
+
+/* Chaque chiffre est une fenêtre d'une case de haut, devant sa colonne. */
+.chiffres {
+  --case: 1.16em;
+  display: flex;
+  gap: 1px;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: var(--case);
+  font-variant-numeric: tabular-nums;
+}
+
+.chiffre {
+  display: block;
+  width: .58em;
+  height: var(--case);
+  overflow: hidden;
+}
+
+.rouleau {
+  display: block;
+  transform: translateY(calc(var(--n, 1) * var(--case) * -1));
+  transition: transform 520ms cubic-bezier(.2,.85,.25,1);
+}
+
+.rouleau > span { display: block; height: var(--case); text-align: center; }
+
+/* Le saut de rattrapage, du 9 de tête au 9 de queue, ne doit pas se voir. */
+.chiffre.sans-glisse .rouleau { transition: none; }
+
+.compteur-arrive {
+  display: none;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 24px;
+  font-weight: 600;
+  padding: 14px 22px;
+  border-radius: var(--rayon-plein);
+  background: rgba(255,255,255,.15);
+}
+
+.grille-compteur[data-etat='arrive'] .unite { display: none; }
+.grille-compteur[data-etat='arrive'] .compteur-arrive { display: block; }
+
 .compteur-legende { font-size: 14px; color: rgba(255,255,255,.82); }
+
+@media (max-width: 380px) {
+  .chiffres { font-size: 25px; }
+  .unite { min-width: 54px; padding: 10px 8px 8px; }
+}
 
 /* ---------- Sections ---------- */
 
@@ -838,14 +908,6 @@ html[data-enveloppe='vue'] .voile { display: none; }
   to   { left: 130%; }
 }
 
-.compteur-valeur { animation: battement 3.4s ease-in-out 1.6s infinite; }
-
-/* Le compte à rebours bat doucement : il rappelle que le jour approche. */
-@keyframes battement {
-  0%, 92%, 100% { transform: scale(1); }
-  96%           { transform: scale(1.06); }
-}
-
 /* Les sections se redressent au défilement, sans une ligne de JavaScript.
    Le mouvement ne touche jamais l'opacité : une invitation dont le programme
    attendrait un défilement pour devenir lisible serait une invitation ratée.
@@ -900,7 +962,6 @@ html[data-enveloppe='vue'] .voile { display: none; }
   .hero-noms,
   .carte-cadre,
   .compteur,
-  .compteur-valeur,
   .carte-cadre::after,
   .voile[data-etat='ouverture'] .pli-carte,
   .voile[data-etat='ouverture'] .pli-rabat,
@@ -909,6 +970,7 @@ html[data-enveloppe='vue'] .voile { display: none; }
   }
 
   .ciel { display: none; }
+  .rouleau { transition: none; }
 
   .ceremonie, .ceremonie-pastille, .action, .whatsapp, .partage, .mot-carte {
     transition: none;

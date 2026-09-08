@@ -3,16 +3,12 @@
 import { render } from 'preact-render-to-string'
 import Enveloppe, { SCRIPT_ENVELOPPE, scriptMemoire } from './enveloppe'
 import { Ambiance } from './ambiance'
+import CompteARebours, { SCRIPT_COMPTEUR } from './compteur'
 import Rsvp, { Merci } from './rsvp'
 import { Cagnotte, Galerie, LivreOr } from './modules'
 import { IconeAnneau, IconeColombe, IconeCoupe, IconeLieu, IconeTenue } from './icones'
 import { STYLES } from './styles'
-import {
-  formaterDateLongue,
-  formaterPlage,
-  joursRestants,
-  libelleCompteARebours,
-} from '@/lib/dates'
+import { detaillerRestant, formaterDateLongue, formaterPlage } from '@/lib/dates'
 import { lienGoogleMaps } from '@/lib/itineraire'
 import type { CeremonieVue, EvenementVue } from '@/serveur/bdd/evenements'
 import type { MessageVue, ParticipationVue, PhotoVue } from '@/serveur/bdd/modules'
@@ -118,7 +114,7 @@ function Corps({
 }: ContexteInvitation) {
   const slug = evenement.slug
   const premiere = evenement.ceremonies[0]
-  const compteur = premiere ? libelleCompteARebours(joursRestants(premiere.debuteLe)) : ''
+  const restant = premiere ? detaillerRestant(premiere.debuteLe) : null
   const partage = `Une invitation pour vous — ${evenement.titre}`
   const type = evenement.typeEvenement
 
@@ -152,11 +148,12 @@ function Corps({
             />
           </span>
 
-          {compteur && premiere && (
-            <p className="compteur">
-              <span className="compteur-valeur">{compteur}</span>
-              <span className="compteur-legende">{formaterDateLongue(premiere.debuteLe)}</span>
-            </p>
+          {restant && premiere && (
+            <CompteARebours
+              restant={restant}
+              cible={premiere.debuteLe}
+              legende={formaterDateLongue(premiere.debuteLe)}
+            />
           )}
         </header>
 
@@ -326,6 +323,7 @@ export function documentInvitation(contexte: ContexteInvitation): string {
       <body>
         <Corps {...contexte} />
         <script dangerouslySetInnerHTML={{ __html: SCRIPT_ENVELOPPE }} />
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_COMPTEUR }} />
       </body>
     </html>,
   )

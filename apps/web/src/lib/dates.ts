@@ -72,3 +72,35 @@ export function libelleCompteARebours(jours: number): string {
   if (jours === 1) return 'C’est demain'
   return `J-${jours}`
 }
+
+export interface RestantDetaille {
+  jours: number
+  heures: number
+  minutes: number
+  secondes: number
+}
+
+/**
+ * Le temps qui reste, décomposé, pour un compte à rebours qui bat.
+ *
+ * Contrairement à `joursRestants`, qui compte les jours du calendrier, celui-ci
+ * compte la durée réelle : un compteur qui affiche les secondes ne peut pas
+ * s'appuyer sur des minuits. Rend `null` quand la date est passée — il n'y a
+ * alors plus rien à décompter.
+ */
+export function detaillerRestant(
+  cible: Date,
+  maintenant: Date = new Date(),
+): RestantDetaille | null {
+  let reste = cible.getTime() - maintenant.getTime()
+  if (reste <= 0) return null
+
+  const jours = Math.floor(reste / JOUR_EN_MS)
+  reste -= jours * JOUR_EN_MS
+  const heures = Math.floor(reste / 3_600_000)
+  reste -= heures * 3_600_000
+  const minutes = Math.floor(reste / 60_000)
+  const secondes = Math.floor((reste - minutes * 60_000) / 1000)
+
+  return { jours, heures, minutes, secondes }
+}
