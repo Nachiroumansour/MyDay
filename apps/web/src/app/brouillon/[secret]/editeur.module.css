@@ -1,0 +1,152 @@
+.coquille {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+  padding: 32px 0 0;
+}
+
+/* L'aperçu occupe le haut et y reste collé au défilement ; le formulaire
+   glisse dessous. C'est le seul endroit où la couleur est large. */
+.colonneApercu {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--fond);
+  padding: 12px 0;
+  border-bottom: 1px solid var(--trait);
+}
+
+.apercu {
+  display: block;
+  margin: 0 auto;
+  width: min(100%, 220px);
+  height: auto;
+  border: 1px solid var(--trait);
+  border-top: 3px solid var(--evenement);
+}
+
+.etapes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--trait);
+}
+
+.etape {
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--encre-douce);
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.etapeActive {
+  composes: etape;
+  color: var(--encre);
+  border-bottom-color: var(--evenement);
+}
+
+.formulaire {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 56px;
+  /* Un champ de saisie trop large se lit mal et se remplit moins bien. */
+  max-width: 560px;
+}
+
+.titre { font-size: 26px; letter-spacing: -0.025em; }
+.introduction { color: var(--encre-douce); font-size: 15px; max-width: 54ch; }
+
+.champ { display: flex; flex-direction: column; gap: 6px; }
+
+.compteur { font-size: 12px; color: var(--encre-douce); font-variant-numeric: tabular-nums; }
+.compteurProche { composes: compteur; color: #8a6d1f; }
+.compteurLong { composes: compteur; color: #b3261e; }
+
+.formules { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.formule {
+  appearance: none;
+  padding: 6px 10px;
+  border: 1px solid var(--trait);
+  background: var(--surface);
+  font: inherit;
+  font-size: 13px;
+  color: var(--encre-douce);
+  cursor: pointer;
+  text-align: left;
+}
+.formule:hover { border-color: var(--evenement); color: var(--encre); }
+
+.rangee { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+.rangee > * { flex: 1 1 160px; }
+
+.avertissement {
+  padding-left: 14px;
+  border-left: 2px solid #b3261e;
+  font-size: 14px;
+}
+
+.rappel {
+  padding-left: 14px;
+  border-left: 2px solid var(--evenement);
+  font-size: 14px;
+  color: var(--encre-douce);
+}
+
+.liste { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 16px; }
+
+.carteCeremonie {
+  border: 1px solid var(--trait);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.carteCeremonieTete { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.carteCeremonieNom { font-size: 17px; font-weight: 600; }
+.carteCeremonieQuand { font-size: 14px; color: var(--encre-douce); }
+
+.lienDanger {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 14px;
+  color: #b3261e;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.actions { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 8px; }
+
+.photoApercu {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border: 1px solid var(--trait);
+}
+
+.curseurs { display: flex; flex-direction: column; gap: 12px; max-width: 340px; }
+.curseur { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+.curseur input { flex: 1; accent-color: var(--evenement); }
+
+@media (min-width: 900px) {
+  .coquille { grid-template-columns: 300px 1fr; gap: 48px; align-items: start; }
+  .colonneApercu {
+    position: sticky;
+    top: 24px;
+    border-bottom: none;
+    padding: 0;
+  }
+  .apercu { width: 100%; }
+}
