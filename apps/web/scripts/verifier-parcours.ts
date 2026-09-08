@@ -94,7 +94,11 @@ async function parcoursClient(page: Page): Promise<void> {
 
   await page.getByRole('link', { name: 'Mariage', exact: true }).click()
   await page.waitForURL('**type=mariage**')
-  verifier('le filtre par type restreint le catalogue', (await page.locator('h1').innerText()) === 'Mariage')
+  // Le titre porte désormais l'emoji de la fête : on vérifie qu'il le contient.
+  verifier(
+    'le filtre par type restreint le catalogue',
+    (await page.locator('h1').innerText()).includes('Mariage'),
+  )
 
   await page.getByRole('link', { name: 'Aidez-moi à choisir' }).click()
   await page.waitForURL('**/guide**')

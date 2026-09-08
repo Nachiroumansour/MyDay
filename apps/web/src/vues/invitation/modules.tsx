@@ -17,7 +17,7 @@ export function LivreOr({
 }) {
   return (
     <section className="section" id="livre-or">
-      <h2 className="titre-section">Le livre d’or</h2>
+      <h2 className="titre-section"><span className="titre-emoji">✍️</span>Le livre d’or</h2>
 
       {depose ? (
         <div className="merci">
@@ -79,7 +79,7 @@ export function Galerie({
 }) {
   return (
     <section className="section" id="galerie">
-      <h2 className="titre-section">Vos photos</h2>
+      <h2 className="titre-section"><span className="titre-emoji">📸</span>Vos photos</h2>
       <p className="aide">
         Déposez ici les photos que vous avez prises. Les hôtes les retrouveront toutes au
         même endroit.
@@ -150,7 +150,7 @@ export function Cagnotte({
 }) {
   return (
     <section className="section" id="participer">
-      <h2 className="titre-section">Participer</h2>
+      <h2 className="titre-section"><span className="titre-emoji">🎁</span>Participer</h2>
       {mot && <p className="mot">{mot}</p>}
 
       {envoyee ? (

@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Vignette } from '@/composants/vignette'
-import { couleurEvenement, libelleEvenement } from '@/lib/evenements'
+import { Ambiance } from '@/composants/ambiance'
+import { IconeCachet, IconeEnvoi, IconeLieu, IconeReponses } from '@/composants/icones'
+import { festivite } from '@/lib/festivite'
+import { libelleEvenement } from '@/lib/evenements'
 import { lireIdentite, versParametres } from '@/lib/identite'
 import { libelleEtiquette, scoreGabarit } from '@/lib/guidage'
 import { catalogue, gabaritParSlug } from '@/serveur/bdd/catalogue'
@@ -53,10 +56,26 @@ export default async function FicheModele({ params, searchParams }: Props) {
     )
     .slice(0, 3)
 
-  const couleur = couleurEvenement(gabarit.typeEvenement)
+  const fete = festivite(gabarit.typeEvenement)
 
   return (
-    <main className="contenu" style={{ ['--evenement' as string]: couleur }}>
+    <main
+      className="contenu"
+      style={{
+        ['--evenement' as string]: fete.couleur,
+        ['--teinte' as string]: fete.couleurClaire,
+      }}
+    >
+      <div className={styles.bandeau}>
+        <Ambiance type={gabarit.typeEvenement} nombre={10} intensite={1} zone="bords" />
+        <p className={styles.bandeauInterieur}>
+          <span className={styles.bandeauEmoji}>{fete.emoji}</span>
+          <span className={styles.bandeauType}>
+            {libelleEvenement(gabarit.typeEvenement)}
+          </span>
+        </p>
+      </div>
+
       <div className={styles.fiche}>
         <div className={styles.apercu}>
           <Vignette gabarit={gabarit} identite={identite} largeur={900} priorite />
@@ -65,9 +84,7 @@ export default async function FicheModele({ params, searchParams }: Props) {
         <div className={styles.infos}>
           <div>
             <h1 className={styles.nom}>{gabarit.nom}</h1>
-            <p className={styles.auteur}>
-              {libelleEvenement(gabarit.typeEvenement)} · dessiné par {gabarit.graphisteNom}
-            </p>
+            <p className={styles.auteur}>Dessiné par {gabarit.graphisteNom}</p>
           </div>
 
           {gabarit.etiquettes.length > 0 && (
@@ -88,10 +105,30 @@ export default async function FicheModele({ params, searchParams }: Props) {
           </div>
 
           <ul className={styles.inclus}>
-            <li>Un lien d’invitation à partager sur WhatsApp</li>
-            <li>Le programme de vos cérémonies, avec les repères pour trouver</li>
-            <li>Les réponses de vos invités, cérémonie par cérémonie</li>
-            <li>Votre carte en haute définition, et son PDF imprimable</li>
+            <li>
+              <span className={styles.inclusIcone}>
+                <IconeEnvoi />
+              </span>
+              Un lien d’invitation à partager sur WhatsApp
+            </li>
+            <li>
+              <span className={styles.inclusIcone}>
+                <IconeLieu />
+              </span>
+              Le programme de vos cérémonies, avec les repères pour trouver
+            </li>
+            <li>
+              <span className={styles.inclusIcone}>
+                <IconeReponses />
+              </span>
+              Les réponses de vos invités, cérémonie par cérémonie
+            </li>
+            <li>
+              <span className={styles.inclusIcone}>
+                <IconeCachet />
+              </span>
+              Votre carte en haute définition, et son PDF imprimable
+            </li>
           </ul>
 
           <div className={styles.actions}>

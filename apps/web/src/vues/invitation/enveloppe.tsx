@@ -1,4 +1,7 @@
 /** @jsxImportSource preact */
+
+import { Eclosion } from './ambiance'
+import type { TypeEvenement } from '@/lib/evenements'
 const DUREE_OUVERTURE = 900
 
 /**
@@ -14,13 +17,13 @@ export const SCRIPT_ENVELOPPE = `
     try{localStorage.setItem('myday:enveloppe:'+v.dataset.slug,'1')}catch(e){}
     document.documentElement.dataset.enveloppe='vue';
   }
-  function effacer(){v.dataset.etat='partie'}
+  function effacer(){v.dataset.etat='partie';memoriser()}
   v.querySelector('[data-role=ouvrir]').addEventListener('click',function(){
     if(v.dataset.etat!=='attente')return;
-    v.dataset.etat='ouverture';memoriser();m=setTimeout(effacer,${DUREE_OUVERTURE});
+    v.dataset.etat='ouverture';m=setTimeout(effacer,${DUREE_OUVERTURE});
   });
   v.querySelector('[data-role=passer]').addEventListener('click',function(){
-    clearTimeout(m);memoriser();effacer();
+    clearTimeout(m);effacer();
   });
 })()`
 
@@ -34,11 +37,12 @@ interface Props {
   titre: string
   initiales: string
   couleur: string
+  type: TypeEvenement
   /** Nom de l'invité, quand il ouvre son lien nominatif. */
   invite?: string
 }
 
-export default function Enveloppe({ slug, titre, initiales, couleur, invite }: Props) {
+export default function Enveloppe({ slug, titre, initiales, couleur, type, invite }: Props) {
   return (
     <div
       id="enveloppe"
@@ -90,6 +94,9 @@ export default function Enveloppe({ slug, titre, initiales, couleur, invite }: P
       </button>
 
       <p className="voile-invite">Touchez pour ouvrir</p>
+
+      {/* La gerbe part du centre au moment où le cachet se brise. */}
+      <Eclosion type={type} />
     </div>
   )
 }

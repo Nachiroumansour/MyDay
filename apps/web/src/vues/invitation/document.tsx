@@ -3,6 +3,8 @@ import { render } from 'preact-render-to-string'
 import Enveloppe, { SCRIPT_ENVELOPPE, scriptMemoire } from './enveloppe'
 import Rsvp, { Merci } from './rsvp'
 import { Cagnotte, Galerie, LivreOr } from './modules'
+import { Ambiance, Eclosion } from './ambiance'
+import { festivite } from '@/lib/festivite'
 import type { MessageVue, ParticipationVue, PhotoVue } from '@/serveur/bdd/modules'
 import { STYLES } from './styles'
 import {
@@ -118,11 +120,16 @@ function Corps({
         titre={evenement.titre}
         initiales={initialesDe(evenement.titre)}
         couleur={couleur}
+        type={evenement.typeEvenement}
         {...(invite ? { invite: invite.nomComplet } : {})}
       />
 
       <main>
         <header className="hero">
+          {/* L'ambiance de la fête, derrière la carte, jamais sur le texte. */}
+          <Ambiance type={evenement.typeEvenement} nombre={14} intensite={0.9} zone="bords" />
+
+          <span className="hero-carte">
           <img
             className="carte"
             src={`/e/${slug}/carte.png?l=900`}
@@ -131,20 +138,26 @@ function Corps({
             alt={`Invitation de ${evenement.titre}`}
             fetchPriority="high"
           />
+          </span>
 
           {compteur && (
-            <p className="compteur">
-              <span className="compteur-valeur">{compteur}</span>
-              {premiere && (
-                <span className="compteur-legende">{formaterDateLongue(premiere.debuteLe)}</span>
-              )}
-            </p>
+            <div className="compteur">
+              <Ambiance type={evenement.typeEvenement} nombre={12} intensite={2.6} teinte="#ffffff" />
+              <span className="compteur-interieur">
+                <span className="compteur-valeur">{compteur}</span>
+                {premiere && (
+                  <span className="compteur-legende">
+                    {formaterDateLongue(premiere.debuteLe)}
+                  </span>
+                )}
+              </span>
+            </div>
           )}
         </header>
 
         {evenement.ceremonies.length > 0 && (
           <section className="section">
-            <h2 className="titre-section">Le programme</h2>
+            <h2 className="titre-section"><span className="titre-emoji">📅</span>Le programme</h2>
             <ol className="programme">
               {evenement.ceremonies.map((ceremonie) => (
                 <BlocCeremonie
@@ -160,24 +173,29 @@ function Corps({
 
         {evenement.codeVestimentaire && (
           <section className="section">
-            <h2 className="titre-section">La tenue</h2>
+            <h2 className="titre-section"><span className="titre-emoji">👗</span>La tenue</h2>
             <span className="pastille-tenue">{evenement.codeVestimentaire}</span>
           </section>
         )}
 
         {evenement.motDesHotes && (
           <section className="section">
-            <h2 className="titre-section">Le mot des hôtes</h2>
+            <h2 className="titre-section"><span className="titre-emoji">💌</span>Le mot des hôtes</h2>
             <p className="mot">{evenement.motDesHotes}</p>
           </section>
         )}
 
         <section className="section" id="repondre">
           <h2 className="titre-section">
+            <span className="titre-emoji">{festivite(evenement.typeEvenement).emoji}</span>
             {invite ? `${invite.nomComplet}, serez-vous des nôtres ?` : 'Serez-vous des nôtres ?'}
           </h2>
           {reponseEnvoyee ? (
-            <Merci />
+            <span style={{ position: 'relative', display: 'block' }}>
+              {/* Une volée de confettis salue la réponse. */}
+              <Eclosion type={evenement.typeEvenement} classe="eclosion-merci" />
+              <Merci />
+            </span>
           ) : (
             <Rsvp
               slug={slug}
@@ -212,7 +230,7 @@ function Corps({
 
         {evenement.telephoneHote && (
           <section className="section">
-            <h2 className="titre-section">Une question ?</h2>
+            <h2 className="titre-section"><span className="titre-emoji">💬</span>Une question ?</h2>
             <p className="contact">Écrivez directement aux hôtes sur WhatsApp.</p>
             <a
               className="action"

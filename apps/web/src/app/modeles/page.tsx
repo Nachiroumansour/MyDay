@@ -7,6 +7,8 @@ import {
   TYPES_EVENEMENT,
 } from '@/lib/evenements'
 import { lireIdentite, versParametres } from '@/lib/identite'
+import { festivite } from '@/lib/festivite'
+import { Ambiance } from '@/composants/ambiance'
 import { libelleEtiquette, nommerStyle } from '@/lib/guidage'
 import { catalogue, etiquettesDisponibles } from '@/serveur/bdd/catalogue'
 import styles from './page.module.css'
@@ -61,15 +63,33 @@ export default async function Galerie({ searchParams }: { searchParams: Promise<
   ])
 
   const base = { ...(type ? { type } : {}), tags, identite: parametres }
-  const couleur = type ? couleurEvenement(type) : undefined
+  const fete = type ? festivite(type) : undefined
 
   return (
-    <main className="contenu" style={couleur ? { ['--evenement' as string]: couleur } : undefined}>
+    <main
+      className="contenu"
+      style={
+        fete
+          ? {
+              ['--evenement' as string]: fete.couleur,
+              ['--teinte' as string]: fete.couleurClaire,
+            }
+          : undefined
+      }
+    >
       <div className={styles.tete}>
-        <h1 className={styles.titre}>
-          {tags.length > 0 ? nommerStyle(tags) : type ? libelleEvenement(type) : 'Tous les modèles'}
-        </h1>
-        <BarreIdentite identite={identite} action="/modeles" compact />
+        {type && <Ambiance type={type} nombre={12} intensite={1.1} zone="bords" />}
+        <div className={styles.teteInterieur}>
+          <h1 className={styles.titre}>
+            {fete && <span className={styles.titreEmoji}>{fete.emoji}</span>}
+            {tags.length > 0
+              ? nommerStyle(tags)
+              : type
+                ? libelleEvenement(type)
+                : 'Tous les modèles'}
+          </h1>
+          <BarreIdentite identite={identite} action="/modeles" compact />
+        </div>
       </div>
 
       <div className={styles.filtres}>

@@ -94,16 +94,55 @@ html[data-enveloppe='vue'] .voile { display: none; }
 
 /* ---------- Le héros ---------- */
 
-.hero { display: flex; flex-direction: column; align-items: center; gap: 28px; padding: 40px var(--marge) 56px; }
-
-.carte { display: block; width: min(100%, 420px); height: auto; border: 1px solid var(--trait); }
-
-.compteur { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
-.compteur-valeur {
-  font-size: clamp(34px, 11vw, 46px); font-weight: 600; letter-spacing: -0.03em;
-  line-height: 1; color: var(--evenement); font-variant-numeric: tabular-nums;
+.hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  padding: 52px var(--marge) 0;
 }
-.compteur-legende { font-size: 15px; color: var(--encre-douce); }
+
+.hero-carte { position: relative; z-index: 1; display: flex; justify-content: center; width: 100%; }
+
+.carte {
+  display: block;
+  width: min(100%, 420px);
+  height: auto;
+  border: 1px solid var(--trait);
+  box-shadow:
+    0 2px 4px rgba(20, 22, 29, 0.06),
+    0 14px 30px -10px rgba(20, 22, 29, 0.18),
+    0 36px 60px -26px rgba(20, 22, 29, 0.24);
+}
+
+.compteur {
+  position: relative;
+  overflow: hidden;
+  align-self: stretch;
+  margin: 0 calc(var(--marge) * -1);
+  padding: 32px var(--marge) 36px;
+  background: var(--evenement);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.compteur-interieur { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 6px; }
+
+.compteur-valeur {
+  font-size: clamp(52px, 17vw, 84px);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 0.92;
+  font-variant-numeric: tabular-nums;
+}
+
+.compteur-legende { font-size: 15px; color: rgba(255, 255, 255, 0.88); }
 
 /* ---------- Sections ---------- */
 
@@ -114,7 +153,14 @@ html[data-enveloppe='vue'] .voile { display: none; }
   display: flex; flex-direction: column; gap: 24px;
 }
 
-.titre-section { font-size: 22px; }
+.titre-section {
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.titre-emoji { font-size: 22px; line-height: 1; }
 
 /* ---------- Programme ---------- */
 
@@ -234,6 +280,98 @@ html[data-enveloppe='vue'] .voile { display: none; }
 .signature { font-size: 13px; color: var(--encre-douce); }
 .signature a { color: var(--encre); text-decoration: none; border-bottom: 1px solid var(--trait); }
 
+/* ---------- Ambiance festive ---------- */
+
+.scene {
+  display: block;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.grain { position: absolute; top: -8%; will-change: transform, opacity; }
+
+.petale {
+  border-radius: 100% 0 100% 0;
+  animation-name: tomber;
+  animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  animation-iteration-count: infinite;
+}
+
+.bulle {
+  top: auto;
+  bottom: -8%;
+  border-radius: 50%;
+  background: none !important;
+  animation-name: monter;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.confetti {
+  border-radius: 1px;
+  animation-name: culbuter;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes tomber {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+  8% { opacity: var(--opacite); }
+  50% { transform: translate3d(26px, 50vh, 0) rotate(180deg); }
+  92% { opacity: var(--opacite); }
+  100% { transform: translate3d(-12px, 110vh, 0) rotate(360deg); opacity: 0; }
+}
+
+@keyframes monter {
+  0% { transform: translate3d(0, 0, 0) scale(0.7); opacity: 0; }
+  12% { opacity: var(--opacite); }
+  50% { transform: translate3d(20px, -50vh, 0) scale(1); }
+  88% { opacity: var(--opacite); }
+  100% { transform: translate3d(-8px, -110vh, 0) scale(1.1); opacity: 0; }
+}
+
+@keyframes culbuter {
+  0% { transform: translate3d(0, 0, 0) rotate3d(1, 1, 0, 0deg); opacity: 0; }
+  10% { opacity: var(--opacite); }
+  100% { transform: translate3d(32px, 110vh, 0) rotate3d(1, 1, 0, 900deg); opacity: 0; }
+}
+
+/* L'éclosion ne part qu'au moment de l'ouverture, et ne se rejoue pas. */
+.eclosion, .eclosion-merci {
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.eclat {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 100% 0 100% 0;
+  opacity: 0;
+}
+
+.voile[data-etat='ouverture'] .eclat,
+.voile[data-etat='partie'] .eclat,
+.eclosion-merci .eclat {
+  animation: eclore 2400ms cubic-bezier(0.16, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes eclore {
+  0% { transform: rotate(0deg) translateY(0) scale(0.2); opacity: 0; }
+  14% { opacity: 1; }
+  68% { opacity: 1; }
+  100% { transform: rotate(var(--angle)) translateY(var(--portee)) scale(1); opacity: 0; }
+}
+
 /* ---------- Modules ouverts aux invités ---------- */
 
 .mots { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 20px; }
@@ -283,5 +421,6 @@ html[data-enveloppe='vue'] .voile { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .rabat, .cachet, .carte-pliee { transition: none; }
   .voile { transition: opacity 160ms linear; }
+  .scene, .eclosion, .eclosion-merci { display: none; }
 }
 `
