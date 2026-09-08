@@ -211,5 +211,10 @@ export const reponses = pgTable(
     creeLe: timestamp('cree_le', { withTimezone: true }).notNull().defaultNow(),
     modifieLe: timestamp('modifie_le', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [index('reponses_evenement_present').on(table.evenementId, table.present)],
+  (table) => [
+    index('reponses_evenement_present').on(table.evenementId, table.present),
+    // Un invité qui répond une seconde fois corrige sa réponse : il ne
+    // compte pas deux fois dans le total attendu.
+    uniqueIndex('reponses_evenement_telephone').on(table.evenementId, table.telephone),
+  ],
 )

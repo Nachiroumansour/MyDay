@@ -47,6 +47,17 @@ async function parcours(page: Page): Promise<void> {
   await page.getByText('C’est noté, merci.').waitFor({ timeout: 6000 })
   verifier('la réponse est enregistrée', true)
 
+  // Une seconde réponse depuis le même numéro doit corriger la première.
+  await page.goto(`${base}/e/${slug}`, { waitUntil: 'domcontentloaded' })
+  await page.getByText('Je serai là', { exact: true }).click()
+  await page.getByLabel('Votre nom').fill('Fatou Sarr')
+  await page.getByLabel('Votre numéro').fill('77 987 65 43')
+  await page.getByLabel('Vous serez combien ?').fill('5')
+  await page.locator('input[name="ceremonies"]').first().check()
+  await page.getByRole('button', { name: 'Envoyer ma réponse' }).click()
+  await page.getByText('C’est noté, merci.').waitFor({ timeout: 6000 })
+  verifier('répondre une seconde fois corrige au lieu de dupliquer', true)
+
   verifier(
     'la page invité ne charge aucun JavaScript de cadre',
     (await page.evaluate(() => document.querySelectorAll('script[src]').length)) === 0,

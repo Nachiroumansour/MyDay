@@ -15,6 +15,13 @@
       "when": 1788867892012,
       "tag": "0001_nasty_cerebro",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788868658373,
+      "tag": "0002_romantic_barracuda",
+      "breakpoints": true
     }
   ]
 }
