@@ -1,13 +1,36 @@
 /** @jsxImportSource preact */
 
-import { Eclosion } from './ambiance'
-import type { TypeEvenement } from '@/lib/evenements'
-const DUREE_OUVERTURE = 900
+import { Ambiance, type TypeFete } from './ambiance'
+import { IconeAnneau, IconeColombe, IconeCoupe } from './icones'
+
+/** Le cachet porte l'emblème de la fête, pas un cœur pour tout le monde. */
+const EMBLEME: Record<TypeFete, () => preact.JSX.Element> = {
+  mariage: IconeAnneau,
+  bapteme: IconeColombe,
+  anniversaire: IconeCoupe,
+}
+
+/** Le temps que dure l'ouverture, du clic à la page. Doit suivre les keyframes. */
+const DUREE_OUVERTURE = 1600
 
 /**
- * Le script qui pilote l'ouverture. Volontairement minuscule et en ligne :
- * le geste doit fonctionner dès que le HTML arrive. Sur un réseau lent, un
- * invité qui touche l'enveloppe et pour qui rien ne se passe est perdu.
+ * L'ouverture de l'enveloppe.
+ *
+ * C'est le premier geste de l'invité, et le seul moment de la page qui doit
+ * faire un effet : une enveloppe fermée, son sceau de cire, le rabat qui
+ * bascule, la carte qui glisse dehors. Tout est en CSS — le script ne fait
+ * que basculer un attribut.
+ *
+ * Volontairement sans React : le geste doit fonctionner dès que le HTML
+ * arrive, pas après l'hydratation. Sur un réseau lent, un invité qui touche
+ * l'enveloppe et pour qui rien ne se passe est un invité perdu.
+ *
+ * La mémorisation n'a lieu qu'une fois l'ouverture terminée : la faire au clic
+ * déclencherait aussitôt la règle qui masque le voile, et l'animation n'aurait
+ * jamais le temps de se jouer.
+ *
+ * Sans JavaScript du tout, le voile est masqué : il est un enrichissement,
+ * jamais un péage devant l'information.
  */
 export const SCRIPT_ENVELOPPE = `
 (function(){
@@ -18,10 +41,14 @@ export const SCRIPT_ENVELOPPE = `
     document.documentElement.dataset.enveloppe='vue';
   }
   function effacer(){v.dataset.etat='partie';memoriser()}
-  v.querySelector('[data-role=ouvrir]').addEventListener('click',function(){
+  function ouvrir(){
     if(v.dataset.etat!=='attente')return;
-    v.dataset.etat='ouverture';m=setTimeout(effacer,${DUREE_OUVERTURE});
-  });
+    v.dataset.etat='ouverture';
+    var lent=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    m=setTimeout(effacer,lent?260:${DUREE_OUVERTURE});
+  }
+  v.querySelector('[data-role=ouvrir]').addEventListener('click',ouvrir);
+  v.querySelector('[data-role=enveloppe]').addEventListener('click',ouvrir);
   v.querySelector('[data-role=passer]').addEventListener('click',function(){
     clearTimeout(m);effacer();
   });
@@ -35,14 +62,15 @@ export function scriptMemoire(slug: string): string {
 interface Props {
   slug: string
   titre: string
-  initiales: string
-  couleur: string
-  type: TypeEvenement
+  intitule: string
+  type: TypeFete
   /** Nom de l'invité, quand il ouvre son lien nominatif. */
   invite?: string
 }
 
-export default function Enveloppe({ slug, titre, initiales, couleur, type, invite }: Props) {
+export default function Enveloppe({ slug, titre, intitule, type, invite }: Props) {
+  const Embleme = EMBLEME[type]
+
   return (
     <div
       id="enveloppe"
@@ -52,51 +80,45 @@ export default function Enveloppe({ slug, titre, initiales, couleur, type, invit
       role="dialog"
       aria-label={`Invitation de ${titre}`}
     >
-      <button type="button" className="passer" data-role="passer">
-        Passer
-      </button>
+      <Ambiance type={type} />
 
-      <p className="voile-intro">{invite ? `Pour ${invite}` : 'Une invitation pour vous'}</p>
-      <p className="voile-noms">{titre}</p>
+      <div className="pli-scene">
+        {/* Toute l'enveloppe est cliquable : c'est le geste qu'on a envie de
+            faire en la voyant. Le bouton reste, pour le clavier et pour dire
+            quoi faire. */}
+        <div className="pli-enveloppe" data-role="enveloppe">
+          <span className="pli-dos" aria-hidden="true" />
 
-      <button type="button" className="pli" data-role="ouvrir" aria-label="Ouvrir l’invitation">
-        <svg viewBox="0 0 320 224" aria-hidden="true">
-          <rect x="25" y="55" width="270" height="150" fill="#1b1f28" />
+          <div className="pli-carte">
+            <p className="pli-sur-titre">{invite ? `Pour ${invite}` : 'Invitation officielle'}</p>
+            <p className="pli-noms">{intitule}</p>
+            <p className="pli-mot">
+              Vous êtes cordialement convié à célébrer ce moment avec nous.
+            </p>
+          </div>
 
-          {/* La carte, invisible tant que l'enveloppe est close — sans quoi
-              elle transparaîtrait à travers le rabat. */}
-          <g className="carte-pliee">
-            <rect x="52" y="48" width="216" height="140" fill="#f7f8fa" />
-            <rect x="52" y="48" width="216" height="5" fill={couleur} />
-          </g>
+          <span className="pli-poche" aria-hidden="true">
+            <span className="pli-adresse">
+              {invite ? invite : 'À nos invités'}
+              <span className="pli-filet" />
+              <span className="pli-mention">Invitation</span>
+            </span>
+          </span>
 
-          <g className="rabat">
-            <path d="M25 55 L160 148 L295 55 Z" fill="#262b36" />
-            <path d="M25 55 L160 148 L295 55" fill="none" stroke="#33394a" strokeWidth="1" />
-          </g>
+          <span className="pli-rabat" aria-hidden="true" />
 
-          <g className="cachet">
-            <circle cx="160" cy="140" r="27" fill={couleur} />
-            <circle cx="160" cy="140" r="22" fill="none" stroke="#ffffff" strokeOpacity="0.28" />
-            <text
-              x="160"
-              y="148"
-              textAnchor="middle"
-              fill="#ffffff"
-              fontSize="19"
-              fontWeight="600"
-              letterSpacing="1"
-            >
-              {initiales}
-            </text>
-          </g>
-        </svg>
-      </button>
+          <span className="pli-sceau" aria-hidden="true">
+            <Embleme />
+          </span>
+        </div>
 
-      <p className="voile-invite">Touchez pour ouvrir</p>
-
-      {/* La gerbe part du centre au moment où le cachet se brise. */}
-      <Eclosion type={type} />
+        <button type="button" className="pli-bouton" data-role="ouvrir">
+          Ouvrir l’enveloppe
+        </button>
+        <button type="button" className="passer" data-role="passer">
+          Passer l’animation
+        </button>
+      </div>
     </div>
   )
 }

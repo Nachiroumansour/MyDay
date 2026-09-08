@@ -8,7 +8,6 @@ import { evenements } from '@/serveur/bdd/schema'
 import { fournisseursDisponibles, montantAffichable } from '@/serveur/paiement'
 import { eq } from 'drizzle-orm'
 import { Celebration } from '@/composants/celebration'
-import { festivite } from '@/lib/festivite'
 import styles from '../editeur.module.css'
 
 export default async function EtapePublier({
@@ -37,8 +36,8 @@ export default async function EtapePublier({
 
     return (
       <div className={styles.formulaire}>
-        <Celebration couleur={festivite(brouillon.typeEvenement).couleur} />
-        <h1 className={styles.titre}>🎉 C’est en ligne.</h1>
+        <Celebration couleur="#9F3C16" />
+        <h1 className={styles.titre}>C’est en ligne.</h1>
         <p className={styles.introduction}>
           Partagez ce lien dans vos groupes WhatsApp : vos invités l’ouvriront sans rien
           installer.

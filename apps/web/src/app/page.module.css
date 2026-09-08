@@ -1,236 +1,366 @@
 /* ------------------------------------------------------------------ *
- * L'accueil.
- *
- * Le geste : trois grands panneaux de fête, chacun dans sa couleur, qui
- * portent toute la couleur du site. Le reste de la page reste calme —
- * la hardiesse se dépense à un seul endroit.
+ * L'accueil, d'après la maquette Stitch.
  * ------------------------------------------------------------------ */
 
 .page { display: flex; flex-direction: column; }
 
 /* ---------- Héro ---------- */
 
-.hero {
-  position: relative;
-  overflow: hidden;
-  padding: clamp(56px, 11vw, 128px) 0 clamp(40px, 7vw, 88px);
+.hero { position: relative; overflow: hidden; padding: 48px 0 72px; }
+
+/* Deux halos diffus, comme dans la maquette. */
+.hero::before,
+.hero::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+}
+.hero::before {
+  top: -60px; right: 12%;
+  width: 380px; height: 380px;
+  background: rgba(159, 60, 22, 0.1);
+}
+.hero::after {
+  bottom: -80px; left: 2%;
+  width: 320px; height: 320px;
+  background: rgba(115, 92, 0, 0.1);
 }
 
-.heroInterieur {
+.heroGrille {
   position: relative;
   z-index: 1;
-  max-width: var(--largeur-maximale);
-  margin: 0 auto;
-  padding: 0 var(--marge-laterale);
-  display: flex;
-  flex-direction: column;
-  gap: clamp(24px, 4vw, 40px);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.heroTexte { display: flex; flex-direction: column; gap: 20px; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  padding: 8px 16px;
+  border-radius: var(--rayon-plein);
+  background: var(--surface-teintee);
+  color: var(--primaire);
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(28, 28, 24, 0.05);
 }
 
 .titre {
-  font-size: clamp(46px, 11.5vw, 104px);
-  line-height: 0.94;
-  letter-spacing: -0.045em;
-  font-weight: 700;
-  max-width: 14ch;
+  font-size: clamp(34px, 5.6vw, 56px);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+  max-width: 15ch;
 }
 
-.chapeau {
-  font-size: clamp(17px, 2.2vw, 20px);
+.chapeau { font-size: 17px; line-height: 1.6; color: var(--encre-douce); max-width: 46ch; }
+
+.actionsHero { display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* La carte d'aperçu, posée sur une photo. */
+.apercuHero {
+  overflow: hidden;
+  border-radius: var(--rayon-lg);
+  background: var(--surface-carte);
+  border: 1px solid var(--surface-variante);
+  box-shadow: var(--ombre-levee);
+}
+
+.apercuPhoto {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--surface-haute) center / cover no-repeat;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.apercuVoile {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(28, 28, 24, 0.78), rgba(28, 28, 24, 0.1) 55%);
+}
+
+.apercuCarte {
+  position: relative;
+  z-index: 1;
+  width: min(48%, 170px);
+  box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.5);
+}
+
+.apercuLegende {
+  position: absolute;
+  left: 20px;
+  bottom: 18px;
+  z-index: 1;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.apercuSurTitre {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.apercuNoms { font-family: var(--police-titre), serif; font-size: 21px; font-weight: 600; }
+
+.apercuEtiquette {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 1;
+  padding: 5px 12px;
+  border-radius: var(--rayon-plein);
+  background: var(--primaire);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.apercuPied {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  font-size: 13px;
   color: var(--encre-douce);
-  max-width: 44ch;
-  line-height: 1.55;
+  flex-wrap: wrap;
 }
 
-/* ---------- Les trois fêtes ---------- */
+.apercuPret { color: var(--primaire); font-weight: 500; }
 
-.fetes {
+/* ---------- Sections ---------- */
+
+.section { padding: var(--ecart-section) 0; }
+.sectionTeintee { composes: section; background: var(--surface-basse); }
+
+.enTeteSection {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 32px;
+}
+
+.titreSection {
+  font-size: clamp(24px, 3vw, 32px);
+  line-height: 1.25;
+  font-weight: 600;
+}
+
+.introSection { font-size: 15px; line-height: 1.6; color: var(--encre-douce); max-width: 48ch; }
+
+/* ---------- Les trois célébrations ---------- */
+
+.celebrations {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
   grid-template-columns: 1fr;
+  gap: 20px;
 }
 
-.fete {
-  position: relative;
-  overflow: hidden;
-  display: block;
-  text-decoration: none;
-  color: #ffffff;
-  padding: clamp(36px, 6vw, 64px) var(--marge-laterale) clamp(40px, 6vw, 72px);
-  background: var(--fond-fete);
-  /* Les trois panneaux se posent en séquence à l'ouverture. */
-  animation: poser 520ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
-}
+.celebrations > li { display: flex; }
 
-.fete:nth-child(1) { animation-delay: 60ms; }
-.fete:nth-child(2) { animation-delay: 120ms; }
-.fete:nth-child(3) { animation-delay: 180ms; }
-
-.feteInterieur {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 18px;
-  text-align: center;
-}
-
-.feteEmoji {
-  font-size: clamp(40px, 6vw, 56px);
-  line-height: 1;
-}
-
-.feteNom {
-  font-size: clamp(28px, 4.4vw, 38px);
-  font-weight: 700;
-  letter-spacing: -0.035em;
-  line-height: 1;
-}
-
-.feteCompte {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.66);
-}
-
-/* La carte est un objet qu'on tient : elle a une épaisseur et une ombre. */
-.feteCarte {
-  display: block;
-  width: min(74vw, 220px);
-  height: auto;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  transform: rotate(var(--inclinaison));
-  box-shadow:
-    0 2px 4px rgba(8, 10, 18, 0.24),
-    0 14px 30px -8px rgba(8, 10, 18, 0.4),
-    0 34px 60px -28px rgba(8, 10, 18, 0.5);
-  transition:
-    transform 340ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 340ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.fete:hover .feteCarte,
-.fete:focus-visible .feteCarte {
-  transform: rotate(0deg) translateY(-10px) scale(1.03);
-  box-shadow:
-    0 4px 8px rgba(8, 10, 18, 0.28),
-    0 22px 44px -8px rgba(8, 10, 18, 0.46),
-    0 52px 84px -30px rgba(8, 10, 18, 0.56);
-}
-
-.fete:focus-visible { outline: 3px solid #ffffff; outline-offset: -6px; }
-
-@keyframes poser {
-  from { opacity: 0; transform: translateY(18px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ---------- Sections calmes ---------- */
-
-.section {
-  /* « margin: 0 auto » sur un enfant flex annule l'étirement : sans cette
-     largeur explicite, la section se réduit à son contenu. */
-  width: 100%;
-  max-width: var(--largeur-maximale);
-  margin: 0 auto;
-  padding: clamp(48px, 7vw, 80px) var(--marge-laterale);
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.sectionTitre {
-  font-size: clamp(24px, 3.4vw, 32px);
-  letter-spacing: -0.03em;
-  font-weight: 600;
-}
-
-.sectionTexte { color: var(--encre-douce); max-width: 56ch; }
-
-/* ---------- Par envie ---------- */
-
-.envies {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-  gap: 10px;
-}
-
-.envies > li { display: flex; }
-
-.envie {
+.celebration {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 22px 22px 24px;
-  background: var(--teinte);
+  overflow: hidden;
+  border-radius: var(--rayon-lg);
+  background: var(--surface-carte);
+  border: 1px solid var(--surface-variante);
+  box-shadow: var(--ombre-carte);
   text-decoration: none;
-  border-left: 3px solid var(--accent);
-  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: box-shadow var(--court), transform var(--court);
 }
 
-.envie:hover, .envie:focus-visible { transform: translateY(-3px); }
+.celebration:hover, .celebration:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: var(--ombre-levee);
+}
 
-.envieEmoji { font-size: 26px; line-height: 1; }
-.envieNom { font-size: 16px; font-weight: 600; }
-.envieDetail { font-size: 14px; color: var(--encre-douce); }
+.celebrationPhoto {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: var(--surface-haute) center / cover no-repeat;
+}
 
-/* ---------- Comment ça marche ---------- */
+.celebrationBadge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 5px 12px;
+  border-radius: var(--rayon-plein);
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--encre);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.celebrationCorps { padding: 20px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.celebrationNom { font-family: var(--police-titre), serif; font-size: 20px; font-weight: 600; }
+.celebrationTexte { font-size: 14px; line-height: 1.55; color: var(--encre-douce); flex: 1; }
+.celebrationLien { color: var(--primaire); font-weight: 600; font-size: 14px; }
+
+/* ---------- Savoir-faire ---------- */
+
+.savoir { display: grid; grid-template-columns: 1fr; gap: 40px; align-items: center; }
+.savoirTexte { display: flex; flex-direction: column; gap: 18px; }
+
+.chiffres { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.chiffre {
+  padding: 16px 18px;
+  border-left: 3px solid var(--evenement, var(--primaire));
+  background: var(--surface-carte);
+  border-radius: 0 var(--rayon-md) var(--rayon-md) 0;
+}
+
+.chiffreValeur {
+  display: block;
+  font-family: var(--police-titre), serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--primaire);
+}
+
+.chiffreLibelle { font-size: 13px; color: var(--encre-douce); }
+
+ /* Trois rangées, quatre photos : deux d'entre elles en occupent deux, ce
+    qui remplit la grille sans laisser de trou. */
+.grillePhotos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(3, 130px);
+  gap: 12px;
+}
+
+.photo {
+  border-radius: var(--rayon-lg);
+  background: var(--surface-haute) center / cover no-repeat;
+  box-shadow: var(--ombre-carte);
+}
+
+.photo:nth-child(1) { grid-column: 1; grid-row: 1 / span 2; }
+.photo:nth-child(2) { grid-column: 2; grid-row: 1; }
+.photo:nth-child(3) { grid-column: 2; grid-row: 2 / span 2; }
+.photo:nth-child(4) { grid-column: 1; grid-row: 3; }
+
+/* ---------- Les trois étapes ---------- */
+
+.etapesEnTete { text-align: center; display: flex; flex-direction: column; gap: 10px; align-items: center; }
 
 .etapes {
   list-style: none;
-  margin: 0;
+  margin: 32px 0 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 28px;
+  grid-template-columns: 1fr;
+  gap: 20px;
 }
 
-.etape { display: flex; flex-direction: column; gap: 8px; }
-.etapeIcone { color: var(--evenement); }
-.etapeNom { font-size: 18px; font-weight: 600; }
-.etapeTexte { font-size: 15px; color: var(--encre-douce); }
-
-/* ---------- Créateurs ---------- */
-
-.createurs {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 28px;
+.etape {
+  padding: 24px;
+  border-radius: var(--rayon-lg);
+  background: var(--surface-carte);
+  border: 1px solid var(--surface-variante);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.createur { display: flex; gap: 14px; align-items: flex-start; }
-
-.createurPastille {
-  flex: none;
-  width: 44px;
-  height: 44px;
+.etapeNumero {
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: var(--evenement);
-  color: #ffffff;
   display: grid;
   place-items: center;
-  font-weight: 700;
-  font-size: 17px;
+  background: var(--teinte-etape);
+  color: #fff;
+  font-family: var(--police-titre), serif;
+  font-size: 15px;
+  font-weight: 600;
 }
 
-.createurNom { font-size: 17px; font-weight: 600; }
-.createurBio { font-size: 15px; color: var(--encre-douce); }
-.createurCompte { font-size: 13px; color: var(--encre-douce); }
+.etapeNom { font-family: var(--police-titre), serif; font-size: 19px; font-weight: 600; }
+.etapeTexte { font-size: 14px; line-height: 1.55; color: var(--encre-douce); }
+.etapeNote { font-size: 13px; color: var(--primaire); font-weight: 500; }
+
+/* ---------- Appel final ---------- */
+
+.appel {
+  margin: 0 var(--marge-laterale) var(--ecart-section);
+  padding: clamp(40px, 6vw, 72px) var(--marge-laterale);
+  border-radius: var(--rayon-lg);
+  background: linear-gradient(135deg, #a23e18, #8a3410);
+  color: #fff;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.appelSurTitre {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.appelTitre {
+  font-size: clamp(26px, 3.6vw, 38px);
+  line-height: 1.2;
+  font-weight: 600;
+  max-width: 20ch;
+}
+
+.appelTexte { color: rgba(255, 255, 255, 0.86); max-width: 52ch; font-size: 15px; line-height: 1.6; }
+.appelActions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; padding-top: 8px; }
+
+.appelPrincipal {
+  padding: 13px 26px;
+  border-radius: var(--rayon-md);
+  background: #fff;
+  color: var(--primaire);
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.appelSecondaire {
+  padding: 13px 26px;
+  border-radius: var(--rayon-md);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+}
 
 @media (min-width: 760px) {
-  .fetes { grid-template-columns: repeat(3, 1fr); }
+  .celebrations { grid-template-columns: repeat(3, 1fr); }
+  .etapes { grid-template-columns: repeat(3, 1fr); }
+  .enTeteSection { grid-template-columns: 1fr auto; gap: 40px; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .fete { animation: none; }
-  .feteCarte, .envie { transition: none; }
+@media (min-width: 1000px) {
+  .heroGrille { grid-template-columns: 7fr 5fr; gap: 56px; }
+  .savoir { grid-template-columns: 1fr 1.15fr; gap: 56px; }
+  .grillePhotos { grid-template-rows: repeat(3, 160px); }
 }

@@ -86,3 +86,29 @@ describe('valeursDepuisIdentite', () => {
     expect(valeursDepuisIdentite({ date: '2027-12-01' }).date).toBe('1 décembre 2027')
   })
 })
+
+describe('un seul champ pour deux prénoms', () => {
+  it('scinde « Amina & Lamine »', () => {
+    expect(lireIdentite({ n1: 'Amina & Lamine' })).toEqual({
+      nom1: 'Amina',
+      nom2: 'Lamine',
+    })
+  })
+
+  it('scinde aussi sur « et »', () => {
+    expect(lireIdentite({ n1: 'Awa et Moussa' })).toEqual({ nom1: 'Awa', nom2: 'Moussa' })
+  })
+
+  it('laisse un prénom seul intact', () => {
+    expect(lireIdentite({ n1: 'Sokhna' })).toEqual({ nom1: 'Sokhna' })
+  })
+
+  it('n’est pas trompé par un prénom composé', () => {
+    expect(lireIdentite({ n1: 'Marie-José' })).toEqual({ nom1: 'Marie-José' })
+  })
+
+  it('fait toujours l’aller-retour', () => {
+    const identite = lireIdentite({ n1: 'Amina & Lamine', d: '2027-03-14' })
+    expect(lireIdentite(new URLSearchParams(versParametres(identite)))).toEqual(identite)
+  })
+})

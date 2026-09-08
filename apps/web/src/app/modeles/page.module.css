@@ -1,125 +1,167 @@
-.tete {
-  position: relative;
-  overflow: hidden;
-  margin: 0 calc(var(--marge-laterale) * -1);
-  padding: clamp(36px, 6vw, 64px) var(--marge-laterale) clamp(28px, 4vw, 40px);
-  background: var(--teinte, transparent);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
+/* ------------------------------------------------------------------ *
+ * La galerie, d'après la maquette Stitch : en-tête éditorial, filtres
+ * en pilules, puis une grille de cartes-produit.
+ * ------------------------------------------------------------------ */
 
-.teteInterieur { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 20px; }
+.tete {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  align-items: start;
+  padding: 40px 0 28px;
+}
 
 .titre {
-  font-size: clamp(34px, 8vw, 54px);
-  letter-spacing: -0.04em;
-  font-weight: 700;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
+  font-size: clamp(30px, 4.4vw, 44px);
+  line-height: 1.12;
+  font-weight: 600;
+  margin: 6px 0 10px;
 }
 
-.titreEmoji { font-size: 0.86em; line-height: 1; }
+.intro { font-size: 15px; line-height: 1.6; color: var(--encre-douce); max-width: 52ch; }
 
-.compte { font-size: 15px; color: var(--encre-douce); }
+/* L'appel au guidage, posé en haut à droite. */
+.guidage {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 16px 18px;
+  border-radius: var(--rayon-lg);
+  background: var(--surface-teintee);
+  text-decoration: none;
+  transition: background var(--court);
+}
+
+.guidage:hover { background: var(--surface-haute); }
+
+.guidagePastille {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--primaire-claire);
+  color: var(--primaire);
+  display: grid;
+  place-items: center;
+  font-size: 17px;
+}
+
+.guidageTitre { display: block; font-size: 14px; font-weight: 600; }
+.guidageLien { display: block; font-size: 13px; color: var(--primaire); font-weight: 500; }
+
+/* ---------- Filtres ---------- */
 
 .filtres {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   padding-bottom: 28px;
-  border-bottom: 1px solid var(--trait);
 }
 
-.rangee {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
+.rangee { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+.etiquetteFiltre {
+  font-size: 13px;
+  color: var(--encre-douce);
+  margin-right: 4px;
 }
 
-.pastille {
-  display: inline-block;
-  padding: 7px 14px;
-  border: 1px solid var(--trait);
-  font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
-  color: var(--encre);
-  transition: border-color var(--duree-courte), color var(--duree-courte);
-}
+.compte { font-size: 14px; color: var(--encre-douce); padding-bottom: 20px; }
 
-.pastille:hover { border-color: var(--evenement); }
-
-.pastilleActive {
-  composes: pastille;
-  border-color: var(--evenement);
-  background: var(--evenement);
-  color: #ffffff;
-}
-
-.aide {
-  margin-left: auto;
-  font-size: 14px;
-  font-weight: 500;
-}
+/* ---------- Grille ---------- */
 
 .grille {
   list-style: none;
   margin: 0;
-  padding: 32px 0 0;
+  padding: 0;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px 16px;
+  grid-template-columns: 1fr;
+  gap: 20px;
 }
+
+.grille > li { display: flex; }
 
 .modele {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  overflow: hidden;
+  border-radius: var(--rayon-lg);
+  background: var(--surface-carte);
+  border: 1px solid var(--surface-variante);
+  box-shadow: var(--ombre-carte);
   text-decoration: none;
+  transition: box-shadow var(--court), transform var(--court);
 }
 
-/* La vignette est un objet : une ombre en trois couches lui donne une
-   épaisseur de papier, pas l'ombre grise uniforme d'une carte d'interface. */
-.modele img {
-  box-shadow:
-    0 1px 2px rgba(20, 22, 29, 0.05),
-    0 6px 16px -6px rgba(20, 22, 29, 0.14),
-    0 18px 34px -18px rgba(20, 22, 29, 0.2);
-  transition:
-    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 260ms cubic-bezier(0.22, 1, 0.36, 1);
+.modele:hover, .modele:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: var(--ombre-levee);
 }
 
-.modele:hover img,
-.modele:focus-visible img {
-  transform: translateY(-7px) scale(1.015);
-  box-shadow:
-    0 2px 4px rgba(20, 22, 29, 0.07),
-    0 14px 28px -6px rgba(20, 22, 29, 0.2),
-    0 32px 54px -22px rgba(20, 22, 29, 0.26);
+.modeleVisuel {
+  position: relative;
+  padding: 22px 22px 0;
+  background: var(--surface-basse);
 }
 
-.nom { font-size: 15px; font-weight: 600; }
-.auteur { font-size: 13px; color: var(--encre-douce); }
+.modeleBadge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 1;
+  padding: 5px 12px;
+  border-radius: var(--rayon-plein);
+  background: var(--teinte-badge);
+  color: var(--sur-badge);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.modeleCorps { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+
+.modeleAmbiance {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--encre-douce);
+}
+
+.modeleNom { font-family: var(--police-titre), serif; font-size: 19px; font-weight: 600; }
+.modeleAuteur { font-size: 13px; color: var(--encre-douce); }
+
+.modelePied {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 14px;
+  margin-top: auto;
+}
+
+.modelePrixLibelle { display: block; font-size: 12px; color: var(--encre-douce); }
+.modelePrix { font-size: 16px; font-weight: 600; }
+
+.modeleAction {
+  padding: 9px 16px;
+  border-radius: var(--rayon-md);
+  background: var(--primaire);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}
 
 .vide {
   padding: 56px 0;
   color: var(--encre-douce);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   align-items: flex-start;
 }
 
-@media (min-width: 640px) {
-  .grille { grid-template-columns: repeat(3, 1fr); gap: 32px 24px; }
-}
-
-@media (min-width: 980px) {
-  .grille { grid-template-columns: repeat(4, 1fr); }
+@media (min-width: 640px) { .grille { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 900px) {
+  .grille { grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .tete { grid-template-columns: 1fr auto; }
 }

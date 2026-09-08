@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { couleurEvenement } from '@/lib/evenements'
+import { libelleEvenement } from '@/lib/evenements'
 import { brouillonParSecret } from '@/serveur/bdd/brouillons'
 import { Apercu } from './apercu'
 import { Etapes } from './etapes'
@@ -17,17 +17,30 @@ export default async function EditeurLayout({
   if (!brouillon) notFound()
 
   return (
-    <main
-      className="contenu"
-      style={{ ['--evenement' as string]: couleurEvenement(brouillon.typeEvenement) }}
-    >
-      <Etapes secret={secret} />
-      <div className={styles.coquille}>
-        <div className={styles.colonneApercu}>
-          <Apercu secret={secret} />
+    <>
+      <div className={styles.bandeau}>
+        <div className={`contenu ${styles.bandeauInterieur}`}>
+          <div>
+            <span className={styles.bandeauEtiquette}>Éditeur en direct</span>
+            <h1 className={styles.bandeauTitre}>
+              {brouillon.titre} · {libelleEvenement(brouillon.typeEvenement)}
+            </h1>
+          </div>
+          <div className={styles.bandeauActions}>
+            <a className="bouton-contour" href={`/brouillon/${secret}/publier`}>
+              Publier
+            </a>
+          </div>
         </div>
-        <div>{children}</div>
       </div>
-    </main>
+
+      <main className="contenu">
+        <Etapes secret={secret} />
+        <div className={styles.coquille}>
+          <Apercu secret={secret} />
+          <div>{children}</div>
+        </div>
+      </main>
+    </>
   )
 }

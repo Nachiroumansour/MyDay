@@ -1,118 +1,197 @@
+/* ------------------------------------------------------------------ *
+ * L'éditeur, d'après la maquette Stitch : bandeau d'en-tête, étapes
+ * numérotées, panneau de formulaire teinté, aperçu à droite.
+ * ------------------------------------------------------------------ */
+
+.bandeau {
+  border-bottom: 1px solid var(--surface-variante);
+  background: var(--surface-basse);
+  padding: 20px 0;
+}
+
+.bandeauInterieur {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.bandeauEtiquette {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: var(--rayon-plein);
+  background: var(--primaire-claire);
+  color: var(--primaire);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bandeauTitre {
+  font-family: var(--police-titre), serif;
+  font-size: clamp(20px, 3vw, 26px);
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.bandeauActions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ---------- Les étapes ---------- */
+
+.etapes {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 6px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  background: var(--surface-teintee);
+  border-radius: var(--rayon-lg);
+}
+
+.etape {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 8px;
+  border-radius: var(--rayon-md);
+  text-decoration: none;
+  color: var(--encre-douce);
+  text-align: center;
+  transition: background var(--court), color var(--court);
+}
+
+.etape:hover { color: var(--encre); }
+
+.etapeActive {
+  composes: etape;
+  background: var(--surface-carte);
+  color: var(--primaire);
+  box-shadow: 0 1px 3px rgba(28, 28, 24, 0.08);
+}
+
+.etapeNumero { font-size: 12px; font-weight: 600; opacity: 0.7; }
+.etapeLibelle { font-size: 13px; font-weight: 500; }
+
+/* ---------- Coquille ---------- */
+
 .coquille {
   display: grid;
   grid-template-columns: 1fr;
   gap: 28px;
-  padding: 32px 0 0;
+  padding: 28px 0 72px;
+  align-items: start;
 }
 
-/* L'aperçu occupe le haut et y reste collé au défilement ; le formulaire
-   glisse dessous. C'est le seul endroit où la couleur est large. */
 .colonneApercu {
   position: sticky;
-  top: 0;
-  z-index: 5;
-  background: var(--fond);
-  padding: 12px 0;
-  border-bottom: 1px solid var(--trait);
+  top: 88px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.apercuTitre {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.apercuPoint { width: 8px; height: 8px; border-radius: 50%; background: var(--primaire); }
+
+/* Le cadre de téléphone de la maquette. */
+.apercuCadre {
+  padding: 14px;
+  border-radius: 28px;
+  background: var(--surface-teintee);
+  box-shadow: var(--ombre-carte);
 }
 
 .apercu {
   display: block;
-  margin: 0 auto;
-  width: min(100%, 220px);
+  width: 100%;
   height: auto;
-  border: 1px solid var(--trait);
-  border-top: 3px solid var(--evenement);
+  border-radius: 18px;
+  background: var(--surface-carte);
 }
 
-.etapes {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  gap: 4px;
-  overflow-x: auto;
-  border-bottom: 1px solid var(--trait);
+/* ---------- Formulaires ---------- */
+
+.panneau {
+  padding: 24px;
+  border-radius: var(--rayon-lg);
+  background: var(--surface-basse);
+  border: 1px solid var(--surface-variante);
 }
 
-.etape {
-  padding: 10px 14px;
-  font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
-  color: var(--encre-douce);
-  white-space: nowrap;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-}
+.formulaire { display: flex; flex-direction: column; gap: 20px; max-width: 620px; }
 
-.etapeActive {
-  composes: etape;
-  color: var(--encre);
-  border-bottom-color: var(--evenement);
-}
-
-.formulaire {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  padding-bottom: 56px;
-  /* Un champ de saisie trop large se lit mal et se remplit moins bien. */
-  max-width: 560px;
-}
-
-.titre { font-size: 26px; letter-spacing: -0.025em; }
-.introduction { color: var(--encre-douce); font-size: 15px; max-width: 54ch; }
+.titre { font-family: var(--police-titre), serif; font-size: 22px; font-weight: 600; }
+.introduction { color: var(--encre-douce); font-size: 14px; max-width: 56ch; }
 
 .champ { display: flex; flex-direction: column; gap: 6px; }
 
-.compteur { font-size: 12px; color: var(--encre-douce); font-variant-numeric: tabular-nums; }
-.compteurProche { composes: compteur; color: #8a6d1f; }
-.compteurLong { composes: compteur; color: #b3261e; }
+.compteur { font-size: 12px; color: var(--encre-douce); }
+.compteurProche { composes: compteur; color: var(--secondaire); }
+.compteurLong { composes: compteur; color: var(--erreur); }
 
 .formules { display: flex; flex-wrap: wrap; gap: 6px; }
 
 .formule {
   appearance: none;
-  padding: 6px 10px;
-  border: 1px solid var(--trait);
-  background: var(--surface);
+  padding: 7px 12px;
+  border: 1px solid var(--surface-variante);
+  border-radius: var(--rayon-plein);
+  background: var(--surface-carte);
   font: inherit;
   font-size: 13px;
   color: var(--encre-douce);
   cursor: pointer;
   text-align: left;
 }
-.formule:hover { border-color: var(--evenement); color: var(--encre); }
 
-.rangee { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+.formule:hover { border-color: var(--primaire); color: var(--primaire); }
+
+.rangee { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
 .rangee > * { flex: 1 1 160px; }
 
 .avertissement {
-  padding-left: 14px;
-  border-left: 2px solid #b3261e;
+  padding: 14px 16px;
+  border-radius: var(--rayon-md);
+  background: #fdecea;
+  color: #7a1410;
   font-size: 14px;
 }
 
 .rappel {
-  padding-left: 14px;
-  border-left: 2px solid var(--evenement);
+  padding: 14px 16px;
+  border-radius: var(--rayon-md);
+  background: var(--surface-teintee);
   font-size: 14px;
   color: var(--encre-douce);
 }
 
-.liste { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 16px; }
+.liste { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
 
 .carteCeremonie {
-  border: 1px solid var(--trait);
+  border: 1px solid var(--surface-variante);
+  border-radius: var(--rayon-lg);
+  background: var(--surface-carte);
   padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .carteCeremonieTete { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
-.carteCeremonieNom { font-size: 17px; font-weight: 600; }
+.carteCeremonieNom { font-family: var(--police-titre), serif; font-size: 17px; font-weight: 600; }
 .carteCeremonieQuand { font-size: 14px; color: var(--encre-douce); }
 
 .lienDanger {
@@ -121,32 +200,32 @@
   border: none;
   padding: 0;
   font: inherit;
-  font-size: 14px;
-  color: #b3261e;
+  font-size: 13px;
+  color: var(--erreur);
   cursor: pointer;
   text-decoration: underline;
 }
 
-.actions { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 8px; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 6px; }
 
 .photoApercu {
   width: 120px;
   height: 120px;
   object-fit: cover;
-  border: 1px solid var(--trait);
+  border-radius: var(--rayon-md);
+  border: 1px solid var(--surface-variante);
 }
 
 .curseurs { display: flex; flex-direction: column; gap: 12px; max-width: 340px; }
 .curseur { display: flex; align-items: center; gap: 12px; font-size: 14px; }
-.curseur input { flex: 1; accent-color: var(--evenement); }
+.curseur input[type='range'] { flex: 1; accent-color: var(--primaire); }
+.curseur input[type='checkbox'] { accent-color: var(--primaire); width: 17px; height: 17px; }
 
-@media (min-width: 900px) {
-  .coquille { grid-template-columns: 300px 1fr; gap: 48px; align-items: start; }
-  .colonneApercu {
-    position: sticky;
-    top: 24px;
-    border-bottom: none;
-    padding: 0;
-  }
-  .apercu { width: 100%; }
+@media (min-width: 620px) {
+  .etapes { grid-template-columns: repeat(6, 1fr); }
+}
+
+@media (min-width: 1000px) {
+  .coquille { grid-template-columns: 1fr 320px; gap: 48px; }
+  .colonneApercu { order: 2; }
 }

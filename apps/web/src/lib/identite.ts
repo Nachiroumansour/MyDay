@@ -44,10 +44,21 @@ function dateValide(brut: string | undefined): string | undefined {
   return new Date(horodatage).toISOString().slice(0, 10) === brut ? brut : undefined
 }
 
+/**
+ * Un seul champ suffit à la saisie : « Amina & Lamine » y tient naturellement.
+ * On le scinde ici, plutôt que d'imposer deux cases au visiteur.
+ */
+function scinder(brut: string | undefined): [string | undefined, string | undefined] {
+  if (!brut) return [undefined, undefined]
+  const parts = brut.split(/\s*&\s*|\s+et\s+/i).filter((p) => p.trim() !== '')
+  return [parts[0], parts[1]]
+}
+
 export function lireIdentite(source: Parametres): Identite {
   const identite: Identite = {}
-  const nom1 = prenom(premier(source, 'n1'))
-  const nom2 = prenom(premier(source, 'n2'))
+  const [premierNom, secondNom] = scinder(premier(source, 'n1'))
+  const nom1 = prenom(premierNom)
+  const nom2 = prenom(secondNom) ?? prenom(premier(source, 'n2'))
   const date = dateValide(premier(source, 'd'))
   if (nom1) identite.nom1 = nom1
   if (nom2) identite.nom2 = nom2

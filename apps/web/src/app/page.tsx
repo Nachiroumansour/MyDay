@@ -1,9 +1,6 @@
-import { Ambiance } from '@/composants/ambiance'
 import { BarreIdentite } from '@/composants/barre-identite'
-import { IconeCarte, IconeEnvoi, IconePlume } from '@/composants/icones'
 import { Vignette } from '@/composants/vignette'
 import { libelleEvenement, TYPES_EVENEMENT, type TypeEvenement } from '@/lib/evenements'
-import { festivite } from '@/lib/festivite'
 import { lireIdentite, versParametres } from '@/lib/identite'
 import { catalogue, createurs, vitrine } from '@/serveur/bdd/catalogue'
 import styles from './page.module.css'
@@ -11,23 +8,53 @@ import styles from './page.module.css'
 /** Le catalogue bouge rarement ; la page se garde en cache une heure. */
 export const revalidate = 3600
 
-const ENVIES = [
-  { titre: 'Mariage moderne', detail: 'Lignes nettes, peu d’ornement', type: 'mariage' as const, emoji: '💍', tag: 'moderne' },
-  { titre: 'Traditionnel revisité', detail: 'Les codes d’ici, en plus sobre', type: 'mariage' as const, emoji: '✨', tag: 'traditionnel' },
-  { titre: 'Baptême tout en douceur', detail: 'Teintes claires, motifs légers', type: 'bapteme' as const, emoji: '🕊️', tag: 'clair' },
-  { titre: 'Anniversaire festif', detail: 'Couleurs franches, esprit fête', type: 'anniversaire' as const, emoji: '🎈', tag: 'festif' },
-]
-
-const INCLINAISONS = ['-2.4deg', '1.6deg', '3deg']
-
-function initiales(nom: string): string {
-  return nom
-    .split(/\s+/)
-    .map((mot) => mot[0] ?? '')
-    .join('')
-    .slice(0, 2)
-    .toUpperCase()
+const CELEBRATIONS: Record<
+  TypeEvenement,
+  { badge: string; nom: string; texte: string; photo: string }
+> = {
+  mariage: {
+    badge: 'Takk & réception',
+    nom: 'Mariages',
+    texte:
+      'Des faire-part à la hauteur de votre union, du ngénte à la réception, avec le programme complet de vos cérémonies.',
+    photo: '/photos/photo-10.jpg',
+  },
+  bapteme: {
+    badge: 'Ngénte',
+    nom: 'Baptêmes',
+    texte:
+      'Annoncez l’arrivée et le nom de votre enfant. Teintes douces, sable doré et terre cuite chaleureuse.',
+    photo: '/photos/photo-06.jpg',
+  },
+  anniversaire: {
+    badge: 'Réception & soirée',
+    nom: 'Anniversaires',
+    texte:
+      'Des invitations franches et joyeuses pour marquer les grandes dates de votre vie.',
+    photo: '/photos/photo-12.jpg',
+  },
 }
+
+const ETAPES = [
+  {
+    nom: 'Choisissez',
+    texte: 'Écrivez vos prénoms : tous les modèles s’affichent aussitôt avec.',
+    note: 'Plus de 50 modèles',
+    teinte: '#9F3C16',
+  },
+  {
+    nom: 'Personnalisez',
+    texte: 'Le programme de vos cérémonies, les lieux, les repères, la tenue.',
+    note: 'Aperçu en direct',
+    teinte: '#735C00',
+  },
+  {
+    nom: 'Partagez',
+    texte: 'Un lien pour vos groupes WhatsApp, et vos fichiers en haute définition.',
+    note: 'Diffusion illimitée',
+    teinte: '#973F50',
+  },
+]
 
 export default async function Accueil({
   searchParams,
@@ -36,7 +63,6 @@ export default async function Accueil({
 }) {
   const identite = lireIdentite(await searchParams)
   const parametres = versParametres(identite)
-
   const [modeles, equipe, tout] = await Promise.all([vitrine(), createurs(), catalogue()])
 
   const compteParType = new Map<TypeEvenement, number>()
@@ -44,151 +70,182 @@ export default async function Accueil({
     compteParType.set(gabarit.typeEvenement, (compteParType.get(gabarit.typeEvenement) ?? 0) + 1)
   }
 
-  return (
-    <div className={styles.page}>
-      <section className={styles.hero}>
-        {/* Des pétales dérivent derrière le titre, jamais devant. */}
-        <Ambiance type="mariage" nombre={18} intensite={1.1} zone="bords" />
+  const vedette = modeles.find((m) => m.typeEvenement === 'mariage') ?? modeles[0]
+  const noms = [identite.nom1, identite.nom2].filter(Boolean).join(' & ') || 'Amina & Lamine'
 
-        <div className={styles.heroInterieur}>
-          <h1 className={styles.titre}>Votre invitation, prête ce soir.</h1>
-          <p className={styles.chapeau}>
-            Écrivez vos prénoms : tous les modèles s’affichent aussitôt avec. Partagez le lien
-            sur WhatsApp, vos invités répondent en dix secondes.
-          </p>
-          <BarreIdentite identite={identite} action="/modeles" />
+  return (
+    <main className={styles.page}>
+      <section className={styles.hero}>
+        <div className={`contenu ${styles.heroGrille}`}>
+          <div className={styles.heroTexte}>
+            <span className={styles.badge}>Invitations d’exception · Sénégal &amp; diaspora</span>
+
+            <h1 className={styles.titre}>Vos cérémonies, prêtes à être partagées ce soir.</h1>
+
+            <p className={styles.chapeau}>
+              Créez un faire-part numérique pour votre mariage, votre baptême ou votre
+              anniversaire. Partagez le lien sur WhatsApp, et suivez les réponses de vos
+              invités.
+            </p>
+
+            <BarreIdentite identite={identite} action="/modeles" />
+
+            <div className={styles.actionsHero}>
+              <a className="bouton" href={`/modeles${parametres ? `?${parametres}` : ''}`}>
+                Explorer le catalogue
+              </a>
+              <a className="bouton-contour" href="/guide">
+                Trouver mon style
+              </a>
+            </div>
+          </div>
+
+          {vedette && (
+            <div className={styles.apercuHero}>
+              <div
+                className={styles.apercuPhoto}
+                style={{ backgroundImage: 'url(/photos/photo-21.jpg)' }}
+              >
+                <span className={styles.apercuVoile} />
+                <span className={styles.apercuEtiquette}>Takk &amp; réception</span>
+                <span className={styles.apercuCarte}>
+                  <Vignette gabarit={vedette} identite={identite} largeur={480} priorite />
+                </span>
+                <span className={styles.apercuLegende}>
+                  <span className={styles.apercuSurTitre}>Invitation officielle</span>
+                  <span className={styles.apercuNoms}>{noms}</span>
+                </span>
+              </div>
+              <p className={styles.apercuPied}>
+                <span>16h00 · Grand Théâtre, Dakar</span>
+                <span className={styles.apercuPret}>Prêt pour WhatsApp</span>
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
-      <ul className={styles.fetes}>
-        {TYPES_EVENEMENT.map((type, rang) => {
-          const fete = festivite(type)
-          const modele = modeles.find((m) => m.typeEvenement === type)
-          const compte = compteParType.get(type) ?? 0
+      <section className={styles.sectionTeintee}>
+        <div className="contenu">
+          <div className={styles.enTeteSection}>
+            <div>
+              <p className="sur-titre">Célébrations d’exception</p>
+              <h2 className={styles.titreSection}>Trois grands types de fêtes, sublimées</h2>
+            </div>
+            <p className={styles.introSection}>
+              Chaque cérémonie a son code, son rythme et son émotion. Nos collections
+              respectent les traditions sénégalaises tout en offrant un dessin moderne.
+            </p>
+          </div>
 
-          return (
-            <li key={type}>
-              <a
-                className={styles.fete}
-                href={`/modeles?type=${type}${parametres ? `&${parametres}` : ''}`}
-                style={{
-                  ['--fond-fete' as string]: fete.couleurProfonde,
-                  ['--inclinaison' as string]: INCLINAISONS[rang],
-                }}
-              >
-                {/* Chaque fête a sa propre pluie, sur son propre fond. */}
-                <Ambiance type={type} nombre={14} intensite={2.2} teinte="#ffffff" />
-
-                <span className={styles.feteInterieur}>
-                  <span className={styles.feteEmoji}>{fete.emoji}</span>
-                  <span className={styles.feteNom}>{libelleEvenement(type)}</span>
-                  {modele && (
-                    <span className={styles.feteCarte}>
-                      <Vignette
-                        gabarit={modele}
-                        identite={identite}
-                        largeur={480}
-                        priorite={rang === 0}
-                      />
+          <ul className={styles.celebrations}>
+            {TYPES_EVENEMENT.map((type) => {
+              const fete = CELEBRATIONS[type]
+              const compte = compteParType.get(type) ?? 0
+              return (
+                <li key={type}>
+                  <a
+                    className={styles.celebration}
+                    href={`/modeles?type=${type}${parametres ? `&${parametres}` : ''}`}
+                  >
+                    <span
+                      className={styles.celebrationPhoto}
+                      style={{ backgroundImage: `url(${fete.photo})` }}
+                    >
+                      <span className={styles.celebrationBadge}>{fete.badge}</span>
                     </span>
-                  )}
-                  <span className={styles.feteCompte}>
-                    {compte} modèle{compte > 1 ? 's' : ''}
-                  </span>
+                    <span className={styles.celebrationCorps}>
+                      <span className={styles.celebrationNom}>{fete.nom}</span>
+                      <span className={styles.celebrationTexte}>{fete.texte}</span>
+                      <span className={styles.celebrationLien}>
+                        Voir les {compte} modèles →
+                      </span>
+                    </span>
+                  </a>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      </section>
+
+      <section className={styles.section}>
+        <div className={`contenu ${styles.savoir}`}>
+          <div className={styles.savoirTexte}>
+            <span className={styles.badge}>Savoir-faire local</span>
+            <h2 className={styles.titreSection}>La collection des créateurs dakarois</h2>
+            <p className={styles.introSection}>
+              Chaque modèle est dessiné à Dakar, en collaboration avec des graphistes d’ici.
+              Motifs inspirés du bazin, dorures discrètes et calligraphies soignées. Nos
+              créateurs sont rémunérés sur chaque carte vendue.
+            </p>
+
+            <div className={styles.chiffres}>
+              <p className={styles.chiffre}>
+                <span className={styles.chiffreValeur}>{tout.length}</span>
+                <span className={styles.chiffreLibelle}>modèles au catalogue</span>
+              </p>
+              <p className={styles.chiffre}>
+                <span className={styles.chiffreValeur}>{equipe.length}</span>
+                <span className={styles.chiffreLibelle}>
+                  créateur{equipe.length > 1 ? 's' : ''} à Dakar
                 </span>
-              </a>
-            </li>
-          )
-        })}
-      </ul>
+              </p>
+            </div>
+          </div>
 
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitre}>Par envie</h2>
-        <ul className={styles.envies}>
-          {ENVIES.map((envie) => {
-            const fete = festivite(envie.type)
-            return (
-              <li key={envie.titre}>
-                <a
-                  className={styles.envie}
-                  href={`/modeles?type=${envie.type}&t=${envie.tag}${parametres ? `&${parametres}` : ''}`}
-                  style={{
-                    ['--teinte' as string]: fete.couleurClaire,
-                    ['--accent' as string]: fete.couleur,
-                  }}
-                >
-                  <span className={styles.envieEmoji}>{envie.emoji}</span>
-                  <span className={styles.envieNom}>{envie.titre}</span>
-                  <span className={styles.envieDetail}>{envie.detail}</span>
-                </a>
-              </li>
-            )
-          })}
-        </ul>
+          <div className={styles.grillePhotos}>
+            <span className={styles.photo} style={{ backgroundImage: 'url(/photos/photo-17.jpg)' }} />
+            <span className={styles.photo} style={{ backgroundImage: 'url(/photos/photo-04.jpg)' }} />
+            <span className={styles.photo} style={{ backgroundImage: 'url(/photos/photo-19.jpg)' }} />
+            <span className={styles.photo} style={{ backgroundImage: 'url(/photos/photo-05.jpg)' }} />
+          </div>
+        </div>
       </section>
 
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitre}>Comment ça marche</h2>
-        <ul className={styles.etapes}>
-          <li className={styles.etape} style={{ ['--evenement' as string]: '#2C3A80' }}>
-            <span className={styles.etapeIcone}>
-              <IconeCarte />
-            </span>
-            <span className={styles.etapeNom}>Choisissez</span>
-            <span className={styles.etapeTexte}>
-              Écrivez vos prénoms : tous les modèles s’affichent aussitôt avec.
-            </span>
-          </li>
-          <li className={styles.etape} style={{ ['--evenement' as string]: '#1F6B4A' }}>
-            <span className={styles.etapeIcone}>
-              <IconePlume />
-            </span>
-            <span className={styles.etapeNom}>Personnalisez</span>
-            <span className={styles.etapeTexte}>
-              Le programme, les lieux, la tenue. Quelques minutes suffisent.
-            </span>
-          </li>
-          <li className={styles.etape} style={{ ['--evenement' as string]: '#C9700F' }}>
-            <span className={styles.etapeIcone}>
-              <IconeEnvoi />
-            </span>
-            <span className={styles.etapeNom}>Partagez</span>
-            <span className={styles.etapeTexte}>
-              Un lien pour vos groupes WhatsApp, et vos fichiers en haute définition.
-            </span>
-          </li>
-        </ul>
-      </section>
+      <section className={styles.sectionTeintee}>
+        <div className="contenu">
+          <div className={styles.etapesEnTete}>
+            <p className="sur-titre">Simplicité &amp; rapidité</p>
+            <h2 className={styles.titreSection}>Votre faire-part en trois étapes</h2>
+            <p className={styles.introSection}>
+              Pensé pour les habitudes de communication au Sénégal et dans la diaspora.
+            </p>
+          </div>
 
-      {equipe.length > 0 && (
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitre}>Nos créateurs</h2>
-          <p className={styles.sectionTexte}>
-            Chaque modèle est dessiné à Dakar. Nos créateurs sont rémunérés sur chaque carte
-            vendue.
-          </p>
-          <ul className={styles.createurs}>
-            {equipe.map((createur, rang) => (
+          <ol className={styles.etapes}>
+            {ETAPES.map((etape, rang) => (
               <li
-                key={createur.id}
-                className={styles.createur}
-                style={{
-                  ['--evenement' as string]: festivite(TYPES_EVENEMENT[rang % 3]!).couleur,
-                }}
+                key={etape.nom}
+                className={styles.etape}
+                style={{ ['--teinte-etape' as string]: etape.teinte }}
               >
-                <span className={styles.createurPastille}>{initiales(createur.nom)}</span>
-                <span>
-                  <span className={styles.createurNom}>{createur.nom}</span>
-                  {createur.bio && <p className={styles.createurBio}>{createur.bio}</p>}
-                  <span className={styles.createurCompte}>
-                    {createur.nbModeles} modèle{createur.nbModeles > 1 ? 's' : ''} au catalogue
-                  </span>
-                </span>
+                <span className={styles.etapeNumero}>{rang + 1}</span>
+                <span className={styles.etapeNom}>{etape.nom}</span>
+                <span className={styles.etapeTexte}>{etape.texte}</span>
+                <span className={styles.etapeNote}>{etape.note}</span>
               </li>
             ))}
-          </ul>
-        </section>
-      )}
-    </div>
+          </ol>
+        </div>
+      </section>
+
+      <section className={styles.appel}>
+        <p className={styles.appelSurTitre}>Commencez dès maintenant</p>
+        <h2 className={styles.appelTitre}>Prêt à éblouir vos invités&nbsp;?</h2>
+        <p className={styles.appelTexte}>
+          Créez et regardez gratuitement. Vous ne payez qu’au moment de publier votre
+          invitation.
+        </p>
+        <div className={styles.appelActions}>
+          <a className={styles.appelPrincipal} href={`/modeles${parametres ? `?${parametres}` : ''}`}>
+            Créer mon invitation
+          </a>
+          <a className={styles.appelSecondaire} href="/guide">
+            Trouver mon style
+          </a>
+        </div>
+      </section>
+    </main>
   )
 }

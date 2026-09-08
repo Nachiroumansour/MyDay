@@ -1,43 +1,172 @@
-.coquille { padding: 32px 0 72px; display: flex; flex-direction: column; gap: 28px; }
+/* Le back-office, sur la même palette que le site public : crème,
+   terre cuite, Playfair pour les titres. Il sert la même maison. */
 
-.tete { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; }
-.titre { font-size: 28px; letter-spacing: -0.025em; }
-.introduction { color: var(--encre-douce); font-size: 15px; max-width: 60ch; }
+.coquille {
+  padding: 2.5rem 0 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
 
-.onglets { display: flex; gap: 4px; border-bottom: 1px solid var(--trait); overflow-x: auto; }
+.tete {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.titre {
+  font-family: var(--police-titre), Georgia, serif;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.introduction {
+  color: var(--encre-douce);
+  font-size: 0.9375rem;
+  max-width: 60ch;
+  margin: 0;
+}
+
+/* Les onglets reprennent les pilules du site plutôt qu'un soulignement :
+   même geste que les filtres du catalogue. */
+.onglets {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
 .onglet {
-  padding: 10px 14px;
-  font-size: 14px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
   font-weight: 500;
   text-decoration: none;
   color: var(--encre-douce);
+  background: var(--surface-teintee);
+  border-radius: var(--rayon-plein);
   white-space: nowrap;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
+  transition: background var(--court), color var(--court);
 }
-.ongletActif { composes: onglet; color: var(--encre); border-bottom-color: var(--encre); }
 
-.tableau { width: 100%; overflow-x: auto; }
-.tableau table { border-collapse: collapse; width: 100%; font-size: 15px; min-width: 700px; }
-.tableau th, .tableau td {
+.onglet:hover { background: var(--surface-haute); color: var(--encre); }
+
+.ongletActif {
+  composes: onglet;
+  background: var(--primaire);
+  color: var(--sur-primaire);
+}
+
+.ongletActif:hover { background: var(--primaire-vive); color: var(--sur-primaire); }
+
+.tableau {
+  width: 100%;
+  overflow-x: auto;
+  background: var(--surface-carte);
+  border: 1px solid var(--surface-variante);
+  border-radius: var(--rayon-lg);
+  box-shadow: var(--ombre-carte);
+}
+
+.tableau table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.9375rem;
+  min-width: 44rem;
+}
+
+.tableau th,
+.tableau td {
   text-align: left;
-  padding: 12px 16px 12px 0;
-  border-bottom: 1px solid var(--trait);
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid var(--surface-variante);
   vertical-align: top;
 }
-.tableau th { font-size: 13px; font-weight: 500; color: var(--encre-douce); }
 
-.pastille { display: inline-block; padding: 3px 9px; border: 1px solid var(--trait); font-size: 12px; }
-.pastilleActive { composes: pastille; border-color: var(--evenement); color: var(--evenement); }
+.tableau tr:last-child td { border-bottom: none; }
 
-.formulaire { display: flex; flex-direction: column; gap: 20px; max-width: 560px; }
-.champ { display: flex; flex-direction: column; gap: 6px; }
-.aide { font-size: 13px; color: var(--encre-douce); }
-.erreur { font-size: 14px; color: #b3261e; padding-left: 14px; border-left: 2px solid #b3261e; }
-.succes { font-size: 14px; padding-left: 14px; border-left: 2px solid var(--evenement); }
+.tableau th {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--contour);
+  background: var(--surface-basse);
+  white-space: nowrap;
+}
 
-.apercuDepot { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
-.apercuDepot img { width: 240px; border: 1px solid var(--trait); }
+.pastille {
+  display: inline-block;
+  padding: 0.1875rem 0.625rem;
+  border-radius: var(--rayon-plein);
+  background: var(--surface-teintee);
+  color: var(--encre-douce);
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
 
-.actionsLigne { display: flex; gap: 10px; flex-wrap: wrap; }
-.lienAction { appearance: none; background: none; border: none; padding: 0; font: inherit; font-size: 14px; color: var(--encre); cursor: pointer; text-decoration: underline; }
+.pastilleActive {
+  composes: pastille;
+  background: var(--primaire-claire);
+  color: var(--primaire);
+}
+
+.formulaire {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 35rem;
+  background: var(--surface-carte);
+  border: 1px solid var(--surface-variante);
+  border-radius: var(--rayon-lg);
+  padding: 1.75rem;
+  box-shadow: var(--ombre-carte);
+}
+
+.champ { display: flex; flex-direction: column; gap: 0.375rem; }
+
+.aide { font-size: 0.8125rem; color: var(--encre-douce); }
+
+/* Un message ne crie pas : la couleur porte, la barre situe. */
+.erreur,
+.succes {
+  font-size: 0.875rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--rayon-md);
+  border-left: 3px solid;
+  margin: 0;
+}
+
+.erreur {
+  color: var(--erreur);
+  border-left-color: var(--erreur);
+  background: #fdecec;
+}
+
+.succes {
+  color: var(--secondaire);
+  border-left-color: var(--secondaire-claire);
+  background: #fff7dd;
+}
+
+.actionsLigne { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+.lienAction {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--primaire);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.lienAction:hover { color: var(--primaire-vive); }

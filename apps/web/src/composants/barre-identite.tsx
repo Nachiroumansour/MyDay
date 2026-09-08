@@ -19,52 +19,44 @@ export function BarreIdentite({
 }) {
   return (
     <form method="get" action={action} className={compact ? styles.compacte : styles.barre}>
-      <div className={styles.champ}>
-        <label className="etiquette-champ" htmlFor="id-n1">
-          Prénom
-        </label>
-        <input
-          id="id-n1"
-          name="n1"
-          className="saisie"
-          defaultValue={identite.nom1 ?? ''}
-          placeholder="Awa"
-          maxLength={32}
-          autoComplete="off"
-        />
+      <div className={styles.tete}>
+        <span className={styles.intitule}>Personnalisez en direct pour tester</span>
+        <span className={styles.direct}>Aperçu instantané</span>
       </div>
 
-      <div className={styles.champ}>
-        <label className="etiquette-champ" htmlFor="id-n2">
-          Et
-        </label>
-        <input
-          id="id-n2"
-          name="n2"
-          className="saisie"
-          defaultValue={identite.nom2 ?? ''}
-          placeholder="Moussa"
-          maxLength={32}
-          autoComplete="off"
-        />
-      </div>
+      <div className={styles.champs}>
+        <div className={styles.champ}>
+          <label className="etiquette-champ" htmlFor="id-n1">
+            Prénoms des mariés ou de la personne fêtée
+          </label>
+          <input
+            id="id-n1"
+            name="n1"
+            className="saisie"
+            defaultValue={[identite.nom1, identite.nom2].filter(Boolean).join(' & ')}
+            placeholder="Amina & Lamine"
+            maxLength={70}
+            autoComplete="off"
+          />
+        </div>
 
-      <div className={styles.champ}>
-        <label className="etiquette-champ" htmlFor="id-d">
-          Date
-        </label>
-        <input
-          id="id-d"
-          name="d"
-          type="date"
-          className="saisie"
-          defaultValue={identite.date ?? ''}
-        />
-      </div>
+        <div className={styles.champ}>
+          <label className="etiquette-champ" htmlFor="id-d">
+            Date de la cérémonie
+          </label>
+          <input
+            id="id-d"
+            name="d"
+            type="date"
+            className="saisie"
+            defaultValue={identite.date ?? ''}
+          />
+        </div>
 
-      <button type="submit" className="bouton">
-        Voir avec nos noms
-      </button>
+        <button type="submit" className="bouton">
+          Voir avec nos noms
+        </button>
+      </div>
     </form>
   )
 }

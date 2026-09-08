@@ -16,12 +16,20 @@ export function Apercu({ secret }: { secret: string }) {
   const version = `${chemin}?${requete}`
 
   return (
-    <img
-      className={styles.apercu}
-      src={`/brouillon/${secret}/apercu.png?l=480&v=${encodeURIComponent(version)}`}
-      width={1500}
-      height={2250}
-      alt="Aperçu de votre carte"
-    />
+    <div className={styles.colonneApercu}>
+      <p className={styles.apercuTitre}>
+        <span className={styles.apercuPoint} aria-hidden="true" />
+        Aperçu en temps réel
+      </p>
+      <div className={styles.apercuCadre}>
+        <img
+          className={styles.apercu}
+          src={`/brouillon/${secret}/apercu.png?l=480&v=${encodeURIComponent(version)}`}
+          width={1500}
+          height={2250}
+          alt="Aperçu de votre carte"
+        />
+      </div>
+    </div>
   )
 }

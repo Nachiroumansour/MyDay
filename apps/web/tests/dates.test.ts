@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  detaillerRestant,
   formaterDateCourte,
   formaterDateLongue,
   formaterHeure,
@@ -82,5 +83,32 @@ describe('libelleCompteARebours', () => {
 
   it('ne compte plus une fois l’événement passé', () => {
     expect(libelleCompteARebours(-3)).toBe('')
+  })
+})
+
+describe('detaillerRestant', () => {
+  const cible = new Date('2027-03-13T10:00:00Z')
+
+  it('décompose le temps qui reste', () => {
+    const restant = detaillerRestant(cible, new Date('2027-03-11T08:30:45Z'))
+    expect(restant).toEqual({ jours: 2, heures: 1, minutes: 29, secondes: 15 })
+  })
+
+  it('ne rend rien quand la date est passée', () => {
+    expect(detaillerRestant(cible, new Date('2027-03-13T10:00:01Z'))).toBeNull()
+  })
+
+  it('ne rend rien à l’instant exact', () => {
+    expect(detaillerRestant(cible, cible)).toBeNull()
+  })
+
+  it('compte au-delà de cent jours sans déborder sur les heures', () => {
+    const restant = detaillerRestant(cible, new Date('2026-09-08T10:00:00Z'))
+    expect(restant).toEqual({ jours: 186, heures: 0, minutes: 0, secondes: 0 })
+  })
+
+  it('tient la dernière seconde', () => {
+    const restant = detaillerRestant(cible, new Date('2027-03-13T09:59:59Z'))
+    expect(restant).toEqual({ jours: 0, heures: 0, minutes: 0, secondes: 1 })
   })
 })
