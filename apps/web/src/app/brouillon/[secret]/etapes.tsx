@@ -8,6 +8,7 @@ const ETAPES = [
   { suffixe: '/programme', libelle: 'Le programme' },
   { suffixe: '/details', libelle: 'Les détails' },
   { suffixe: '/publier', libelle: 'Publier' },
+  { suffixe: '/reponses', libelle: 'Les réponses' },
 ]
 
 export function Etapes({ secret }: { secret: string }) {

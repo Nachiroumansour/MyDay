@@ -1,4 +1,4 @@
-import { and, asc, eq } from 'drizzle-orm'
+import { and, asc, desc, eq } from 'drizzle-orm'
 import { bdd } from './client'
 import { ceremonies, evenements, gabarits, reponses } from './schema'
 
@@ -91,8 +91,15 @@ export interface NouvelleReponse {
   message?: string
 }
 
+/**
+ * Enregistre une réponse.
+ *
+ * Un invité qui répond une seconde fois depuis le même numéro corrige sa
+ * réponse au lieu d'en créer une seconde : la spec veut la réponse modifiable
+ * jusqu'au jour J, et un doublon fausserait le nombre de personnes attendues.
+ */
 export async function enregistrerReponse(entree: NouvelleReponse): Promise<void> {
-  await bdd.insert(reponses).values({
+  const valeurs = {
     evenementId: entree.evenementId,
     nom: entree.nom,
     telephone: entree.telephone,
@@ -100,7 +107,22 @@ export async function enregistrerReponse(entree: NouvelleReponse): Promise<void>
     nbPersonnes: entree.nbPersonnes,
     ceremonieIds: entree.ceremonieIds,
     message: entree.message ?? null,
-  })
+  }
+
+  await bdd
+    .insert(reponses)
+    .values(valeurs)
+    .onConflictDoUpdate({
+      target: [reponses.evenementId, reponses.telephone],
+      set: {
+        nom: valeurs.nom,
+        present: valeurs.present,
+        nbPersonnes: valeurs.nbPersonnes,
+        ceremonieIds: valeurs.ceremonieIds,
+        message: valeurs.message,
+        modifieLe: new Date(),
+      },
+    })
 }
 
 /**
@@ -115,4 +137,22 @@ export async function evenementVitrine(): Promise<{ slug: string } | undefined> 
     .orderBy(asc(evenements.creeLe))
     .limit(1)
   return ligne
+}
+
+/** Les réponses d'un événement, de la plus récente à la plus ancienne. */
+export async function reponsesPour(evenementId: string) {
+  return bdd
+    .select({
+      id: reponses.id,
+      nom: reponses.nom,
+      telephone: reponses.telephone,
+      present: reponses.present,
+      nbPersonnes: reponses.nbPersonnes,
+      ceremonieIds: reponses.ceremonieIds,
+      message: reponses.message,
+      creeLe: reponses.creeLe,
+    })
+    .from(reponses)
+    .where(eq(reponses.evenementId, evenementId))
+    .orderBy(desc(reponses.creeLe))
 }
