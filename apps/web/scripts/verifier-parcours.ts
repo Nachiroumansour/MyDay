@@ -22,12 +22,15 @@ async function parcours(page: Page): Promise<void> {
   const voile = page.getByRole('dialog')
   verifier('l’enveloppe accueille l’invité', await voile.isVisible())
 
-  await page.getByRole('button', { name: 'Ouvrir l’invitation' }).click()
+  await page.getByRole('button', { name: 'Ouvrir l’enveloppe' }).click()
   await voile.waitFor({ state: 'hidden', timeout: 4000 })
   verifier('l’enveloppe s’efface après l’ouverture', !(await voile.isVisible()))
 
-  verifier('le programme est là', await page.getByText('Le programme').isVisible())
-  verifier('le repère guide l’invité', await page.getByText('Pour trouver').first().isVisible())
+  verifier('le programme est là', await page.getByText('Programme des cérémonies').isVisible())
+  verifier(
+    'le repère guide l’invité',
+    await page.getByText('pharmacie du Point E').first().isVisible(),
+  )
 
   await page.reload({ waitUntil: 'domcontentloaded' })
   verifier('l’ouverture ne se rejoue pas', !(await voile.isVisible()))
@@ -35,9 +38,9 @@ async function parcours(page: Page): Promise<void> {
   // La réponse. « Je serai là » est un bouton radio déguisé : on clique
   // l'étiquette, comme le ferait un invité.
   await page.getByText('Je serai là', { exact: true }).click()
-  await page.getByLabel('Votre nom').fill('Fatou Sarr')
-  await page.getByLabel('Votre numéro').fill('77 987 65 43')
-  await page.getByLabel('Vous serez combien ?').fill('3')
+  await page.getByLabel('Votre nom et prénom').fill('Fatou Sarr')
+  await page.getByLabel('Votre numéro WhatsApp').fill('77 987 65 43')
+  await page.getByLabel('Vous serez combien ?').selectOption('3')
 
   const cases = page.locator('input[name="ceremonies"]')
   await cases.first().check()
@@ -51,9 +54,9 @@ async function parcours(page: Page): Promise<void> {
   // Une seconde réponse depuis le même numéro doit corriger la première.
   await page.goto(`${base}/e/${slug}`, { waitUntil: 'domcontentloaded' })
   await page.getByText('Je serai là', { exact: true }).click()
-  await page.getByLabel('Votre nom').fill('Fatou Sarr')
-  await page.getByLabel('Votre numéro').fill('77 987 65 43')
-  await page.getByLabel('Vous serez combien ?').fill('5')
+  await page.getByLabel('Votre nom et prénom').fill('Fatou Sarr')
+  await page.getByLabel('Votre numéro WhatsApp').fill('77 987 65 43')
+  await page.getByLabel('Vous serez combien ?').selectOption('5')
   await page.locator('input[name="ceremonies"]').first().check()
   await page.getByRole('button', { name: 'Envoyer ma réponse' }).click()
   await page.getByText('C’est noté, merci.').waitFor({ timeout: 6000 })
@@ -68,8 +71,8 @@ async function parcours(page: Page): Promise<void> {
   // L'enveloppe ne se rejoue plus : elle a déjà été vue plus haut.
   await page.goto(`${base}/e/${slug}`, { waitUntil: 'domcontentloaded' })
   await page.getByText('Je serai là', { exact: true }).click()
-  await page.getByLabel('Votre nom').fill('Test')
-  await page.getByLabel('Votre numéro').fill('123')
+  await page.getByLabel('Votre nom et prénom').fill('Test')
+  await page.getByLabel('Votre numéro WhatsApp').fill('123')
   await page.locator('input[name="ceremonies"]').first().check()
   await page.getByRole('button', { name: 'Envoyer ma réponse' }).click()
   await page.getByText('Ce numéro ne semble pas valide', { exact: false }).waitFor({ timeout: 6000 })
@@ -80,27 +83,27 @@ async function parcours(page: Page): Promise<void> {
 async function parcoursClient(page: Page): Promise<void> {
   await page.goto(`${base}/?n1=Aminata&n2=Ibrahima`, { waitUntil: 'domcontentloaded' })
   verifier(
-    'l’accueil montre de vraies cartes',
-    (await page.locator('img[src*="/vignette.png"]').count()) >= 3,
+    'l’accueil montre une vraie carte du catalogue',
+    (await page.locator('img[src*="/vignette.png"]').count()) >= 1,
   )
   verifier(
-    'les vignettes portent déjà les prénoms du visiteur',
-    (await page.locator('img[src*="n1=Aminata"]').count()) >= 3,
+    'elle porte déjà les prénoms du visiteur',
+    (await page.locator('img[src*="n1=Aminata"]').count()) >= 1,
   )
 
-  await page.getByRole('link', { name: 'Les modèles' }).click()
+  await page.getByRole('link', { name: 'Catalogue' }).first().click()
   await page.waitForURL('**/modeles*')
   verifier('la galerie affiche le catalogue', (await page.locator('img[src*="/vignette.png"]').count()) > 8)
 
-  await page.getByRole('link', { name: 'Mariage', exact: true }).click()
+  await page.getByRole('link', { name: 'Mariage (takk)' }).first().click()
   await page.waitForURL('**type=mariage**')
   // Le titre porte désormais l'emoji de la fête : on vérifie qu'il le contient.
   verifier(
     'le filtre par type restreint le catalogue',
-    (await page.locator('h1').innerText()).includes('Mariage'),
+    (await page.locator('h1').innerText()).toLowerCase().includes('mariage'),
   )
 
-  await page.getByRole('link', { name: 'Aidez-moi à choisir' }).click()
+  await page.getByRole('link', { name: /test visuel/ }).click()
   await page.waitForURL('**/guide**')
   verifier('le guidage démarre', (await page.locator('h1').innerText()).length > 0)
 
@@ -250,10 +253,10 @@ async function parcoursModules(page: Page): Promise<void> {
     'l’enveloppe accueille l’invité par son nom',
     (await page.getByText('Pour Aminata Diallo').count()) > 0,
   )
-  await page.getByRole('button', { name: 'Passer' }).click()
+  await page.getByRole('button', { name: 'Passer l’animation' }).click()
   verifier(
     'sa réponse est déjà pré-remplie',
-    (await page.getByLabel('Votre nom').inputValue()) === 'Aminata Diallo',
+    (await page.getByLabel('Votre nom et prénom').inputValue()) === 'Aminata Diallo',
   )
 
   // Le livre d'or.

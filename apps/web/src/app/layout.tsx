@@ -1,15 +1,22 @@
 import type { Metadata } from 'next'
-import { Bricolage_Grotesque } from 'next/font/google'
-import { Marque } from '@/composants/marque'
+import { Inter, Playfair_Display } from 'next/font/google'
+import { Entete } from '@/composants/entete'
+import { PiedSite } from '@/composants/pied-site'
 import './globals.css'
 
-// Une seule famille pour toute l'interface (spec §9.5). `swap` garantit que le
-// texte s'affiche avant la police sur un réseau lent.
-const bricolage = Bricolage_Grotesque({
+/** Playfair pour les titres, Inter pour le texte — la maquette Stitch. */
+const playfair = Playfair_Display({
   subsets: ['latin'],
   display: 'swap',
-  // Police variable : next/font refuse une liste de graisses, il expose la plage.
-  variable: '--police-interface',
+  weight: ['500', '600', '700'],
+  variable: '--police-titre',
+})
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  weight: ['400', '500', '600'],
+  variable: '--police-texte',
 })
 
 /**
@@ -24,38 +31,18 @@ const origine =
 
 export const metadata: Metadata = {
   metadataBase: new URL(origine),
-  title: 'MyDay — Votre invitation, prête ce soir',
+  title: 'MyDay — Vos cérémonies, prêtes à être partagées ce soir',
   description:
     'Créez votre invitation de mariage, de baptême ou d’anniversaire, partagez-la sur WhatsApp et suivez les réponses de vos invités.',
 }
 
 export default function RacineLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={bricolage.variable}>
+    <html lang="fr" className={`${playfair.variable} ${inter.variable}`}>
       <body>
-        <header className="entete">
-          <div className="contenu entete-interieur">
-            <a href="/" aria-label="MyDay, accueil">
-              <Marque />
-            </a>
-            <nav className="entete-nav">
-              <a href="/modeles" className="lien-sobre">
-                Les modèles
-              </a>
-            </nav>
-          </div>
-        </header>
-
+        <Entete />
         {children}
-
-        <footer className="pied-site">
-          <div className="contenu pied-interieur">
-            <Marque taille={22} />
-            <p className="legende">
-              Cartes et invitations pour les mariages, baptêmes et anniversaires au Sénégal.
-            </p>
-          </div>
-        </footer>
+        <PiedSite />
       </body>
     </html>
   )

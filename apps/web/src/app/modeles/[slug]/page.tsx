@@ -1,10 +1,15 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Vignette } from '@/composants/vignette'
-import { Ambiance } from '@/composants/ambiance'
 import { IconeCachet, IconeEnvoi, IconeLieu, IconeReponses } from '@/composants/icones'
-import { festivite } from '@/lib/festivite'
 import { libelleEvenement } from '@/lib/evenements'
+
+/** Le libellé et la teinte du badge de chaque type de fête. */
+const BADGES = {
+  mariage: { libelle: 'Mariage (takk)', teinte: '#FFDBCF', encre: '#822801' },
+  bapteme: { libelle: 'Baptême (ngénte)', teinte: '#FED65B', encre: '#574500' },
+  anniversaire: { libelle: 'Réception & gala', teinte: '#FFD9DD', encre: '#7C2A3B' },
+} as const
 import { lireIdentite, versParametres } from '@/lib/identite'
 import { libelleEtiquette, scoreGabarit } from '@/lib/guidage'
 import { catalogue, gabaritParSlug } from '@/serveur/bdd/catalogue'
@@ -56,25 +61,19 @@ export default async function FicheModele({ params, searchParams }: Props) {
     )
     .slice(0, 3)
 
-  const fete = festivite(gabarit.typeEvenement)
+  const badge = BADGES[gabarit.typeEvenement]
 
   return (
     <main
       className="contenu"
       style={{
-        ['--evenement' as string]: fete.couleur,
-        ['--teinte' as string]: fete.couleurClaire,
+        ['--teinte-badge' as string]: badge.teinte,
+        ['--sur-badge' as string]: badge.encre,
       }}
     >
-      <div className={styles.bandeau}>
-        <Ambiance type={gabarit.typeEvenement} nombre={10} intensite={1} zone="bords" />
-        <p className={styles.bandeauInterieur}>
-          <span className={styles.bandeauEmoji}>{fete.emoji}</span>
-          <span className={styles.bandeauType}>
-            {libelleEvenement(gabarit.typeEvenement)}
-          </span>
-        </p>
-      </div>
+      <p className={`${styles.bandeau} ${styles.filAriane}`}>
+        <a href="/modeles">Catalogue</a> · {libelleEvenement(gabarit.typeEvenement)}
+      </p>
 
       <div className={styles.fiche}>
         <div className={styles.apercu}>
@@ -82,23 +81,25 @@ export default async function FicheModele({ params, searchParams }: Props) {
         </div>
 
         <div className={styles.infos}>
+          <span className={styles.badge}>{badge.libelle}</span>
           <div>
             <h1 className={styles.nom}>{gabarit.nom}</h1>
-            <p className={styles.auteur}>Dessiné par {gabarit.graphisteNom}</p>
+            <p className={styles.auteur}>Dessiné par {gabarit.graphisteNom}, à Dakar</p>
           </div>
 
           {gabarit.etiquettes.length > 0 && (
             <ul className={styles.pastilles}>
               {gabarit.etiquettes.map((etiquette) => (
-                <li key={etiquette} className={styles.pastille}>
+                <li key={etiquette} className="pilule">
                   {libelleEtiquette(etiquette)}
                 </li>
               ))}
             </ul>
           )}
 
-          <div>
-            <p className={styles.prix}>{formaterPrix(gabarit.prix)}</p>
+          <div className={styles.prixBloc}>
+            <span className={styles.prixLibelle}>À partir de</span>
+            <span className={styles.prix}>{formaterPrix(gabarit.prix)}</span>
             <p className={styles.prixDetail}>
               Créez et regardez gratuitement. Vous ne payez qu’au moment de publier.
             </p>

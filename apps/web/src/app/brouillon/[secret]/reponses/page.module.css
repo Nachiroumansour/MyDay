@@ -1,67 +1,169 @@
+.entete { display: flex; flex-direction: column; gap: 8px; padding-bottom: 8px; }
+.titre { font-family: var(--police-titre), serif; font-size: 26px; font-weight: 600; color: var(--primaire); }
+.intro { font-size: 15px; color: var(--encre-douce); max-width: 60ch; }
+
+/* ---------- Les chiffres ---------- */
+
 .chiffres {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 1px;
-  background: var(--trait);
-  border: 1px solid var(--trait);
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
 }
 
 .chiffre {
-  background: var(--surface);
-  padding: 18px;
+  padding: 20px;
+  border-radius: var(--rayon-lg);
+  background: var(--surface-carte);
+  border: 1px solid var(--surface-variante);
+  box-shadow: var(--ombre-carte);
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+}
+
+.chiffreTete { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.intitule { font-size: 14px; color: var(--encre-douce); }
+
+.pastille {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--teinte-pastille);
+  color: var(--sur-pastille);
+  display: grid;
+  place-items: center;
+  font-size: 15px;
 }
 
 .valeur {
-  font-size: 30px;
+  font-family: var(--police-titre), serif;
+  font-size: 34px;
   font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
+  line-height: 1.05;
   font-variant-numeric: tabular-nums;
 }
 
-.valeurAccent { composes: valeur; color: var(--evenement); }
+.valeurAccent { composes: valeur; color: var(--primaire); }
+.detail { font-size: 13px; color: var(--encre-douce); }
 
-.intitule { font-size: 13px; color: var(--encre-douce); }
+/* ---------- Par cérémonie ---------- */
 
-.parCeremonie { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.parCeremonie {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 14px;
+}
 
 .ligneCeremonie {
+  padding: 20px;
+  border-radius: var(--rayon-lg);
+  background: var(--surface-carte);
+  border: 1px solid var(--surface-variante);
+  box-shadow: var(--ombre-carte);
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 16px;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--trait);
+  flex-direction: column;
+  gap: 6px;
 }
 
-.nomCeremonie { font-weight: 500; }
-.detailCeremonie { font-size: 14px; color: var(--encre-douce); font-variant-numeric: tabular-nums; }
+.quandCeremonie { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--secondaire); font-weight: 600; }
+.nomCeremonie { font-family: var(--police-titre), serif; font-size: 19px; font-weight: 600; }
+
+.mesure { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 8px; }
+.mesureValeur { font-family: var(--police-titre), serif; font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.mesureLibelle { font-size: 13px; color: var(--encre-douce); }
+
+.jauge { height: 6px; border-radius: var(--rayon-plein); background: var(--surface-variante); overflow: hidden; }
+.jaugeRemplie { height: 100%; background: var(--primaire); border-radius: var(--rayon-plein); }
+
+.lieuCeremonie {
+  margin-top: 10px;
+  padding: 9px 12px;
+  border-radius: var(--rayon-md);
+  background: var(--surface-basse);
+  font-size: 13px;
+  color: var(--encre-douce);
+}
+
+/* ---------- Le tableau ---------- */
+
+.panneau {
+  padding: 22px;
+  border-radius: var(--rayon-lg);
+  background: var(--surface-carte);
+  border: 1px solid var(--surface-variante);
+  box-shadow: var(--ombre-carte);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.panneauTete { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; justify-content: space-between; }
+.panneauTitre { font-family: var(--police-titre), serif; font-size: 20px; font-weight: 600; }
 
 .tableau { width: 100%; overflow-x: auto; }
+.tableau table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 680px; }
 
-.tableau table {
-  border-collapse: collapse;
-  width: 100%;
-  font-size: 15px;
-  min-width: 620px;
-}
-
-.tableau th,
-.tableau td {
+.tableau th, .tableau td {
   text-align: left;
-  padding: 12px 16px 12px 0;
-  border-bottom: 1px solid var(--trait);
-  vertical-align: top;
+  padding: 14px 16px 14px 0;
+  border-bottom: 1px solid var(--surface-variante);
+  vertical-align: middle;
 }
 
-.tableau th { font-size: 13px; font-weight: 500; color: var(--encre-douce); }
+.tableau th {
+  font-size: 11px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--encre-douce);
+}
 
-.oui { color: var(--evenement); font-weight: 500; }
-.non { color: var(--encre-douce); }
+.invite { display: flex; align-items: center; gap: 10px; }
+
+.initiales {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--teinte-initiales);
+  color: var(--sur-initiales);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.inviteNom { display: block; font-weight: 600; }
+.inviteTel { font-size: 12px; color: var(--encre-douce); text-decoration: none; }
+.inviteTel:hover { color: var(--primaire); }
+
+.statut {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--rayon-plein);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.present { composes: statut; background: #DDF3E4; color: #14663A; }
+.absent { composes: statut; background: #FFD9DD; color: #7C2A3B; }
+
+.jetons { display: flex; flex-wrap: wrap; gap: 5px; }
+
+.jeton {
+  padding: 3px 9px;
+  border-radius: var(--rayon);
+  background: var(--surface-teintee);
+  font-size: 12px;
+}
 
 .nombre { font-variant-numeric: tabular-nums; }
+.mot { color: var(--encre-douce); font-style: italic; }
 
-.vide { color: var(--encre-douce); padding: 32px 0; }
+.vide { padding: 40px 0; color: var(--encre-douce); text-align: center; }

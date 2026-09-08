@@ -1,29 +1,33 @@
 .barre {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 12px;
+  gap: 14px;
   padding: 20px;
-  background: var(--surface);
-  border: 1px solid var(--trait);
+  background: var(--surface-basse);
+  border: 1px solid var(--surface-variante);
+  border-radius: var(--rayon-lg);
+  box-shadow: var(--ombre-carte);
   width: 100%;
-  max-width: 720px;
+  max-width: 620px;
 }
 
-.compacte {
-  composes: barre;
-  padding: 16px;
-}
+.compacte { composes: barre; padding: 16px; }
 
-.champ {
+.tete {
   display: flex;
-  flex-direction: column;
-  gap: 5px;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-@media (min-width: 620px) {
-  .barre {
-    grid-template-columns: 1fr 1fr 1fr auto;
-    align-items: end;
-  }
-  .barre button { height: 46px; }
+.intitule { font-size: 14px; font-weight: 600; }
+.direct { font-size: 12px; font-weight: 500; color: var(--primaire); }
+
+.champs { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.champ { display: flex; flex-direction: column; gap: 5px; }
+
+@media (min-width: 560px) {
+  .champs { grid-template-columns: 1fr 1fr auto; align-items: end; }
+  .champs button { height: 44px; }
 }

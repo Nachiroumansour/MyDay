@@ -1,23 +1,58 @@
+/* ------------------------------------------------------------------ *
+ * Système de design MyDay.
+ *
+ * Repris de la maquette Stitch : fond crème, terracotta en couleur
+ * principale, Playfair Display pour les titres et Inter pour le texte.
+ * ------------------------------------------------------------------ */
+
 :root {
-  --fond: #F7F8FA;
-  --surface: #FFFFFF;
-  --trait: #E3E6EC;
-  --encre: #14161D;
-  --encre-douce: #5A6070;
+  /* Surfaces, du plus clair au plus sombre */
+  --surface: #fcf9f3;
+  --surface-basse: #f6f3ed;
+  --surface-carte: #ffffff;
+  --surface-teintee: #f0eee8;
+  --surface-haute: #ebe8e2;
+  --surface-variante: #e5e2dc;
 
-  --mariage: #2C3A80;
-  --bapteme: #1F6B4A;
-  --anniversaire: #C9700F;
+  /* Encres */
+  --encre: #1c1c18;
+  --encre-douce: #57423b;
+  --contour: #8a726a;
+  --contour-clair: #dec0b7;
 
-  /* Prend la couleur du type d'événement en cours. */
-  --evenement: var(--encre);
+  /* Couleur principale : la terre cuite */
+  --primaire: #9f3c16;
+  --primaire-vive: #bf542c;
+  --primaire-claire: #ffdbcf;
+  --sur-primaire: #ffffff;
 
-  --marge-laterale: 20px;
-  --largeur-maximale: 1100px;
+  /* Secondaire : l'ocre et le safran */
+  --secondaire: #735c00;
+  --secondaire-claire: #fed65b;
+  --sur-secondaire-claire: #745c00;
 
-  --duree-courte: 120ms;
-  --duree-scene: 320ms;
-  --pose-carte: 60ms;
+  /* Tertiaire : le bordeaux */
+  --tertiaire: #973f50;
+  --tertiaire-claire: #ffd9dd;
+  --sur-tertiaire-claire: #7c2a3b;
+
+  --erreur: #ba1a1a;
+
+  /* La couleur de la fête en cours, réassignée par page */
+  --evenement: var(--primaire);
+
+  --rayon: 0.25rem;
+  --rayon-md: 0.5rem;
+  --rayon-lg: 0.75rem;
+  --rayon-plein: 9999px;
+
+  --marge-laterale: 1.5rem;
+  --largeur-maximale: 80rem;
+  --ecart-section: 4rem;
+
+  --court: 160ms;
+  --ombre-carte: 0 1px 2px rgba(28, 28, 24, 0.04), 0 8px 24px -12px rgba(28, 28, 24, 0.14);
+  --ombre-levee: 0 2px 6px rgba(28, 28, 24, 0.06), 0 18px 40px -16px rgba(28, 28, 24, 0.22);
 }
 
 * { box-sizing: border-box; }
@@ -25,28 +60,256 @@
 html, body {
   margin: 0;
   padding: 0;
-  background: var(--fond);
+  background: var(--surface);
   color: var(--encre);
 }
 
 body {
-  font-family: var(--police-interface), system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: var(--police-texte), system-ui, -apple-system, 'Segoe UI', sans-serif;
   font-size: 16px;
-  line-height: 1.625;
-  font-weight: 400;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -0.02em; text-wrap: balance; }
-h1 { font-size: 40px; line-height: 1.1; }
-h2 { font-size: 24px; line-height: 1.25; font-weight: 500; }
-p  { margin: 0; max-width: 66ch; }
+h1, h2, h3 {
+  margin: 0;
+  font-family: var(--police-titre), Georgia, 'Times New Roman', serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+p { margin: 0; }
+a { color: inherit; }
+
+:focus-visible { outline: 2px solid var(--primaire); outline-offset: 3px; }
+
+/* ---------- Gabarit ---------- */
+
+.contenu {
+  max-width: var(--largeur-maximale);
+  margin: 0 auto;
+  padding: 0 var(--marge-laterale);
+}
+
+/* ---------- Typographie ---------- */
+
+.sur-titre {
+  font-family: var(--police-texte), sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primaire);
+}
 
 .legende { font-size: 14px; line-height: 1.43; color: var(--encre-douce); }
 
-:focus-visible {
-  outline: 2px solid var(--evenement);
-  outline-offset: 3px;
+/* ---------- Boutons ---------- */
+
+.bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 22px;
+  border: 1px solid var(--primaire);
+  border-radius: var(--rayon-md);
+  background: var(--primaire);
+  color: var(--sur-primaire);
+  font: inherit;
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--court), border-color var(--court);
+}
+
+.bouton:hover { background: var(--primaire-vive); border-color: var(--primaire-vive); }
+
+.bouton-contour {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 22px;
+  border: 1px solid var(--surface-variante);
+  border-radius: var(--rayon-md);
+  background: var(--surface-carte);
+  color: var(--encre);
+  font: inherit;
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color var(--court), color var(--court);
+}
+
+.bouton-contour:hover { border-color: var(--primaire); color: var(--primaire); }
+
+.lien-sobre {
+  color: var(--primaire);
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 1px solid transparent;
+}
+.lien-sobre:hover { border-bottom-color: currentColor; }
+
+/* ---------- Pilules ---------- */
+
+.pilule {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--rayon-plein);
+  background: var(--surface-teintee);
+  color: var(--encre-douce);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--court), color var(--court);
+}
+
+.pilule:hover { background: var(--surface-haute); color: var(--encre); }
+
+.pilule-active {
+  background: var(--primaire);
+  color: var(--sur-primaire);
+}
+.pilule-active:hover { background: var(--primaire-vive); color: var(--sur-primaire); }
+
+/* ---------- Cartes ---------- */
+
+.carte {
+  background: var(--surface-carte);
+  border: 1px solid var(--surface-variante);
+  border-radius: var(--rayon-lg);
+  box-shadow: var(--ombre-carte);
+}
+
+/* ---------- Champs ---------- */
+
+.saisie {
+  font: inherit;
+  font-size: 15px;
+  padding: 12px 14px;
+  border: 1px solid var(--surface-variante);
+  border-radius: var(--rayon-md);
+  background: var(--surface-carte);
+  color: var(--encre);
+  width: 100%;
+}
+
+.saisie:focus-visible { border-color: var(--primaire); outline: none; }
+
+.etiquette-champ {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--encre-douce);
+}
+
+/* ---------- En-tête ---------- */
+
+.entete {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(252, 249, 243, 0.86);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 1px 8px rgba(28, 28, 24, 0.04);
+}
+
+.entete-interieur {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 72px;
+}
+
+.entete-marque {
+  font-family: var(--police-titre), serif;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--primaire);
+  text-decoration: none;
+}
+
+.entete-nav { display: none; gap: 6px; align-items: center; }
+
+.entete-lien {
+  padding: 8px 16px;
+  border-radius: var(--rayon-lg);
+  font-size: 14px;
+  color: var(--encre-douce);
+  text-decoration: none;
+  transition: color var(--court), background var(--court);
+}
+
+.entete-lien:hover { color: var(--encre); }
+
+.entete-lien-actif {
+  background: var(--primaire-claire);
+  color: var(--sur-tertiaire-claire);
+  font-weight: 500;
+}
+
+.entete-region {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--rayon-plein);
+  background: var(--surface-teintee);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--encre-douce);
+}
+
+@media (min-width: 900px) {
+  .entete-nav { display: flex; }
+}
+
+/* ---------- Pied de page ---------- */
+
+.pied-site {
+  margin-top: var(--ecart-section);
+  border-top: 1px solid var(--surface-variante);
+  background: var(--surface-basse);
+}
+
+.pied-grille {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  padding: 48px 0 32px;
+}
+
+.pied-marque {
+  font-family: var(--police-titre), serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--primaire);
+}
+
+.pied-colonne { display: flex; flex-direction: column; gap: 10px; }
+.pied-titre { font-size: 14px; font-weight: 600; }
+.pied-lien { font-size: 14px; color: var(--encre-douce); text-decoration: none; }
+.pied-lien:hover { color: var(--primaire); }
+
+.pied-bas {
+  border-top: 1px solid var(--surface-variante);
+  padding: 20px 0 28px;
+  font-size: 13px;
+  color: var(--encre-douce);
+  text-align: center;
+}
+
+@media (min-width: 760px) {
+  .pied-grille { grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -55,112 +318,4 @@ p  { margin: 0; max-width: 66ch; }
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-}
-
-/* ------------------------------------------------------------------ *
- * Éléments communs au parcours créateur.
- * ------------------------------------------------------------------ */
-
-.contenu {
-  max-width: var(--largeur-maximale);
-  margin: 0 auto;
-  padding: 0 var(--marge-laterale);
-}
-
-a { color: inherit; }
-
-.lien-sobre {
-  color: var(--encre);
-  text-decoration: none;
-  border-bottom: 1px solid var(--trait);
-}
-.lien-sobre:hover { border-color: var(--evenement); }
-
-/* Bouton principal : plein, dans la couleur de l'événement en cours. */
-.bouton {
-  display: inline-block;
-  padding: 14px 22px;
-  background: var(--evenement);
-  color: #ffffff;
-  border: 1px solid var(--evenement);
-  font: inherit;
-  font-weight: 600;
-  font-size: 16px;
-  text-decoration: none;
-  text-align: center;
-  cursor: pointer;
-  transition: opacity var(--duree-courte);
-}
-.bouton:hover { opacity: 0.88; }
-
-/* Bouton secondaire : un simple contour. */
-.bouton-contour {
-  display: inline-block;
-  padding: 13px 21px;
-  background: transparent;
-  color: var(--encre);
-  border: 1px solid var(--trait);
-  font: inherit;
-  font-weight: 600;
-  font-size: 16px;
-  text-decoration: none;
-  text-align: center;
-  cursor: pointer;
-  transition: border-color var(--duree-courte), color var(--duree-courte);
-}
-.bouton-contour:hover { border-color: var(--evenement); color: var(--evenement); }
-
-.saisie {
-  font: inherit;
-  padding: 12px 14px;
-  border: 1px solid var(--trait);
-  background: var(--surface);
-  color: var(--encre);
-  width: 100%;
-}
-.saisie:focus-visible { border-color: var(--evenement); outline: none; }
-
-.etiquette-champ {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--encre-douce);
-}
-
-/* ---------- Chrome du site ---------- */
-
-.entete {
-  border-bottom: 1px solid var(--trait);
-  background: var(--fond);
-}
-
-.entete-interieur {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding-top: 16px;
-  padding-bottom: 16px;
-}
-
-.entete-interieur a { text-decoration: none; }
-
-.entete-nav {
-  display: flex;
-  gap: 18px;
-  font-size: 15px;
-  font-weight: 500;
-}
-
-.pied-site {
-  border-top: 1px solid var(--trait);
-  margin-top: 72px;
-}
-
-.pied-interieur {
-  padding-top: 32px;
-  padding-bottom: 48px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: flex-start;
 }

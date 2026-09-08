@@ -1,6 +1,5 @@
 import { Vignette } from '@/composants/vignette'
 import {
-  couleurEvenement,
   estTypeEvenement,
   libelleEvenement,
   TYPES_EVENEMENT,
@@ -45,7 +44,7 @@ export default async function Guide({ searchParams }: { searchParams: Promise<Re
     return (
       <main className="contenu">
         <div className={styles.guide}>
-          <p className={styles.progression}>1 sur 4</p>
+          <p className={styles.progression}>Étape 1 sur 4</p>
           <h1 className={styles.question}>Quelle fête préparez-vous ?</h1>
           <ul className={styles.types}>
             {TYPES_EVENEMENT.map((candidat) => {
@@ -55,7 +54,6 @@ export default async function Guide({ searchParams }: { searchParams: Promise<Re
                   <a
                     className={styles.type}
                     href={lienEtape(requete, { type: candidat })}
-                    style={{ ['--evenement' as string]: couleurEvenement(candidat) }}
                   >
                     {apercu && <Vignette gabarit={apercu} identite={identite} largeur={300} />}
                     <span className={styles.typeNom}>{libelleEvenement(candidat)}</span>
@@ -74,7 +72,6 @@ export default async function Guide({ searchParams }: { searchParams: Promise<Re
     )
   }
 
-  const couleur = couleurEvenement(type)
   const etapes = etapesGuidage(type)
   const choix: Record<string, string> = {}
   for (const etape of etapes) {
@@ -94,9 +91,9 @@ export default async function Guide({ searchParams }: { searchParams: Promise<Re
       )[0]
 
     return (
-      <main className="contenu" style={{ ['--evenement' as string]: couleur }}>
+    <main className="contenu">
         <div className={styles.guide}>
-          <p className={styles.progression}>{rang} sur 4</p>
+          <p className={styles.progression}>Étape {rang} sur 4</p>
           <h1 className={styles.question}>{prochaine.question}</h1>
           <ul className={styles.options}>
             {prochaine.options.map((option) => {
@@ -139,7 +136,7 @@ export default async function Guide({ searchParams }: { searchParams: Promise<Re
   }`
 
   return (
-    <main className="contenu" style={{ ['--evenement' as string]: couleur }}>
+    <main className="contenu">
       <div className={styles.guide}>
         <div className={styles.resultat}>
           <p className={styles.progression}>Votre style</p>

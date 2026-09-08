@@ -1,4 +1,7 @@
 /** @jsxImportSource preact */
+
+import { IconeCoche } from './icones'
+
 interface CeremonieChoisissable {
   id: string
   nom: string
@@ -26,10 +29,13 @@ const MESSAGES: Record<string, string> = {
 export function Merci() {
   return (
     <div className="merci">
+      <span className="merci-pastille">
+        <IconeCoche />
+      </span>
       <p className="merci-titre">C’est noté, merci.</p>
       <p className="aide">
-        Les hôtes ont reçu votre réponse. Revenez sur cette page quand vous voulez pour
-        retrouver le programme et les adresses.
+        Les hôtes ont reçu votre réponse. Revenez quand vous voulez pour retrouver le
+        programme et les adresses.
       </p>
     </div>
   )
@@ -41,104 +47,59 @@ export function Merci() {
  * par deux boutons radio déguisés en boutons, ce qui préserve le clavier et
  * les lecteurs d'écran.
  */
-export default function Rsvp({ slug, ceremonies, champsFautifs, choixPrecedent, invite }: Props) {
+export default function Rsvp({
+  slug,
+  ceremonies,
+  champsFautifs,
+  choixPrecedent,
+  invite,
+}: Props) {
   const erreur = (champ: string) =>
     champsFautifs.includes(champ) ? MESSAGES[champ] : undefined
 
   return (
     <form method="post" action={`/e/${slug}/repondre`} className="rsvp">
-      <div className="choix">
-        <input
-          type="radio"
-          id="rsvp-oui"
-          name="present"
-          value="oui"
-          className="radio"
-          defaultChecked={choixPrecedent === 'oui'}
-          required
-        />
-        <label htmlFor="rsvp-oui" className="bouton-choix">
-          Je serai là
-        </label>
+      <div>
+        <p className="pli-sur-titre">Confirmation de présence</p>
+        <h2 className="rsvp-titre">S’inscrire en dix secondes</h2>
+        <p className="rsvp-intro">Sans créer de compte. Vos hôtes reçoivent votre réponse aussitôt.</p>
+      </div>
 
-        <input
-          type="radio"
-          id="rsvp-non"
-          name="present"
-          value="non"
-          className="radio radio-absent"
-          defaultChecked={choixPrecedent === 'non'}
-        />
-        <label htmlFor="rsvp-non" className="bouton-choix">
-          Je ne peux pas
-        </label>
+      <div className="choix">
+        <input type="radio" id="rsvp-oui" name="present" value="oui" className="radio"
+               defaultChecked={choixPrecedent === 'oui'} required />
+        <label htmlFor="rsvp-oui" className="bouton-choix">Je serai là</label>
+
+        <input type="radio" id="rsvp-non" name="present" value="non" className="radio radio-absent"
+               defaultChecked={choixPrecedent === 'non'} />
+        <label htmlFor="rsvp-non" className="bouton-choix">Je ne peux pas</label>
       </div>
 
       <div className="details">
         <div className="champ">
-          <label className="etiquette" htmlFor="rsvp-nom">
-            Votre nom
-          </label>
-          <input
-            id="rsvp-nom"
-            name="nom"
-            className="saisie"
-            autoComplete="name"
-            defaultValue={invite?.nomComplet ?? ''}
-            required
-          />
+          <label className="etiquette" htmlFor="rsvp-nom">Votre nom et prénom</label>
+          <input id="rsvp-nom" name="nom" className="saisie" autoComplete="name"
+                 placeholder="Aminata Diallo" defaultValue={invite?.nomComplet ?? ''} required />
           {erreur('nom') && <p className="erreur">{erreur('nom')}</p>}
         </div>
 
         <div className="champ">
-          <label className="etiquette" htmlFor="rsvp-telephone">
-            Votre numéro
-          </label>
-          <input
-            id="rsvp-telephone"
-            name="telephone"
-            className="saisie"
-            type="tel"
-            inputMode="tel"
-            autoComplete="tel"
-            placeholder="77 123 45 67"
-            defaultValue={invite?.telephone ?? ''}
-            required
-          />
-          {erreur('telephone') ? (
-            <p className="erreur">{erreur('telephone')}</p>
-          ) : (
-            <p className="aide">Seuls les hôtes le voient.</p>
-          )}
-        </div>
-
-        <div className="champ si-present">
-          <label className="etiquette" htmlFor="rsvp-nb">
-            Vous serez combien ?
-          </label>
-          <input
-            id="rsvp-nb"
-            name="nbPersonnes"
-            className="saisie"
-            type="number"
-            inputMode="numeric"
-            min={1}
-            max={20}
-            defaultValue={1}
-          />
-          {erreur('nbPersonnes') && <p className="erreur">{erreur('nbPersonnes')}</p>}
+          <label className="etiquette" htmlFor="rsvp-telephone">Votre numéro WhatsApp</label>
+          <input id="rsvp-telephone" name="telephone" className="saisie" type="tel"
+                 inputMode="tel" autoComplete="tel" placeholder="77 123 45 67"
+                 defaultValue={invite?.telephone ?? ''} required />
+          {erreur('telephone')
+            ? <p className="erreur">{erreur('telephone')}</p>
+            : <p className="aide">Seuls les hôtes le voient.</p>}
         </div>
 
         {ceremonies.length > 1 ? (
           <fieldset className="ceremonies si-present">
-            <legend>À quelles cérémonies ?</legend>
+            <legend>À quelles cérémonies serez-vous ?</legend>
             {ceremonies.map((ceremonie) => (
-              <label key={ceremonie.id} className="coche">
+              <label key={ceremonie.id} className="coche" title={ceremonie.quand}>
                 <input type="checkbox" name="ceremonies" value={ceremonie.id} />
-                <span>
-                  {ceremonie.nom}
-                  <small>{ceremonie.quand}</small>
-                </span>
+                {ceremonie.nom}
               </label>
             ))}
             {erreur('ceremonieIds') && <p className="erreur">{erreur('ceremonieIds')}</p>}
@@ -147,6 +108,18 @@ export default function Rsvp({ slug, ceremonies, champsFautifs, choixPrecedent, 
           ceremonies[0] && <input type="hidden" name="ceremonies" value={ceremonies[0].id} />
         )}
 
+        <div className="champ si-present">
+          <label className="etiquette" htmlFor="rsvp-nb">Vous serez combien ?</label>
+          <select id="rsvp-nb" name="nbPersonnes" className="liste" defaultValue="1">
+            {Array.from({ length: 10 }, (_, rang) => rang + 1).map((n) => (
+              <option key={n} value={n}>
+                {n === 1 ? '1 personne (moi seul)' : `${n} personnes`}
+              </option>
+            ))}
+          </select>
+          {erreur('nbPersonnes') && <p className="erreur">{erreur('nbPersonnes')}</p>}
+        </div>
+
         <div className="champ">
           <label className="etiquette" htmlFor="rsvp-message">
             Un mot pour les hôtes <span className="aide">(facultatif)</span>
@@ -154,9 +127,7 @@ export default function Rsvp({ slug, ceremonies, champsFautifs, choixPrecedent, 
           <textarea id="rsvp-message" name="message" className="zone" maxLength={500} />
         </div>
 
-        <button type="submit" className="envoyer">
-          Envoyer ma réponse
-        </button>
+        <button type="submit" className="envoyer">Envoyer ma réponse</button>
       </div>
     </form>
   )

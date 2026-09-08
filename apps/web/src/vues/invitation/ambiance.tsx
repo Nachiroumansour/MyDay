@@ -1,88 +1,26 @@
 /** @jsxImportSource preact */
 
-import type { TypeEvenement } from '@/lib/evenements'
-import { festivite, grainsAmbiance, type ZoneAmbiance } from '@/lib/festivite'
-
 /**
- * L'ambiance de la page invitation.
+ * La pluie de la fête : pétales pour un mariage, étoiles douces pour un
+ * baptême, confettis et chapeaux pour un anniversaire.
  *
- * Jumelle du composant des pages du créateur, mais sans CSS Modules : cette
- * page est rendue en HTML statique avec sa feuille de style en ligne. Tout est
- * en CSS — la page reste à zéro JavaScript.
+ * Ce sont des formes dessinées en CSS, pas des emoji : un emoji change de
+ * dessin d'un téléphone à l'autre, et pèse une police entière quand la page
+ * doit rester sous les cent kilo-octets. Les positions, durées et retards
+ * vivent dans la feuille de style (`:nth-child`) — ici, on ne pose que le
+ * nombre d'éléments et le décor à jouer.
  */
-export function Ambiance({
-  type,
-  nombre = 16,
-  intensite = 1,
-  zone = 'partout',
-  teinte,
-}: {
-  type: TypeEvenement
-  nombre?: number
-  intensite?: number
-  zone?: ZoneAmbiance
-  /** À forcer en blanc sur un aplat coloré. */
-  teinte?: string
-}) {
-  const fete = festivite(type)
-  const grains = grainsAmbiance(type, nombre, zone)
 
+const NOMBRE = 14
+
+export type TypeFete = 'mariage' | 'bapteme' | 'anniversaire'
+
+export function Ambiance({ type }: { type: TypeFete }) {
   return (
-    <span className="scene" aria-hidden="true">
-      {grains.map((grain, rang) => (
-        <span
-          key={rang}
-          className={`grain ${fete.forme}`}
-          style={{
-            left: `${grain.gauche}%`,
-            width: fete.forme === 'confetti' ? grain.taille * 0.45 : grain.taille,
-            height: grain.taille,
-            background: teinte ?? fete.couleur,
-            border: fete.forme === 'bulle' ? `1.5px solid ${teinte ?? fete.couleur}` : undefined,
-            // Négatif : des grains sont visibles dès le premier instant.
-            animationDelay: `-${grain.delai}s`,
-            animationDuration: `${grain.duree}s`,
-            ['--opacite' as string]: String(Math.round(grain.opacite * intensite * 100) / 100),
-          }}
-        />
+    <div className="ciel" data-fete={type} aria-hidden="true">
+      {Array.from({ length: NOMBRE }, (_, i) => (
+        <span key={i} className="flocon" />
       ))}
-    </span>
-  )
-}
-
-/**
- * L'éclosion : la gerbe qui part du cachet au moment où l'enveloppe s'ouvre.
- * Elle ne se déclenche que sous `data-etat="ouverture"`, dure deux secondes et
- * demie, puis disparaît. Une boucle infinie fatiguerait en dix secondes.
- */
-export function Eclosion({
-  type,
-  nombre = 20,
-  classe = 'eclosion',
-}: {
-  type: TypeEvenement
-  nombre?: number
-  classe?: string
-}) {
-  const fete = festivite(type)
-  const grains = grainsAmbiance(type, nombre)
-
-  return (
-    <span className={classe} aria-hidden="true">
-      {grains.map((grain, rang) => (
-        <span
-          key={rang}
-          className="eclat"
-          style={{
-            width: fete.forme === 'confetti' ? grain.taille * 0.5 : grain.taille,
-            height: grain.taille,
-            background: fete.couleur,
-            animationDelay: `${(rang % 6) * 45}ms`,
-            ['--angle' as string]: `${(rang / nombre) * 360}deg`,
-            ['--portee' as string]: `${-100 - grain.taille * 4}px`,
-          }}
-        />
-      ))}
-    </span>
+    </div>
   )
 }

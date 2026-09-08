@@ -1,14 +1,7 @@
 import { BarreIdentite } from '@/composants/barre-identite'
 import { Vignette } from '@/composants/vignette'
-import {
-  couleurEvenement,
-  estTypeEvenement,
-  libelleEvenement,
-  TYPES_EVENEMENT,
-} from '@/lib/evenements'
+import { estTypeEvenement, libelleEvenement, TYPES_EVENEMENT } from '@/lib/evenements'
 import { lireIdentite, versParametres } from '@/lib/identite'
-import { festivite } from '@/lib/festivite'
-import { Ambiance } from '@/composants/ambiance'
 import { libelleEtiquette, nommerStyle } from '@/lib/guidage'
 import { catalogue, etiquettesDisponibles } from '@/serveur/bdd/catalogue'
 import styles from './page.module.css'
@@ -16,6 +9,13 @@ import styles from './page.module.css'
 export const revalidate = 3600
 
 type Requete = Record<string, string | string[] | undefined>
+
+/** Le libellé et la teinte du badge de chaque type de fête. */
+const BADGES = {
+  mariage: { libelle: 'Mariage (takk)', teinte: '#FFDBCF', encre: '#822801' },
+  bapteme: { libelle: 'Baptême (ngénte)', teinte: '#FED65B', encre: '#574500' },
+  anniversaire: { libelle: 'Réception & gala', teinte: '#FFD9DD', encre: '#7C2A3B' },
+} as const
 
 function premier(requete: Requete, cle: string): string | undefined {
   const valeur = requete[cle]
@@ -39,11 +39,15 @@ function lienFiltre(
       : [...base.tags, changement.tag]
   }
   for (const tag of tags) params.append('t', tag)
+  if (base.identite) params.set('__', '')
 
-  const chaine = params.toString()
-  return `/modeles${chaine || base.identite ? '?' : ''}${chaine}${
-    base.identite ? `${chaine ? '&' : ''}${base.identite}` : ''
-  }`
+  const chaine = params.toString().replace(/&?__=$/, '')
+  const morceaux = [chaine, base.identite].filter(Boolean)
+  return `/modeles${morceaux.length ? `?${morceaux.join('&')}` : ''}`
+}
+
+function formaterPrix(montant: number): string {
+  return `${montant.toLocaleString('fr-FR')} F CFA`
 }
 
 export default async function Galerie({ searchParams }: { searchParams: Promise<Requete> }) {
@@ -63,64 +67,66 @@ export default async function Galerie({ searchParams }: { searchParams: Promise<
   ])
 
   const base = { ...(type ? { type } : {}), tags, identite: parametres }
-  const fete = type ? festivite(type) : undefined
 
   return (
-    <main
-      className="contenu"
-      style={
-        fete
-          ? {
-              ['--evenement' as string]: fete.couleur,
-              ['--teinte' as string]: fete.couleurClaire,
-            }
-          : undefined
-      }
-    >
+    <main className="contenu">
       <div className={styles.tete}>
-        {type && <Ambiance type={type} nombre={12} intensite={1.1} zone="bords" />}
-        <div className={styles.teteInterieur}>
+        <div>
+          <p className="sur-titre">Catalogue exclusif</p>
           <h1 className={styles.titre}>
-            {fete && <span className={styles.titreEmoji}>{fete.emoji}</span>}
             {tags.length > 0
               ? nommerStyle(tags)
               : type
-                ? libelleEvenement(type)
-                : 'Tous les modèles'}
+                ? `Nos ${libelleEvenement(type).toLowerCase()}s`
+                : 'La galerie des cérémonies'}
           </h1>
-          <BarreIdentite identite={identite} action="/modeles" compact />
+          <p className={styles.intro}>
+            Des invitations dessinées à Dakar pour vos mariages, baptêmes et réceptions.
+            Écrivez vos prénoms : chaque modèle s’affiche aussitôt avec.
+          </p>
         </div>
+
+        <a className={styles.guidage} href={`/guide${parametres ? `?${parametres}` : ''}`}>
+          <span className={styles.guidagePastille} aria-hidden="true">
+            ✦
+          </span>
+          <span>
+            <span className={styles.guidageTitre}>Vous hésitez sur le style ?</span>
+            <span className={styles.guidageLien}>Lancer le test visuel →</span>
+          </span>
+        </a>
+      </div>
+
+      <div style={{ paddingBottom: 24 }}>
+        <BarreIdentite identite={identite} action="/modeles" compact />
       </div>
 
       <div className={styles.filtres}>
         <div className={styles.rangee}>
           <a
-            className={type ? styles.pastille : styles.pastilleActive}
+            className={`pilule ${type ? '' : 'pilule-active'}`}
             href={lienFiltre(base, { type: null })}
           >
-            Tous
+            Tous ({modeles.length})
           </a>
           {TYPES_EVENEMENT.map((candidat) => (
             <a
               key={candidat}
-              className={type === candidat ? styles.pastilleActive : styles.pastille}
+              className={`pilule ${type === candidat ? 'pilule-active' : ''}`}
               href={lienFiltre(base, { type: candidat })}
-              style={{ ['--evenement' as string]: couleurEvenement(candidat) }}
             >
-              {libelleEvenement(candidat)}
+              {BADGES[candidat].libelle}
             </a>
           ))}
-          <a className={`${styles.aide} lien-sobre`} href="/guide">
-            Aidez-moi à choisir
-          </a>
         </div>
 
         {etiquettes.length > 0 && (
           <div className={styles.rangee}>
+            <span className={styles.etiquetteFiltre}>Ambiance</span>
             {etiquettes.map((etiquette) => (
               <a
                 key={etiquette}
-                className={tags.includes(etiquette) ? styles.pastilleActive : styles.pastille}
+                className={`pilule ${tags.includes(etiquette) ? 'pilule-active' : ''}`}
                 href={lienFiltre(base, { tag: etiquette })}
               >
                 {libelleEtiquette(etiquette)}
@@ -130,9 +136,9 @@ export default async function Galerie({ searchParams }: { searchParams: Promise<
         )}
       </div>
 
-      <p className={styles.compte} style={{ paddingTop: 20 }}>
+      <p className={styles.compte}>
         {modeles.length} modèle{modeles.length > 1 ? 's' : ''}
-        {identite.nom1 ? `, déjà à vos noms` : ''}
+        {identite.nom1 ? ', déjà à vos noms' : ''}
       </p>
 
       {modeles.length === 0 ? (
@@ -144,23 +150,49 @@ export default async function Galerie({ searchParams }: { searchParams: Promise<
         </div>
       ) : (
         <ul className={styles.grille}>
-          {modeles.map((gabarit, rang) => (
-            <li key={gabarit.id}>
-              <a
-                className={styles.modele}
-                href={`/modeles/${gabarit.slug}${parametres ? `?${parametres}` : ''}`}
-              >
-                <Vignette
-                  gabarit={gabarit}
-                  identite={identite}
-                  largeur={480}
-                  priorite={rang < 4}
-                />
-                <span className={styles.nom}>{gabarit.nom}</span>
-                <span className={styles.auteur}>{gabarit.graphisteNom}</span>
-              </a>
-            </li>
-          ))}
+          {modeles.map((gabarit, rang) => {
+            const badge = BADGES[gabarit.typeEvenement]
+            return (
+              <li key={gabarit.id}>
+                <a
+                  className={styles.modele}
+                  href={`/modeles/${gabarit.slug}${parametres ? `?${parametres}` : ''}`}
+                >
+                  <span
+                    className={styles.modeleVisuel}
+                    style={{
+                      ['--teinte-badge' as string]: badge.teinte,
+                      ['--sur-badge' as string]: badge.encre,
+                    }}
+                  >
+                    <span className={styles.modeleBadge}>{badge.libelle}</span>
+                    <Vignette
+                      gabarit={gabarit}
+                      identite={identite}
+                      largeur={480}
+                      priorite={rang < 3}
+                    />
+                  </span>
+
+                  <span className={styles.modeleCorps}>
+                    <span className={styles.modeleAmbiance}>
+                      {gabarit.etiquettes.slice(0, 2).map(libelleEtiquette).join(' · ') || '—'}
+                    </span>
+                    <span className={styles.modeleNom}>{gabarit.nom}</span>
+                    <span className={styles.modeleAuteur}>Par {gabarit.graphisteNom}</span>
+
+                    <span className={styles.modelePied}>
+                      <span>
+                        <span className={styles.modelePrixLibelle}>À partir de</span>
+                        <span className={styles.modelePrix}>{formaterPrix(gabarit.prix)}</span>
+                      </span>
+                      <span className={styles.modeleAction}>Personnaliser →</span>
+                    </span>
+                  </span>
+                </a>
+              </li>
+            )
+          })}
         </ul>
       )}
     </main>

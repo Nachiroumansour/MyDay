@@ -5,41 +5,77 @@
  * page n'est pas rendue par le routeur de Next : elle est produite en HTML
  * statique. L'inliner supprime une requête réseau, ce qui compte plus que le
  * confort d'édition sur une page servie en 3G.
+ *
+ * Les jetons reprennent la maquette Stitch.
  */
 export const STYLES = `
 @font-face {
-  font-family: 'Bricolage Grotesque';
-  src: url('/polices/bricolage-grotesque.woff2') format('woff2');
-  font-weight: 200 800;
+  font-family: 'Playfair Display';
+  src: url('/polices/playfair-display.woff2') format('woff2');
+  font-weight: 500 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'InterVar';
+  src: url('/polices/inter.woff2') format('woff2');
+  font-weight: 400 600;
   font-display: swap;
 }
 
 :root {
-  --fond: #F7F8FA;
-  --surface: #FFFFFF;
-  --trait: #E3E6EC;
-  --encre: #14161D;
-  --encre-douce: #5A6070;
-  --marge: 20px;
-  --lecture: 560px;
-  --court: 120ms;
+  --surface: #FCF9F3;
+  --surface-basse: #F6F3ED;
+  --surface-carte: #FFFFFF;
+  --surface-teintee: #F0EEE8;
+  --surface-variante: #E5E2DC;
+
+  --encre: #1C1C18;
+  --encre-douce: #57423B;
+
+  --primaire: #9F3C16;
+  --primaire-vive: #BF542C;
+  --primaire-claire: #FFDBCF;
+  --secondaire: #735C00;
+  --secondaire-claire: #FED65B;
+  --tertiaire: #973F50;
+  --tertiaire-claire: #FFD9DD;
+  --erreur: #BA1A1A;
+
+  --marge: 24px;
+  --lecture: 620px;
+  --rayon: 8px;
+  --rayon-lg: 12px;
+  --rayon-plein: 9999px;
+  --court: 160ms;
+  --ombre: 0 1px 2px rgba(28,28,24,.04), 0 8px 24px -12px rgba(28,28,24,.14);
 }
 
 * { box-sizing: border-box; }
 
-html, body { margin: 0; padding: 0; background: var(--fond); color: var(--encre); }
+html, body { margin: 0; padding: 0; background: var(--surface); color: var(--encre); }
 
 body {
-  font-family: 'Bricolage Grotesque', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family: 'InterVar', system-ui, -apple-system, 'Segoe UI', sans-serif;
   font-size: 16px;
-  line-height: 1.625;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -0.02em; text-wrap: balance; }
-p { margin: 0; }
+h1, h2, h3 {
+  margin: 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
 
-:focus-visible { outline: 2px solid var(--evenement); outline-offset: 3px; }
+p { margin: 0; }
+a { color: inherit; }
+
+:focus-visible { outline: 2px solid var(--primaire); outline-offset: 3px; }
+
+.enveloppe-page { max-width: var(--lecture); margin: 0 auto; padding: 0 var(--marge); }
 
 /* ---------- L'ouverture ---------- */
 
@@ -47,170 +83,579 @@ p { margin: 0; }
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: #101218;
-  color: #f2f3f6;
+  background: radial-gradient(120% 90% at 50% 15%, #B54A1E 0%, #8A3410 52%, #5E230A 100%);
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 32px;
-  padding: 32px 20px;
-  transition: opacity 420ms ease, visibility 420ms;
+  padding: 24px;
+  overflow: hidden;
+  transition: opacity 460ms ease, visibility 460ms;
 }
 
 html[data-enveloppe='vue'] .voile { display: none; }
-
 .voile[data-etat='partie'] { opacity: 0; visibility: hidden; pointer-events: none; }
 
-.voile-intro { font-size: 14px; letter-spacing: 0.06em; color: #8f96a5; text-align: center; }
-
-.voile-noms {
-  font-size: clamp(26px, 8vw, 38px);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  text-align: center;
-  text-wrap: balance;
-}
-
-.pli { appearance: none; border: none; background: none; padding: 0; cursor: pointer; display: block; width: min(74vw, 300px); }
-.pli svg { display: block; width: 100%; height: auto; overflow: visible; }
-
-.rabat { transform-box: fill-box; transform-origin: 50% 0%; transition: transform 620ms cubic-bezier(0.66, 0, 0.34, 1); }
-.cachet { transform-box: fill-box; transform-origin: 50% 50%; transition: transform 320ms ease, opacity 320ms ease; }
-.carte-pliee { opacity: 0; transition: transform 640ms cubic-bezier(0.22, 1, 0.36, 1) 180ms, opacity 260ms ease 180ms; }
-
-.voile[data-etat='ouverture'] .rabat { transform: rotateX(180deg); }
-.voile[data-etat='ouverture'] .cachet { transform: scale(0.2); opacity: 0; }
-.voile[data-etat='ouverture'] .carte-pliee { opacity: 1; transform: translateY(-46px) scale(1.04); }
-
-.voile-invite { font-size: 14px; color: #8f96a5; }
-
-.passer {
-  position: absolute; top: 16px; right: 16px;
-  appearance: none; background: none; border: none;
-  color: #8f96a5; font: inherit; font-size: 14px; cursor: pointer; padding: 8px 10px;
-}
-.passer:hover { color: #f2f3f6; }
-
-/* ---------- Le héros ---------- */
-
-.hero {
+.pli-scene {
   position: relative;
-  overflow: hidden;
+  z-index: 1;
+  width: min(100%, 400px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 28px;
-  padding: 52px var(--marge) 0;
+  gap: 18px;
+  animation: pli-arrivee 900ms cubic-bezier(.22,1,.36,1) both;
 }
 
-.hero-carte { position: relative; z-index: 1; display: flex; justify-content: center; width: 100%; }
-
-.carte {
-  display: block;
-  width: min(100%, 420px);
-  height: auto;
-  border: 1px solid var(--trait);
-  box-shadow:
-    0 2px 4px rgba(20, 22, 29, 0.06),
-    0 14px 30px -10px rgba(20, 22, 29, 0.18),
-    0 36px 60px -26px rgba(20, 22, 29, 0.24);
+@keyframes pli-arrivee {
+  from { opacity: 0; transform: translateY(26px) scale(.94); }
+  to   { opacity: 1; transform: none; }
 }
 
-.compteur {
+/* L'enveloppe : une poche, un rabat, un sceau. Le tout empilé en z. */
+.pli-enveloppe {
   position: relative;
+  width: 100%;
+  aspect-ratio: 1.48 / 1;
+  perspective: 1100px;
+  cursor: pointer;
+  filter: drop-shadow(0 26px 44px rgba(0,0,0,.45));
+  animation: pli-respire 5.5s ease-in-out infinite;
+}
+
+/* Une respiration à peine perceptible : l'enveloppe a l'air vivante,
+   et l'invité comprend qu'elle attend d'être touchée. */
+@keyframes pli-respire {
+  0%, 100% { transform: translateY(0) rotate(-.4deg); }
+  50%      { transform: translateY(-7px) rotate(.4deg); }
+}
+
+.voile[data-etat='ouverture'] .pli-enveloppe { animation: none; }
+
+/* Le dos de l'enveloppe : ce que l'on voit une fois le rabat relevé. */
+.pli-dos {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 10px;
+  background: linear-gradient(200deg, #E9D9C9 0%, #DCC6B2 100%);
+}
+
+/* La carte, glissée dans la poche. Elle en sort à l'ouverture. Ses bords
+   tiennent dans ceux de l'enveloppe : rien ne dépasse tant qu'elle dort. */
+.pli-carte {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  top: 8%;
+  bottom: 5%;
+  z-index: 2;
   overflow: hidden;
-  align-self: stretch;
-  margin: 0 calc(var(--marge) * -1);
-  padding: 32px var(--marge) 36px;
-  background: var(--evenement);
-  color: #fff;
+  padding: 20px 20px 18px;
+  justify-content: center;
+  border-radius: 10px;
+  background: linear-gradient(170deg, #FFFDF8 0%, var(--surface-basse) 100%);
+  box-shadow: 0 10px 26px -14px rgba(0,0,0,.5);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+}
+
+.voile[data-etat='ouverture'] .pli-carte {
+  animation: pli-sortie 800ms cubic-bezier(.2,.9,.25,1) 780ms both;
+}
+
+@keyframes pli-sortie {
+  0%   { transform: translateY(0) scale(1); }
+  60%  { transform: translateY(-78%) scale(1.05); opacity: 1; }
+  100% { transform: translateY(-104%) scale(1.14); opacity: 0; }
+}
+
+/* La poche : le devant de l'enveloppe, découpé en V. */
+.pli-poche {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: 10px;
+  background: linear-gradient(160deg, #F3E7DB 0%, #E4D2C2 100%);
+  clip-path: polygon(0 0, 50% 46%, 100% 0, 100% 100%, 0 100%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 12%;
+}
+
+.pli-adresse {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: #6E2A0C;
+}
+
+.pli-filet { display: block; width: 46px; height: 1px; background: rgba(110,42,12,.35); }
+
+.pli-mention {
+  font-family: 'InterVar', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(110,42,12,.6);
+}
+
+/* Le rabat, charnière en haut. Il bascule en arrière puis passe derrière. */
+.pli-rabat {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 47%;
+  z-index: 4;
+  border-radius: 10px 10px 0 0;
+  background: linear-gradient(180deg, #EFDFD0 0%, #DFC9B5 100%);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: top center;
+}
+
+.voile[data-etat='ouverture'] .pli-rabat {
+  animation: pli-rabat 620ms cubic-bezier(.45,-0.15,.3,1.12) 200ms both;
+}
+
+/* Le rabat bascule vers le lecteur, et non vers l'arrière : c'est le geste
+   que l'on voit. Passé la verticale, c'est son envers qui apparaît, plus
+   sombre. Au tout dernier instant il repasse sous la carte, qui sort par
+   devant lui. */
+@keyframes pli-rabat {
+  0%   { transform: rotateX(0deg); z-index: 4;
+         background: linear-gradient(180deg, #EFDFD0 0%, #DFC9B5 100%); }
+  50%  { background: linear-gradient(180deg, #E4D0BE 0%, #D6BCA6 100%); }
+  99%  { z-index: 4; }
+  100% { transform: rotateX(148deg); z-index: 1;
+         background: linear-gradient(180deg, #D2B69E 0%, #C4A68C 100%); }
+}
+
+/* Le sceau de cire, posé sur la pointe du rabat. */
+.pli-sceau {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  z-index: 5;
+  width: 52px;
+  height: 52px;
+  margin: -26px 0 0 -26px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, #C2532A 0%, #9F3C16 55%, #7A2C0E 100%);
+  color: rgba(255,255,255,.9);
+  display: grid;
+  place-items: center;
+  box-shadow: inset 0 -2px 5px rgba(0,0,0,.3), 0 3px 8px rgba(0,0,0,.3);
+}
+
+.pli-sceau svg { width: 22px; height: 22px; }
+
+.voile[data-etat='ouverture'] .pli-sceau {
+  animation: pli-sceau 380ms cubic-bezier(.3,.9,.4,1) both;
+}
+
+/* Le cachet se brise : il grossit, pivote, et s'efface. */
+@keyframes pli-sceau {
+  0%   { transform: scale(1) rotate(0); opacity: 1; }
+  35%  { transform: scale(1.18) rotate(-8deg); opacity: 1; }
+  100% { transform: scale(.55) rotate(24deg) translateY(16px); opacity: 0; }
+}
+
+.pli-sur-titre {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--secondaire);
+}
+
+.pli-noms {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(19px, 5vw, 25px);
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.pli-mot { font-size: 13px; color: var(--encre-douce); max-width: 30ch; }
+
+.pli-bouton {
+  appearance: none;
+  border: none;
+  width: 100%;
+  padding: 15px 24px;
+  border-radius: var(--rayon);
+  background: var(--surface);
+  color: var(--primaire);
+  font: inherit;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px -10px rgba(0,0,0,.6);
+  transition: transform var(--court), background var(--court);
+}
+
+.pli-bouton:hover { background: #fff; transform: translateY(-1px); }
+.pli-bouton:active { transform: translateY(0); }
+
+.voile[data-etat='ouverture'] .pli-bouton,
+.voile[data-etat='ouverture'] .passer { opacity: 0; transition: opacity 200ms ease; }
+
+.passer {
+  appearance: none;
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 13px;
+  color: rgba(255,255,255,.75);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* ---------- La pluie de la fête ---------- */
+
+.ciel {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.flocon {
+  position: absolute;
+  top: -8%;
+  width: 11px;
+  height: 11px;
+  opacity: 0;
+  animation-name: tomber;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* Chaque élément part d'un endroit et d'un instant différents. Les retards
+   sont négatifs : la pluie est déjà en cours quand la page apparaît, plutôt
+   que de démarrer d'un coup sur une page vide. */
+.flocon:nth-child(1)  { left:  4%; animation-duration: 11s; animation-delay:  -1s;  }
+.flocon:nth-child(2)  { left: 12%; animation-duration:  9s; animation-delay:  -5s;  }
+.flocon:nth-child(3)  { left: 20%; animation-duration: 13s; animation-delay:  -9s;  }
+.flocon:nth-child(4)  { left: 28%; animation-duration: 10s; animation-delay:  -3s;  }
+.flocon:nth-child(5)  { left: 36%; animation-duration: 14s; animation-delay: -12s;  }
+.flocon:nth-child(6)  { left: 44%; animation-duration:  8s; animation-delay:  -6s;  }
+.flocon:nth-child(7)  { left: 52%; animation-duration: 12s; animation-delay:  -2s;  }
+.flocon:nth-child(8)  { left: 60%; animation-duration: 10s; animation-delay:  -8s;  }
+.flocon:nth-child(9)  { left: 68%; animation-duration: 15s; animation-delay:  -4s;  }
+.flocon:nth-child(10) { left: 76%; animation-duration:  9s; animation-delay: -11s;  }
+.flocon:nth-child(11) { left: 84%; animation-duration: 12s; animation-delay:  -7s;  }
+.flocon:nth-child(12) { left: 92%; animation-duration: 11s; animation-delay: -13s;  }
+.flocon:nth-child(13) { left: 16%; animation-duration: 16s; animation-delay: -10s;  }
+.flocon:nth-child(14) { left: 72%; animation-duration: 13s; animation-delay: -14s;  }
+
+@keyframes tomber {
+  0%   { opacity: 0; transform: translate3d(0, 0, 0) rotate(0deg); }
+  8%   { opacity: .85; }
+  92%  { opacity: .85; }
+  100% { opacity: 0; transform: translate3d(28px, 118vh, 0) rotate(420deg); }
+}
+
+/* Le mariage : des pétales. */
+.ciel[data-fete='mariage'] .flocon {
+  width: 13px;
+  height: 13px;
+  border-radius: 100% 0 100% 0;
+  background: var(--primaire-claire);
+}
+.ciel[data-fete='mariage'] .flocon:nth-child(3n)   { background: var(--tertiaire-claire); }
+.ciel[data-fete='mariage'] .flocon:nth-child(4n+1) { background: #FFF3EC; width: 10px; height: 10px; }
+
+/* Le baptême : de petites étoiles douces et des perles. */
+.ciel[data-fete='bapteme'] .flocon {
+  width: 10px;
+  height: 10px;
+  background: var(--secondaire-claire);
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+.ciel[data-fete='bapteme'] .flocon:nth-child(3n) {
+  clip-path: none;
+  border-radius: 50%;
+  width: 7px;
+  height: 7px;
+  background: #FFF6E0;
+}
+
+/* L'anniversaire : confettis et chapeaux de fête. */
+.ciel[data-fete='anniversaire'] .flocon {
+  width: 8px;
+  height: 13px;
+  border-radius: 2px;
+  background: var(--secondaire-claire);
+}
+.ciel[data-fete='anniversaire'] .flocon:nth-child(3n)   { background: var(--tertiaire-claire); }
+.ciel[data-fete='anniversaire'] .flocon:nth-child(4n+1) { background: var(--primaire-claire); }
+.ciel[data-fete='anniversaire'] .flocon:nth-child(5n) {
+  width: 14px;
+  height: 16px;
+  border-radius: 0;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  background: #FFF3EC;
+}
+
+/* La pluie ne tombe que sur les fonds terracotta — le voile et le héros.
+   Il faut l'éclaircir pour qu'elle s'y détache. */
+.flocon { filter: brightness(1.3); }
+
+/* ---------- Héros ---------- */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(150deg, #A23E18 0%, #8A3410 100%);
+  padding: 48px var(--marge) 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
   text-align: center;
+  color: #fff;
 }
 
-.compteur-interieur { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 6px; }
+.hero > *:not(.ciel) { position: relative; z-index: 1; }
 
-.compteur-valeur {
-  font-size: clamp(52px, 17vw, 84px);
-  font-weight: 700;
-  letter-spacing: -0.05em;
-  line-height: 0.92;
-  font-variant-numeric: tabular-nums;
+.hero-sur-titre {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.72);
 }
 
-.compteur-legende { font-size: 15px; color: rgba(255, 255, 255, 0.88); }
+.hero-noms {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(28px, 8vw, 42px);
+  font-weight: 600;
+}
+
+.carte {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--rayon);
+}
+
+.compteur {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 10px 20px;
+  border-radius: var(--rayon-plein);
+  background: rgba(255,255,255,.14);
+}
+
+.compteur-valeur { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.compteur-legende { font-size: 14px; color: rgba(255,255,255,.82); }
 
 /* ---------- Sections ---------- */
 
 .section {
-  max-width: var(--lecture); margin: 0 auto;
-  padding: 40px var(--marge);
-  border-top: 1px solid var(--trait);
-  display: flex; flex-direction: column; gap: 24px;
-}
-
-.titre-section {
-  font-size: 22px;
+  max-width: var(--lecture);
+  margin: 0 auto;
+  padding: 36px var(--marge) 0;
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  gap: 18px;
 }
 
-.titre-emoji { font-size: 22px; line-height: 1; }
+.titre-section-rangee {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.titre-section { font-size: 22px; }
+.compte-section { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--primaire); font-weight: 600; }
+
+/* ---------- Le mot des hôtes ---------- */
+
+.mot-carte {
+  display: flex;
+  gap: 14px;
+  padding: 20px;
+  border-radius: var(--rayon-lg);
+  background: var(--surface-teintee);
+}
+
+.mot-pastille {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--secondaire);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.mot-titre { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.mot { font-size: 15px; line-height: 1.65; color: var(--encre-douce); }
+.mot-signature { display: block; margin-top: 10px; font-size: 14px; font-weight: 600; color: var(--primaire); }
 
 /* ---------- Programme ---------- */
 
-.programme { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 36px; }
+.programme { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
 
-.ceremonie { position: relative; padding-left: 26px; }
-.ceremonie::before {
-  content: ''; position: absolute; left: 4px; top: 9px;
-  width: 9px; height: 9px; border-radius: 50%; background: var(--evenement);
+.ceremonie {
+  display: flex;
+  gap: 14px;
+  padding: 18px;
+  border-radius: var(--rayon-lg);
+  background: var(--surface-carte);
+  border: 1px solid var(--surface-variante);
+  box-shadow: var(--ombre);
 }
-.ceremonie:not(:last-child)::after {
-  content: ''; position: absolute; left: 8px; top: 24px; bottom: -36px;
-  width: 1px; background: var(--trait);
+
+.ceremonie-pastille {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--rayon);
+  display: grid;
+  place-items: center;
+  background: var(--teinte-ceremonie, var(--primaire-claire));
+  color: var(--sur-ceremonie, var(--primaire));
 }
 
-.quand { font-size: 14px; color: var(--encre-douce); display: flex; flex-wrap: wrap; gap: 0 8px; }
-.quand b { color: var(--encre); font-weight: 500; }
+.ceremonie-corps { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 
-.nom-ceremonie { font-size: 20px; margin: 4px 0 10px; }
-.lieu { font-weight: 500; }
-.adresse { font-size: 15px; color: var(--encre-douce); }
+.ceremonie-badge {
+  align-self: flex-start;
+  padding: 4px 10px;
+  margin-bottom: 4px;
+  border-radius: var(--rayon-plein);
+  background: var(--teinte-ceremonie, var(--primaire-claire));
+  color: var(--sur-ceremonie, var(--primaire));
+  font-size: 11px;
+  font-weight: 600;
+}
 
-.repere { margin-top: 12px; padding-left: 12px; border-left: 2px solid var(--evenement); font-size: 15px; }
-.repere-etiquette { display: block; font-size: 13px; color: var(--encre-douce); }
+.ceremonie-quand {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 17px;
+  font-weight: 600;
+}
 
-.note { margin-top: 12px; font-size: 15px; color: var(--encre-douce); }
+.ceremonie-lieu { font-size: 15px; color: var(--encre-douce); }
 
-.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.repere {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--primaire);
+  font-weight: 500;
+}
+
+.note { margin-top: 8px; font-size: 14px; color: var(--encre-douce); }
+
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
 .action {
-  display: inline-block; padding: 8px 14px;
-  border: 1px solid var(--trait); color: var(--encre);
-  text-decoration: none; font-size: 14px; font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--rayon);
+  border: 1px solid var(--surface-variante);
+  background: var(--surface-basse);
+  color: var(--encre);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
   transition: border-color var(--court), color var(--court);
 }
-.action:hover, .action:focus-visible { border-color: var(--evenement); color: var(--evenement); }
 
-/* ---------- Tenue, mot, contact ---------- */
+.action:hover { border-color: var(--primaire); color: var(--primaire); }
 
-.pastille-tenue {
-  display: inline-block; align-self: flex-start;
-  padding: 6px 12px; border: 1px solid var(--evenement);
-  color: var(--evenement); font-size: 14px; font-weight: 500;
+.action-pleine { background: var(--primaire); border-color: var(--primaire); color: #fff; }
+.action-pleine:hover { background: var(--primaire-vive); border-color: var(--primaire-vive); color: #fff; }
+
+/* ---------- Tenue ---------- */
+
+.tenue-carte {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+  border-radius: var(--rayon-lg);
+  background: var(--surface-teintee);
 }
 
-.mot { font-size: 17px; line-height: 1.7; }
-.contact { font-size: 15px; color: var(--encre-douce); }
+.tenue-corps { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.tenue-sur-titre { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; color: var(--secondaire); }
+.tenue-valeur { font-family: 'Playfair Display', Georgia, serif; font-size: 18px; font-weight: 600; }
+.tenue-texte { font-size: 14px; color: var(--encre-douce); }
+
+.tenue-pastille {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: var(--rayon);
+  background: var(--secondaire-claire);
+  color: var(--secondaire);
+  display: grid;
+  place-items: center;
+}
 
 /* ---------- Réponse ---------- */
 
-.rsvp { display: flex; flex-direction: column; gap: 22px; }
+.rsvp-carte {
+  padding: 22px;
+  border-radius: var(--rayon-lg);
+  background: var(--surface-carte);
+  border: 1px solid var(--surface-variante);
+  box-shadow: var(--ombre);
+}
+
+.rsvp { display: flex; flex-direction: column; gap: 18px; }
+
+.rsvp-titre { font-size: 20px; margin-top: 2px; }
+.rsvp-intro { font-size: 14px; color: var(--encre-douce); }
+
+.champ { display: flex; flex-direction: column; gap: 6px; }
+.etiquette { font-size: 13px; font-weight: 500; color: var(--encre-douce); }
+
+.saisie, .zone, .liste {
+  font: inherit;
+  font-size: 15px;
+  padding: 12px 14px;
+  border: 1px solid var(--surface-variante);
+  border-radius: var(--rayon);
+  background: var(--surface-basse);
+  color: var(--encre);
+  width: 100%;
+}
+
+.saisie:focus-visible, .zone:focus-visible, .liste:focus-visible {
+  border-color: var(--primaire);
+  outline: none;
+  background: var(--surface-carte);
+}
+
+.zone { min-height: 84px; resize: vertical; }
+
+.aide { font-size: 12px; color: var(--encre-douce); }
+.erreur { font-size: 13px; color: var(--erreur); }
 
 .choix { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
@@ -220,207 +665,257 @@ html[data-enveloppe='vue'] .voile { display: none; }
 }
 
 .bouton-choix {
-  display: block; padding: 18px 12px;
-  border: 1px solid var(--trait); background: var(--surface); color: var(--encre);
-  font-weight: 600; font-size: 16px; text-align: center; cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 10px;
+  border: 1px solid var(--surface-variante);
+  border-radius: var(--rayon);
+  background: var(--surface-basse);
+  font-weight: 600;
+  font-size: 15px;
+  text-align: center;
+  cursor: pointer;
   transition: border-color var(--court), background var(--court), color var(--court);
 }
-.bouton-choix:hover { border-color: var(--evenement); }
-.radio:focus-visible + .bouton-choix { outline: 2px solid var(--evenement); outline-offset: 3px; }
-.radio:checked + .bouton-choix { background: var(--evenement); border-color: var(--evenement); color: #fff; }
 
-.details { display: flex; flex-direction: column; gap: 20px; }
+.bouton-choix:hover { border-color: var(--primaire); }
+.radio:focus-visible + .bouton-choix { outline: 2px solid var(--primaire); outline-offset: 2px; }
+.radio:checked + .bouton-choix { background: var(--primaire); border-color: var(--primaire); color: #fff; }
+
+.details { display: flex; flex-direction: column; gap: 18px; }
 .rsvp:not(:has(.radio:checked)) .details { display: none; }
 .rsvp:has(.radio-absent:checked) .si-present { display: none; }
 
-.champ { display: flex; flex-direction: column; gap: 6px; }
-.etiquette { font-size: 14px; font-weight: 500; }
+.ceremonies { display: flex; flex-wrap: wrap; gap: 8px; border: none; margin: 0; padding: 0; }
+.ceremonies legend { font-size: 13px; font-weight: 500; color: var(--encre-douce); padding: 0 0 8px; }
 
-.saisie, .zone {
-  font: inherit; padding: 12px 14px;
-  border: 1px solid var(--trait); background: var(--surface); color: var(--encre); width: 100%;
+.coche {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border: 1px solid var(--surface-variante);
+  border-radius: var(--rayon);
+  background: var(--surface-basse);
+  font-size: 14px;
+  cursor: pointer;
 }
-.saisie:focus-visible, .zone:focus-visible { border-color: var(--evenement); outline: none; }
-.zone { min-height: 88px; resize: vertical; }
 
-.aide { font-size: 13px; color: var(--encre-douce); }
-.erreur { font-size: 13px; color: #b3261e; }
-
-.ceremonies { display: flex; flex-direction: column; gap: 10px; border: none; margin: 0; padding: 0; }
-.ceremonies legend { font-size: 14px; font-weight: 500; padding: 0 0 10px; }
-
-.coche { display: flex; align-items: baseline; gap: 10px; font-size: 15px; cursor: pointer; }
-.coche input { accent-color: var(--evenement); width: 18px; height: 18px; flex: none; }
-.coche small { display: block; font-size: 13px; color: var(--encre-douce); }
+.coche input { accent-color: var(--primaire); width: 16px; height: 16px; flex: none; }
+.coche:has(input:checked) { border-color: var(--primaire); color: var(--primaire); }
 
 .envoyer {
-  appearance: none; padding: 15px 20px; border: none;
-  background: var(--evenement); color: #fff;
-  font: inherit; font-weight: 600; font-size: 16px; cursor: pointer;
+  appearance: none;
+  padding: 15px 20px;
+  border: none;
+  border-radius: var(--rayon);
+  background: var(--primaire);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
 }
 
-.merci { padding-left: 14px; border-left: 2px solid var(--evenement); display: flex; flex-direction: column; gap: 6px; }
-.merci-titre { font-size: 18px; font-weight: 600; }
+.envoyer:hover { background: var(--primaire-vive); }
 
-/* ---------- Pied ---------- */
+.merci { display: flex; flex-direction: column; gap: 8px; align-items: center; text-align: center; padding: 12px 0; }
+.merci-pastille { width: 48px; height: 48px; border-radius: 50%; background: var(--primaire-claire); color: var(--primaire); display: grid; place-items: center; }
+.merci-titre { font-family: 'Playfair Display', Georgia, serif; font-size: 20px; font-weight: 600; }
 
-.pied {
-  max-width: var(--lecture); margin: 0 auto;
-  padding: 40px var(--marge) 72px;
-  border-top: 1px solid var(--trait);
-  display: flex; flex-direction: column; gap: 18px; align-items: flex-start;
-}
+/* ---------- Modules ---------- */
 
-.partage {
-  display: inline-block; padding: 12px 20px;
-  background: var(--evenement); color: #fff;
-  text-decoration: none; font-weight: 600; font-size: 15px;
-}
-
-.signature { font-size: 13px; color: var(--encre-douce); }
-.signature a { color: var(--encre); text-decoration: none; border-bottom: 1px solid var(--trait); }
-
-/* ---------- Ambiance festive ---------- */
-
-.scene {
-  display: block;
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.grain { position: absolute; top: -8%; will-change: transform, opacity; }
-
-.petale {
-  border-radius: 100% 0 100% 0;
-  animation-name: tomber;
-  animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
-  animation-iteration-count: infinite;
-}
-
-.bulle {
-  top: auto;
-  bottom: -8%;
-  border-radius: 50%;
-  background: none !important;
-  animation-name: monter;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-}
-
-.confetti {
-  border-radius: 1px;
-  animation-name: culbuter;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-}
-
-@keyframes tomber {
-  0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
-  8% { opacity: var(--opacite); }
-  50% { transform: translate3d(26px, 50vh, 0) rotate(180deg); }
-  92% { opacity: var(--opacite); }
-  100% { transform: translate3d(-12px, 110vh, 0) rotate(360deg); opacity: 0; }
-}
-
-@keyframes monter {
-  0% { transform: translate3d(0, 0, 0) scale(0.7); opacity: 0; }
-  12% { opacity: var(--opacite); }
-  50% { transform: translate3d(20px, -50vh, 0) scale(1); }
-  88% { opacity: var(--opacite); }
-  100% { transform: translate3d(-8px, -110vh, 0) scale(1.1); opacity: 0; }
-}
-
-@keyframes culbuter {
-  0% { transform: translate3d(0, 0, 0) rotate3d(1, 1, 0, 0deg); opacity: 0; }
-  10% { opacity: var(--opacite); }
-  100% { transform: translate3d(32px, 110vh, 0) rotate3d(1, 1, 0, 900deg); opacity: 0; }
-}
-
-/* L'éclosion ne part qu'au moment de l'ouverture, et ne se rejoue pas. */
-.eclosion, .eclosion-merci {
-  display: block;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 0;
-  height: 0;
-  pointer-events: none;
-  z-index: 3;
-}
-
-.eclat {
-  position: absolute;
-  left: 0;
-  top: 0;
-  border-radius: 100% 0 100% 0;
-  opacity: 0;
-}
-
-.voile[data-etat='ouverture'] .eclat,
-.voile[data-etat='partie'] .eclat,
-.eclosion-merci .eclat {
-  animation: eclore 2400ms cubic-bezier(0.16, 0.8, 0.3, 1) forwards;
-}
-
-@keyframes eclore {
-  0% { transform: rotate(0deg) translateY(0) scale(0.2); opacity: 0; }
-  14% { opacity: 1; }
-  68% { opacity: 1; }
-  100% { transform: rotate(var(--angle)) translateY(var(--portee)) scale(1); opacity: 0; }
-}
-
-/* ---------- Modules ouverts aux invités ---------- */
-
-.mots { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 20px; }
+.mots { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
 
 .mot-invite {
-  padding-left: 14px;
-  border-left: 2px solid var(--trait);
+  padding: 16px 18px;
+  border-radius: var(--rayon-lg);
+  background: var(--surface-teintee);
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.mot-invite p { font-size: 16px; }
-.mot-signature { font-size: 13px; color: var(--encre-douce); }
+.mot-invite p { font-size: 15px; line-height: 1.6; }
+.mot-invite-signature { font-size: 13px; color: var(--encre-douce); }
 
-.grille-photos {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+.grille-photos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.grille-photos img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--rayon); }
+
+@media (min-width: 560px) { .grille-photos { grid-template-columns: repeat(3, 1fr); } }
+
+/* ---------- Bas de page ---------- */
+
+.pied {
+  max-width: var(--lecture);
+  margin: 0 auto;
+  padding: 36px var(--marge) 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.whatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   gap: 8px;
-}
-
-.grille-photos img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
-  border: 1px solid var(--trait);
-}
-
-@media (min-width: 560px) {
-  .grille-photos { grid-template-columns: repeat(3, 1fr); }
-}
-
-/* ---------- Salutation nominative ---------- */
-
-.pour-vous {
+  padding: 14px 20px;
+  border-radius: var(--rayon);
+  background: #25D366;
+  color: #06331A;
+  font-weight: 600;
   font-size: 15px;
-  color: var(--encre-douce);
-  text-align: center;
+  text-decoration: none;
 }
 
-@media (min-width: 720px) { .hero { padding-top: 64px; } }
+.partage {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 20px;
+  border-radius: var(--rayon);
+  border: 1px solid var(--surface-variante);
+  background: var(--surface-carte);
+  color: var(--encre);
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+}
 
+.signature { font-size: 13px; color: var(--encre-douce); text-align: center; padding-top: 8px; }
+.signature a { color: var(--primaire); font-weight: 600; text-decoration: none; }
+
+/* ---------- L'entrée en scène ---------- */
+
+/* Le héros se pose élément par élément, une fois seulement, à l'arrivée.
+   Chaque bloc part d'un état visible en fin d'animation : rien n'attend un
+   observateur pour devenir lisible. */
+.hero-sur-titre { animation: monter 700ms cubic-bezier(.22,1,.36,1) 60ms both; }
+.hero-noms      { animation: monter 700ms cubic-bezier(.22,1,.36,1) 180ms both; }
+.carte-cadre    { animation: carte-entree 1100ms cubic-bezier(.22,1,.36,1) 300ms both; }
+.compteur       { animation: monter 700ms cubic-bezier(.22,1,.36,1) 620ms both; }
+
+@keyframes monter {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* La carte arrive comme un objet qu'on tend : elle se redresse. */
+@keyframes carte-entree {
+  from { opacity: 0; transform: translateY(30px) rotateX(14deg) scale(.94); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Un éclat traverse la carte, une fois, comme la lumière sur du papier glacé. */
+.carte-cadre {
+  position: relative;
+  display: block;
+  width: min(100%, 340px);
+  border-radius: var(--rayon);
+  overflow: hidden;
+  box-shadow: 0 20px 50px -18px rgba(0,0,0,.55);
+}
+
+.carte-cadre::after {
+  content: '';
+  position: absolute;
+  top: -60%;
+  bottom: -60%;
+  width: 45%;
+  left: -60%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.42), transparent);
+  transform: skewX(-18deg);
+  animation: eclat 1400ms ease-out 1250ms 1 both;
+}
+
+@keyframes eclat {
+  from { left: -60%; }
+  to   { left: 130%; }
+}
+
+.compteur-valeur { animation: battement 3.4s ease-in-out 1.6s infinite; }
+
+/* Le compte à rebours bat doucement : il rappelle que le jour approche. */
+@keyframes battement {
+  0%, 92%, 100% { transform: scale(1); }
+  96%           { transform: scale(1.06); }
+}
+
+/* Les sections se redressent au défilement, sans une ligne de JavaScript.
+   Le mouvement ne touche jamais l'opacité : une invitation dont le programme
+   attendrait un défilement pour devenir lisible serait une invitation ratée.
+   Au repos, tout est là — le mouvement n'est qu'une récompense. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .section, .pied {
+      animation: paraitre linear both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 20%;
+    }
+  }
+}
+
+@keyframes paraitre {
+  from { transform: translateY(22px); }
+  to   { transform: none; }
+}
+
+/* ---------- Les gestes ---------- */
+
+.ceremonie {
+  transition: transform 220ms cubic-bezier(.22,1,.36,1), box-shadow 220ms ease;
+}
+
+.ceremonie:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 2px 6px rgba(28,28,24,.06), 0 18px 40px -16px rgba(28,28,24,.24);
+}
+
+.ceremonie-pastille { transition: transform 260ms cubic-bezier(.34,1.56,.64,1); }
+.ceremonie:hover .ceremonie-pastille { transform: rotate(-8deg) scale(1.08); }
+
+.action, .whatsapp, .partage {
+  transition: transform var(--court), border-color var(--court), background var(--court);
+}
+
+.action:hover, .whatsapp:hover, .partage:hover { transform: translateY(-2px); }
+
+.mot-carte { transition: transform 300ms cubic-bezier(.22,1,.36,1); }
+.mot-carte:hover { transform: translateY(-2px); }
+
+/* ---------- Quand le mouvement dérange ---------- */
+
+/* Réglage système « moins d'animations » : l'ouverture reste, réduite à une
+   fondu — le geste garde son sens — et tout le reste se tient tranquille. */
 @media (prefers-reduced-motion: reduce) {
-  .rabat, .cachet, .carte-pliee { transition: none; }
   .voile { transition: opacity 160ms linear; }
-  .scene, .eclosion, .eclosion-merci { display: none; }
+  .pli-enveloppe,
+  .pli-scene,
+  .hero-sur-titre,
+  .hero-noms,
+  .carte-cadre,
+  .compteur,
+  .compteur-valeur,
+  .carte-cadre::after,
+  .voile[data-etat='ouverture'] .pli-carte,
+  .voile[data-etat='ouverture'] .pli-rabat,
+  .voile[data-etat='ouverture'] .pli-sceau {
+    animation: none;
+  }
+
+  .ciel { display: none; }
+
+  .ceremonie, .ceremonie-pastille, .action, .whatsapp, .partage, .mot-carte {
+    transition: none;
+  }
+
+  .ceremonie:hover, .action:hover, .whatsapp:hover, .partage:hover, .mot-carte:hover {
+    transform: none;
+  }
 }
 `
