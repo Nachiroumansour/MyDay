@@ -11,7 +11,16 @@ const bricolage = Bricolage_Grotesque({
   variable: '--police-interface',
 })
 
+/**
+ * Base des URL absolues des métadonnées. WhatsApp et Facebook ne résolvent pas
+ * une URL d'image relative : sans elle, aucun aperçu de partage ne s'affiche.
+ */
+const origine =
+  process.env.NEXT_PUBLIC_ORIGINE ??
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+
 export const metadata: Metadata = {
+  metadataBase: new URL(origine),
   title: 'MyDay — Votre invitation, prête ce soir',
   description:
     'Créez votre invitation de mariage, de baptême ou d’anniversaire, partagez-la sur WhatsApp et suivez les réponses de vos invités.',

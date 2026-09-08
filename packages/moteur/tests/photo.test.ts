@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { analyserDocument, serialiserDocument } from '../src/dom.js'
-import { calculerPlacement, insererPhoto, retirerZonePhoto } from '../src/gabarit/photo.js'
-import { RECADRAGE_NEUTRE } from '../src/types.js'
+import { analyserDocument, serialiserDocument } from '../src/dom'
+import { calculerPlacement, insererPhoto, retirerZonePhoto } from '../src/gabarit/photo'
+import { RECADRAGE_NEUTRE } from '../src/types'
 
 const cadre = { x: 100, y: 200, largeur: 300, hauteur: 300 }
 

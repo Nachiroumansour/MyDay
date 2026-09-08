@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { analyserDocument } from '../src/dom.js'
-import { analyserGabarit, ErreurGabarit } from '../src/gabarit/analyse.js'
+import { analyserDocument } from '../src/dom'
+import { analyserGabarit, ErreurGabarit } from '../src/gabarit/analyse'
 
 const gabarit = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900">
   <text data-champ="nom_1" data-type="texte" data-cadre="60,200,480,70"

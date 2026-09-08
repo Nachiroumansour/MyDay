@@ -1,13 +1,13 @@
-import { analyserDocument, serialiserDocument } from './dom.js'
-import { ajusterDocument } from './gabarit/ajustement.js'
-import { analyserGabarit } from './gabarit/analyse.js'
-import { apposerFiligrane } from './gabarit/filigrane.js'
-import { insererPhoto, retirerZonePhoto, type Photo } from './gabarit/photo.js'
-import { remplirTextes } from './gabarit/remplissage.js'
-import { vectoriserTextes } from './gabarit/vectorisation.js'
-import { dimensionsPhysiques, type DimensionsPhysiques } from './rendu/png.js'
-import type { CataloguePolices } from './rendu/polices.js'
-import type { ChampGabarit, ValeursChamps } from './types.js'
+import { analyserDocument, serialiserDocument } from './dom'
+import { ajusterDocument } from './gabarit/ajustement'
+import { analyserGabarit } from './gabarit/analyse'
+import { apposerFiligrane } from './gabarit/filigrane'
+import { insererPhoto, retirerZonePhoto, type Photo } from './gabarit/photo'
+import { remplirTextes } from './gabarit/remplissage'
+import { vectoriserTextes } from './gabarit/vectorisation'
+import { dimensionsPhysiques, type DimensionsPhysiques } from './rendu/png'
+import type { CataloguePolices } from './rendu/polices'
+import type { ChampGabarit, ValeursChamps } from './types'
 
 export interface DemandeComposition {
   gabaritSvg: string

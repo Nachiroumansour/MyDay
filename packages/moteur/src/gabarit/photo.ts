@@ -1,6 +1,6 @@
-import { elementsDeChamp } from '../dom.js'
-import type { Cadre, Recadrage } from '../types.js'
-import { RECADRAGE_NEUTRE } from '../types.js'
+import { elementsDeChamp } from '../dom'
+import type { Cadre, Recadrage } from '../types'
+import { RECADRAGE_NEUTRE } from '../types'
 
 const NS_SVG = 'http://www.w3.org/2000/svg'
 const NS_XLINK = 'http://www.w3.org/1999/xlink'

@@ -1,6 +1,6 @@
-import { elementsDeChamp } from '../dom.js'
-import type { CataloguePolices, PoliceChargee } from '../rendu/polices.js'
-import type { Cadre, ChampGabarit } from '../types.js'
+import { elementsDeChamp } from '../dom'
+import type { CataloguePolices, PoliceChargee } from '../rendu/polices'
+import type { Cadre, ChampGabarit } from '../types'
 
 /** En deçà, la carte serait déséquilibrée : on préfère signaler le débordement. */
 export const PLANCHER_ECHELLE = 0.6

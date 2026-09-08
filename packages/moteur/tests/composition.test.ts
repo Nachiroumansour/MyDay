@@ -1,8 +1,8 @@
 import { readFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { composerCarte } from '../src/composition.js'
-import { chargerPolicesDepuisDossier } from '../src/rendu/polices.js'
+import { composerCarte } from '../src/composition'
+import { chargerPolicesDepuisDossier } from '../src/rendu/polices'
 
 const racine = fileURLToPath(new URL('..', import.meta.url))
 const polices = await chargerPolicesDepuisDossier(`${racine}demo/polices`)

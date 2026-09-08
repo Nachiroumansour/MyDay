@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { analyserDocument } from '../src/dom.js'
-import { dimensionsPhysiques, pixelsPourDpi, rendrePng, DPI_LIVRAISON } from '../src/rendu/png.js'
+import { analyserDocument } from '../src/dom'
+import { dimensionsPhysiques, pixelsPourDpi, rendrePng, DPI_LIVRAISON } from '../src/rendu/png'
 
 
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900"

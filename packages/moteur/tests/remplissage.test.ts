@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { analyserDocument, serialiserDocument } from '../src/dom.js'
-import { remplirTextes } from '../src/gabarit/remplissage.js'
+import { analyserDocument, serialiserDocument } from '../src/dom'
+import { remplirTextes } from '../src/gabarit/remplissage'
 
 function gabarit(): Document {
   return analyserDocument(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900">

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { analyserDocument, serialiserDocument } from '../src/dom.js'
-import { apposerFiligrane } from '../src/gabarit/filigrane.js'
+import { analyserDocument, serialiserDocument } from '../src/dom'
+import { apposerFiligrane } from '../src/gabarit/filigrane'
 
 const gabarit = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900">
   <text data-champ="nom_1" data-type="texte" data-cadre="0,0,600,60">Awa</text>

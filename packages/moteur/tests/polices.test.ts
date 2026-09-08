@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { CataloguePolices, chargerPolicesDepuisDossier } from '../src/rendu/polices.js'
+import { CataloguePolices, chargerPolicesDepuisDossier } from '../src/rendu/polices'
 
 const dossier = fileURLToPath(new URL('../demo/polices', import.meta.url))
 

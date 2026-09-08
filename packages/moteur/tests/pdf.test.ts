@@ -1,7 +1,7 @@
 import { PDFDocument } from 'pdf-lib'
 import { describe, expect, it } from 'vitest'
-import { rendrePng } from '../src/rendu/png.js'
-import { rendrePdf } from '../src/rendu/pdf.js'
+import { rendrePng } from '../src/rendu/png'
+import { rendrePdf } from '../src/rendu/pdf'
 
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900">
   <rect width="600" height="900" fill="#FFFFFF"/>
