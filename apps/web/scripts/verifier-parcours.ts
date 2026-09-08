@@ -108,6 +108,66 @@ async function parcoursClient(page: Page): Promise<void> {
   )
 }
 
+/**
+ * Le parcours de création : d'un modèle jusqu'à l'invitation en ligne,
+ * sans jamais créer de compte.
+ */
+async function parcoursCreation(page: Page): Promise<void> {
+  await page.goto(`${base}/creer/bapteme-ciel?n1=Sokhna&d=2027-09-04`, {
+    waitUntil: 'domcontentloaded',
+  })
+  await page.waitForURL('**/brouillon/**')
+  verifier('un brouillon s’ouvre sans créer de compte', page.url().includes('/brouillon/'))
+
+  const secret = page.url().split('/brouillon/')[1]!.split(/[?#]/)[0]!
+  verifier(
+    'l’identité saisie dans la galerie est reprise',
+    (await page.getByLabel('Prénom de l’enfant').inputValue()) === 'Sokhna',
+  )
+  verifier('l’aperçu de la carte est affiché', await page.locator('img[alt="Aperçu de votre carte"]').isVisible())
+
+  await page.getByLabel('Lieu', { exact: true }).fill('Sacré-Cœur 3, Dakar')
+  await page.getByRole('button', { name: 'Enregistrer', exact: true }).click()
+  await page.waitForLoadState('networkidle')
+
+  // Le programme.
+  await page.goto(`${base}/brouillon/${secret}/programme`, { waitUntil: 'domcontentloaded' })
+  await page.getByLabel('Nom de la cérémonie').fill('Ngénte')
+  await page.getByLabel('Date', { exact: true }).fill('2027-09-04')
+  await page.getByLabel('De', { exact: true }).fill('10:00')
+  await page.getByLabel('Lieu', { exact: true }).fill('Maison familiale')
+  await page.getByLabel('Pour trouver').fill('portail vert, après la boulangerie')
+  await page.getByRole('button', { name: 'Ajouter cette cérémonie' }).click()
+  await page.waitForLoadState('networkidle')
+  verifier('la cérémonie est enregistrée', (await page.getByText('Ngénte').count()) > 0)
+
+  // Les détails.
+  await page.goto(`${base}/brouillon/${secret}/details`, { waitUntil: 'domcontentloaded' })
+  await page.getByLabel('La tenue').fill('Blanc et vert')
+  await page.getByLabel('Votre mot').fill('Nous serions heureux de vous compter parmi nous.')
+  await page.getByRole('button', { name: 'Enregistrer', exact: true }).click()
+  await page.waitForLoadState('networkidle')
+
+  // La publication.
+  await page.goto(`${base}/brouillon/${secret}/publier`, { waitUntil: 'domcontentloaded' })
+  await page.getByRole('button', { name: 'Publier mon invitation' }).click()
+  await page.waitForLoadState('networkidle')
+  verifier('l’invitation est publiée', (await page.getByText('C’est en ligne.').count()) > 0)
+
+  const lien = await page.locator('a[href^="/e/"]').first().getAttribute('href')
+  verifier('un lien d’invitation est donné', Boolean(lien))
+
+  await page.goto(`${base}${lien}`, { waitUntil: 'domcontentloaded' })
+  verifier(
+    'la page publiée porte le programme saisi',
+    (await page.getByText('portail vert, après la boulangerie').count()) > 0,
+  )
+  verifier(
+    'la carte publiée ne porte plus de filigrane',
+    (await page.locator('img[src*="/carte.png"]').count()) === 1,
+  )
+}
+
 async function main(): Promise<void> {
   const navigateur = await chromium.launch({ channel: 'chrome' })
   const contexte = await navigateur.newContext({
@@ -124,11 +184,12 @@ async function main(): Promise<void> {
   try {
     await parcours(page)
     await parcoursClient(page)
+    await parcoursCreation(page)
   } finally {
     await navigateur.close()
   }
 
-  console.log(echecs === 0 ? '\nParcours invité et parcours client vérifiés.' : `\n${echecs} vérification(s) en échec.`)
+  console.log(echecs === 0 ? '\nParcours invité, client et création vérifiés.' : `\n${echecs} vérification(s) en échec.`)
   process.exit(echecs === 0 ? 0 : 1)
 }
 
