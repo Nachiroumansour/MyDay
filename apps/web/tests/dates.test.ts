@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  formaterDateCourte,
   formaterDateLongue,
   formaterHeure,
   formaterPlage,
@@ -17,6 +18,12 @@ describe('formaterDateLongue', () => {
 
   it('n’ajoute pas de zéro devant le quantième', () => {
     expect(formaterDateLongue(new Date('2027-03-02T10:00:00Z'))).toBe('mardi 2 mars 2027')
+  })
+})
+
+describe('formaterDateCourte', () => {
+  it('écrit la date sans le jour de la semaine, année comprise', () => {
+    expect(formaterDateCourte(samedi14mars)).toBe('14 mars 2027')
   })
 })
 

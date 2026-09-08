@@ -56,3 +56,111 @@ p  { margin: 0; max-width: 66ch; }
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ------------------------------------------------------------------ *
+ * Éléments communs au parcours créateur.
+ * ------------------------------------------------------------------ */
+
+.contenu {
+  max-width: var(--largeur-maximale);
+  margin: 0 auto;
+  padding: 0 var(--marge-laterale);
+}
+
+a { color: inherit; }
+
+.lien-sobre {
+  color: var(--encre);
+  text-decoration: none;
+  border-bottom: 1px solid var(--trait);
+}
+.lien-sobre:hover { border-color: var(--evenement); }
+
+/* Bouton principal : plein, dans la couleur de l'événement en cours. */
+.bouton {
+  display: inline-block;
+  padding: 14px 22px;
+  background: var(--evenement);
+  color: #ffffff;
+  border: 1px solid var(--evenement);
+  font: inherit;
+  font-weight: 600;
+  font-size: 16px;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  transition: opacity var(--duree-courte);
+}
+.bouton:hover { opacity: 0.88; }
+
+/* Bouton secondaire : un simple contour. */
+.bouton-contour {
+  display: inline-block;
+  padding: 13px 21px;
+  background: transparent;
+  color: var(--encre);
+  border: 1px solid var(--trait);
+  font: inherit;
+  font-weight: 600;
+  font-size: 16px;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--duree-courte), color var(--duree-courte);
+}
+.bouton-contour:hover { border-color: var(--evenement); color: var(--evenement); }
+
+.saisie {
+  font: inherit;
+  padding: 12px 14px;
+  border: 1px solid var(--trait);
+  background: var(--surface);
+  color: var(--encre);
+  width: 100%;
+}
+.saisie:focus-visible { border-color: var(--evenement); outline: none; }
+
+.etiquette-champ {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--encre-douce);
+}
+
+/* ---------- Chrome du site ---------- */
+
+.entete {
+  border-bottom: 1px solid var(--trait);
+  background: var(--fond);
+}
+
+.entete-interieur {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.entete-interieur a { text-decoration: none; }
+
+.entete-nav {
+  display: flex;
+  gap: 18px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.pied-site {
+  border-top: 1px solid var(--trait);
+  margin-top: 72px;
+}
+
+.pied-interieur {
+  padding-top: 32px;
+  padding-bottom: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}

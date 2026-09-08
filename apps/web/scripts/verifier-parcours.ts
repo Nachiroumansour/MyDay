@@ -64,6 +64,50 @@ async function parcours(page: Page): Promise<void> {
   verifier('un numéro invalide est expliqué, pas rejeté sèchement', true)
 }
 
+/** Le parcours du client : de l'accueil au modèle, en passant par le guidage. */
+async function parcoursClient(page: Page): Promise<void> {
+  await page.goto(`${base}/?n1=Aminata&n2=Ibrahima`, { waitUntil: 'domcontentloaded' })
+  verifier(
+    'l’accueil montre de vraies cartes',
+    (await page.locator('img[src*="/vignette.png"]').count()) >= 3,
+  )
+  verifier(
+    'les vignettes portent déjà les prénoms du visiteur',
+    (await page.locator('img[src*="n1=Aminata"]').count()) >= 3,
+  )
+
+  await page.getByRole('link', { name: 'Les modèles' }).click()
+  await page.waitForURL('**/modeles*')
+  verifier('la galerie affiche le catalogue', (await page.locator('img[src*="/vignette.png"]').count()) > 8)
+
+  await page.getByRole('link', { name: 'Mariage', exact: true }).click()
+  await page.waitForURL('**type=mariage**')
+  verifier('le filtre par type restreint le catalogue', (await page.locator('h1').innerText()) === 'Mariage')
+
+  await page.getByRole('link', { name: 'Aidez-moi à choisir' }).click()
+  await page.waitForURL('**/guide**')
+  verifier('le guidage démarre', (await page.locator('h1').innerText()).length > 0)
+
+  // Trois choix visuels mènent au style nommé.
+  for (let etape = 0; etape < 4; etape += 1) {
+    const suivante = page.locator('main a[href*="/guide?"]').first()
+    if ((await suivante.count()) === 0) break
+    await suivante.click()
+    await page.waitForLoadState('domcontentloaded')
+  }
+  verifier(
+    'le guidage aboutit à un style nommé',
+    (await page.getByText('Votre style').count()) > 0,
+  )
+
+  await page.locator('main a[href*="/modeles/"]').first().click()
+  await page.waitForURL('**/modeles/**')
+  verifier(
+    'la fiche modèle propose de personnaliser',
+    (await page.getByRole('link', { name: 'Personnaliser ce modèle' }).count()) === 1,
+  )
+}
+
 async function main(): Promise<void> {
   const navigateur = await chromium.launch({ channel: 'chrome' })
   const contexte = await navigateur.newContext({
@@ -79,11 +123,12 @@ async function main(): Promise<void> {
 
   try {
     await parcours(page)
+    await parcoursClient(page)
   } finally {
     await navigateur.close()
   }
 
-  console.log(echecs === 0 ? '\nParcours invité vérifié.' : `\n${echecs} vérification(s) en échec.`)
+  console.log(echecs === 0 ? '\nParcours invité et parcours client vérifiés.' : `\n${echecs} vérification(s) en échec.`)
   process.exit(echecs === 0 ? 0 : 1)
 }
 

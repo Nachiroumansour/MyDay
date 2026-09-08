@@ -18,10 +18,12 @@ export function formaterDateLongue(date: Date): string {
   }).format(date)
 }
 
+/** « 14 mars 2027 » — la forme qu'on écrit sur une carte. */
 export function formaterDateCourte(date: Date): string {
   return new Intl.DateTimeFormat(LOCALE, {
     day: 'numeric',
     month: 'long',
+    year: 'numeric',
     timeZone: FUSEAU,
   }).format(date)
 }

@@ -3,7 +3,7 @@ import { polices } from './polices'
 import type { EvenementVue } from './bdd/evenements'
 
 /** Largeurs de rendu admises. Une liste fermée : la largeur vient de l'URL. */
-export const LARGEURS_ADMISES = [480, 900, 1500] as const
+export const LARGEURS_ADMISES = [300, 480, 900, 1500] as const
 export type LargeurCarte = (typeof LARGEURS_ADMISES)[number]
 
 export function largeurAdmise(brut: string | null): LargeurCarte {

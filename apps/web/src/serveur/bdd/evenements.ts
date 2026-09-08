@@ -102,3 +102,17 @@ export async function enregistrerReponse(entree: NouvelleReponse): Promise<void>
     message: entree.message ?? null,
   })
 }
+
+/**
+ * Un événement publié quelconque, pour montrer à un client ce que reçoivent
+ * ses invités avant qu'il n'ait rien créé.
+ */
+export async function evenementVitrine(): Promise<{ slug: string } | undefined> {
+  const [ligne] = await bdd
+    .select({ slug: evenements.slug })
+    .from(evenements)
+    .where(eq(evenements.statut, 'publie'))
+    .orderBy(asc(evenements.creeLe))
+    .limit(1)
+  return ligne
+}

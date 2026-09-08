@@ -30,7 +30,7 @@ describe('apposerFiligrane', () => {
     const doc = analyserDocument(gabarit)
     apposerFiligrane(doc)
     const sortie = serialiserDocument(doc)
-    expect(sortie.split('MyDay').length - 1).toBeGreaterThan(4)
+    expect(sortie.split('MyDay').length - 1).toBeGreaterThan(3)
   })
 
   it('n’altère pas le contenu de la carte', () => {

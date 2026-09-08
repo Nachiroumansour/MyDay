@@ -1,14 +1,81 @@
 /**
- * Jeu de démonstration : un graphiste, deux gabarits, et un mariage publié à
- * trois cérémonies — de quoi voir la page invité en vrai.
+ * Jeu de démonstration.
+ *
+ * Chaque dessin est décliné en plusieurs palettes : c'est la stratégie de
+ * catalogue de la spec (§5.2) — un même gabarit sous quatre couleurs donne
+ * quatre entrées visuellement distinctes, pour un travail bien moindre qu'un
+ * nouveau modèle.
  */
 import { readFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { analyserDocument, analyserGabarit } from '@myday/moteur'
 import { bdd } from '../src/serveur/bdd/client'
-import { ceremonies, evenements, gabarits, graphistes, invites, reponses } from '../src/serveur/bdd/schema'
+import {
+  ceremonies,
+  evenements,
+  gabarits,
+  graphistes,
+  invites,
+  reponses,
+} from '../src/serveur/bdd/schema'
+import type { TypeEvenement } from '../src/lib/evenements'
 
 const racine = fileURLToPath(new URL('..', import.meta.url))
+
+interface Variante {
+  suffixe: string
+  nom: string
+  couleur: string
+  etiquettes: string[]
+}
+
+interface Modele {
+  fichier: string
+  type: TypeEvenement
+  /** La couleur d'accent présente dans le fichier source. */
+  couleurOrigine: string
+  variantes: Variante[]
+}
+
+const MODELES: Modele[] = [
+  {
+    fichier: 'mariage-indigo',
+    type: 'mariage',
+    couleurOrigine: '#2C3A80',
+    variantes: [
+      { suffixe: 'indigo', nom: 'Indigo', couleur: '#2C3A80', etiquettes: ['moderne', 'sobre', 'profond'] },
+      { suffixe: 'or', nom: 'Or brûlé', couleur: '#8A6D3B', etiquettes: ['traditionnel', 'dore', 'ornemente'] },
+      { suffixe: 'terre', nom: 'Terre de Casamance', couleur: '#7A3B2E', etiquettes: ['traditionnel', 'profond', 'contraste'] },
+      { suffixe: 'amande', nom: 'Amande', couleur: '#5F7A63', etiquettes: ['moderne', 'clair', 'floral'] },
+      { suffixe: 'ardoise', nom: 'Ardoise', couleur: '#3D4450', etiquettes: ['moderne', 'sobre', 'contraste'] },
+      { suffixe: 'poudre', nom: 'Poudré', couleur: '#A8626E', etiquettes: ['clair', 'pastel', 'floral'] },
+    ],
+  },
+  {
+    fichier: 'bapteme-vert',
+    type: 'bapteme',
+    couleurOrigine: '#1F6B4A',
+    variantes: [
+      { suffixe: 'feuille', nom: 'Feuille', couleur: '#1F6B4A', etiquettes: ['naturel', 'sobre', 'moderne'] },
+      { suffixe: 'ciel', nom: 'Ciel', couleur: '#4A6FA5', etiquettes: ['clair', 'pastel', 'enfantin'] },
+      { suffixe: 'sable', nom: 'Sable', couleur: '#8A7A5C', etiquettes: ['naturel', 'clair', 'traditionnel'] },
+      { suffixe: 'rose', nom: 'Rose thé', couleur: '#B0707C', etiquettes: ['pastel', 'enfantin', 'clair'] },
+      { suffixe: 'nuit', nom: 'Nuit douce', couleur: '#2F3B52', etiquettes: ['profond', 'sobre', 'moderne'] },
+    ],
+  },
+  {
+    fichier: 'anniversaire-ambre',
+    type: 'anniversaire',
+    couleurOrigine: '#C9700F',
+    variantes: [
+      { suffixe: 'ambre', nom: 'Ambre', couleur: '#C9700F', etiquettes: ['festif', 'contraste', 'moderne'] },
+      { suffixe: 'prune', nom: 'Prune', couleur: '#6B3F6E', etiquettes: ['chic', 'profond', 'moderne'] },
+      { suffixe: 'corail', nom: 'Corail', couleur: '#C4553D', etiquettes: ['festif', 'contraste'] },
+      { suffixe: 'encre', nom: 'Encre', couleur: '#2B2B33', etiquettes: ['chic', 'sobre', 'profond'] },
+      { suffixe: 'menthe', nom: 'Menthe', couleur: '#3E8C7A', etiquettes: ['clair', 'festif', 'pastel'] },
+    ],
+  },
+]
 
 async function main(): Promise<void> {
   // Table rase : le script doit pouvoir être relancé sans effet de bord.
@@ -19,7 +86,7 @@ async function main(): Promise<void> {
   await bdd.delete(gabarits)
   await bdd.delete(graphistes)
 
-  const [graphiste] = await bdd
+  const [atelier] = await bdd
     .insert(graphistes)
     .values({
       nom: 'Atelier Ndiaye',
@@ -29,31 +96,46 @@ async function main(): Promise<void> {
     })
     .returning()
 
-  const modeles = [
-    { fichier: 'mariage-indigo', nom: 'Indigo', type: 'mariage' as const, etiquettes: ['moderne', 'sobre'] },
-    { fichier: 'bapteme-vert', nom: 'Feuille', type: 'bapteme' as const, etiquettes: ['doux', 'naturel'] },
-  ]
+  const [studio] = await bdd
+    .insert(graphistes)
+    .values({
+      nom: 'Studio Teranga',
+      bio: 'Deux sœurs, un goût pour les motifs du bazin.',
+      contact: 'studio@exemple.sn',
+      partRevenu: '35.00',
+    })
+    .returning()
 
-  const poses = []
-  for (const modele of modeles) {
-    const svg = await readFile(`${racine}gabarits/${modele.fichier}.svg`, 'utf8')
-    const champs = analyserGabarit(analyserDocument(svg))
-    const [gabarit] = await bdd
-      .insert(gabarits)
-      .values({
-        slug: modele.fichier,
-        nom: modele.nom,
-        typeEvenement: modele.type,
-        sourceSvg: svg,
-        champs,
-        etiquettes: modele.etiquettes,
-        prix: 5000,
-        statut: 'actif',
-        graphisteId: graphiste!.id,
-      })
-      .returning()
-    poses.push(gabarit!)
-    console.log(`✓ gabarit ${modele.nom} — ${champs.length} champs`)
+  const poses = new Map<string, string>()
+  let alterne = 0
+
+  for (const modele of MODELES) {
+    const source = await readFile(`${racine}gabarits/${modele.fichier}.svg`, 'utf8')
+
+    for (const variante of modele.variantes) {
+      const svg = source.replaceAll(modele.couleurOrigine, variante.couleur)
+      const champs = analyserGabarit(analyserDocument(svg))
+      const slug = `${modele.type}-${variante.suffixe}`
+
+      const [gabarit] = await bdd
+        .insert(gabarits)
+        .values({
+          slug,
+          nom: variante.nom,
+          typeEvenement: modele.type,
+          sourceSvg: svg,
+          champs,
+          etiquettes: variante.etiquettes,
+          prix: 5000,
+          statut: 'actif',
+          nbVentes: Math.floor(Math.random() * 40),
+          graphisteId: (alterne++ % 2 === 0 ? atelier! : studio!).id,
+        })
+        .returning()
+
+      poses.set(slug, gabarit!.id)
+      console.log(`✓ ${slug} — ${champs.length} champs`)
+    }
   }
 
   const [evenement] = await bdd
@@ -63,7 +145,7 @@ async function main(): Promise<void> {
       secretBrouillon: crypto.randomUUID(),
       titre: 'Aminata & Ibrahima',
       typeEvenement: 'mariage',
-      gabaritId: poses[0]!.id,
+      gabaritId: poses.get('mariage-indigo')!,
       valeursChamps: {
         nom_1: 'Aminata',
         nom_2: 'Ibrahima',
@@ -123,7 +205,7 @@ async function main(): Promise<void> {
     },
   ])
 
-  console.log(`\n✓ événement publié : /e/${evenement!.slug}`)
+  console.log(`\n✓ ${poses.size} modèles, événement publié : /e/${evenement!.slug}`)
   process.exit(0)
 }
 

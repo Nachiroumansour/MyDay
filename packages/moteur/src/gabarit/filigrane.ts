@@ -34,9 +34,9 @@ export function apposerFiligrane(
   police = 'sans-serif',
 ): void {
   const { largeur, hauteur } = dimensions(doc)
-  const taille = Math.max(largeur, hauteur) / 14
-  const pasX = taille * 7
-  const pasY = taille * 4
+  const taille = Math.max(largeur, hauteur) / 11
+  const pasX = taille * 5.5
+  const pasY = taille * 5.5
 
   const groupe = doc.createElementNS(NS_SVG, 'g')
   groupe.setAttribute('data-filigrane', 'true')
@@ -53,7 +53,7 @@ export function apposerFiligrane(
       texte.setAttribute('font-size', String(taille))
       texte.setAttribute('font-weight', '700')
       texte.setAttribute('fill', '#14161D')
-      texte.setAttribute('fill-opacity', '0.16')
+      texte.setAttribute('fill-opacity', '0.1')
       texte.textContent = mention
       groupe.appendChild(texte)
     }
