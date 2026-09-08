@@ -13,6 +13,11 @@ dist/
 *.log
 npm-debug.log*
 
+# Médias déposés par les clients et fichiers produits par le serveur.
+# En production, ce dossier contient les photos des invités et les fichiers
+# payés : il ne doit jamais être versionné.
+.donnees/
+
 coverage/
 .vercel/
 epreuve/
