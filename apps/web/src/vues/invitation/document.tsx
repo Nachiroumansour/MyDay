@@ -2,6 +2,8 @@
 import { render } from 'preact-render-to-string'
 import Enveloppe, { SCRIPT_ENVELOPPE, scriptMemoire } from './enveloppe'
 import Rsvp, { Merci } from './rsvp'
+import { Cagnotte, Galerie, LivreOr } from './modules'
+import type { MessageVue, ParticipationVue, PhotoVue } from '@/serveur/bdd/modules'
 import { STYLES } from './styles'
 import {
   formaterDateLongue,
@@ -21,6 +23,13 @@ export interface ContexteInvitation {
   reponseEnvoyee: boolean
   champsFautifs: string[]
   choixPrecedent?: 'oui' | 'non'
+  /** L'invité qui ouvre son lien nominatif. */
+  invite?: { nomComplet: string; telephone: string | null; jeton: string }
+  messages: MessageVue[]
+  photos: PhotoVue[]
+  participations: ParticipationVue[]
+  /** Modules dont le formulaire vient d'être envoyé. */
+  deposes: { livreOr: boolean; photo: boolean; participation: boolean }
 }
 
 function initialesDe(titre: string): string {
@@ -91,6 +100,11 @@ function Corps({
   reponseEnvoyee,
   champsFautifs,
   choixPrecedent,
+  invite,
+  messages,
+  photos,
+  participations,
+  deposes,
 }: ContexteInvitation) {
   const slug = evenement.slug
   const premiere = evenement.ceremonies[0]
@@ -104,6 +118,7 @@ function Corps({
         titre={evenement.titre}
         initiales={initialesDe(evenement.titre)}
         couleur={couleur}
+        {...(invite ? { invite: invite.nomComplet } : {})}
       />
 
       <main>
@@ -158,7 +173,9 @@ function Corps({
         )}
 
         <section className="section" id="repondre">
-          <h2 className="titre-section">Serez-vous des nôtres ?</h2>
+          <h2 className="titre-section">
+            {invite ? `${invite.nomComplet}, serez-vous des nôtres ?` : 'Serez-vous des nôtres ?'}
+          </h2>
           {reponseEnvoyee ? (
             <Merci />
           ) : (
@@ -166,6 +183,7 @@ function Corps({
               slug={slug}
               champsFautifs={champsFautifs}
               choixPrecedent={choixPrecedent}
+              {...(invite ? { invite } : {})}
               ceremonies={evenement.ceremonies.map((c) => ({
                 id: c.id,
                 nom: c.nom,
@@ -174,6 +192,23 @@ function Corps({
             />
           )}
         </section>
+
+        {evenement.livreOrOuvert && (
+          <LivreOr slug={slug} messages={messages} depose={deposes.livreOr} />
+        )}
+
+        {evenement.galerieOuverte && (
+          <Galerie slug={slug} photos={photos} depose={deposes.photo} />
+        )}
+
+        {evenement.cagnotteOuverte && (
+          <Cagnotte
+            slug={slug}
+            mot={evenement.cagnotteMot}
+            participations={participations}
+            envoyee={deposes.participation}
+          />
+        )}
 
         {evenement.telephoneHote && (
           <section className="section">

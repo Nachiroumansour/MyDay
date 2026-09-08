@@ -12,6 +12,8 @@ interface Props {
   champsFautifs: string[]
   /** Choix précédent, renvoyé après une erreur, pour rouvrir le formulaire. */
   choixPrecedent?: 'oui' | 'non'
+  /** L'invité nommé : son nom et son numéro sont déjà connus. */
+  invite?: { nomComplet: string; telephone: string | null }
 }
 
 const MESSAGES: Record<string, string> = {
@@ -39,7 +41,7 @@ export function Merci() {
  * par deux boutons radio déguisés en boutons, ce qui préserve le clavier et
  * les lecteurs d'écran.
  */
-export default function Rsvp({ slug, ceremonies, champsFautifs, choixPrecedent }: Props) {
+export default function Rsvp({ slug, ceremonies, champsFautifs, choixPrecedent, invite }: Props) {
   const erreur = (champ: string) =>
     champsFautifs.includes(champ) ? MESSAGES[champ] : undefined
 
@@ -77,7 +79,14 @@ export default function Rsvp({ slug, ceremonies, champsFautifs, choixPrecedent }
           <label className="etiquette" htmlFor="rsvp-nom">
             Votre nom
           </label>
-          <input id="rsvp-nom" name="nom" className="saisie" autoComplete="name" required />
+          <input
+            id="rsvp-nom"
+            name="nom"
+            className="saisie"
+            autoComplete="name"
+            defaultValue={invite?.nomComplet ?? ''}
+            required
+          />
           {erreur('nom') && <p className="erreur">{erreur('nom')}</p>}
         </div>
 
@@ -93,6 +102,7 @@ export default function Rsvp({ slug, ceremonies, champsFautifs, choixPrecedent }
             inputMode="tel"
             autoComplete="tel"
             placeholder="77 123 45 67"
+            defaultValue={invite?.telephone ?? ''}
             required
           />
           {erreur('telephone') ? (

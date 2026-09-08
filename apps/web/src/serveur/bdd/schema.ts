@@ -46,6 +46,12 @@ export const statutLivraisonEnum = pgEnum('statut_livraison', [
   'echouee',
 ])
 
+export const statutModerationEnum = pgEnum('statut_moderation', [
+  'en_attente',
+  'publie',
+  'masque',
+])
+
 export const graphistes = pgTable('graphistes', {
   id: identifiant(),
   nom: text('nom').notNull(),
@@ -105,6 +111,11 @@ export const evenements = pgTable(
     /** Fichiers livrés, produits une fois le paiement confirmé. */
     fichierPng: text('fichier_png'),
     fichierPdf: text('fichier_pdf'),
+    /** Modules que le créateur ouvre à ses invités. */
+    livreOrOuvert: boolean('livre_or_ouvert').notNull().default(false),
+    galerieOuverte: boolean('galerie_ouverte').notNull().default(false),
+    cagnotteOuverte: boolean('cagnotte_ouverte').notNull().default(false),
+    cagnotteMot: text('cagnotte_mot'),
     creeLe: timestamp('cree_le', { withTimezone: true }).notNull().defaultNow(),
     modifieLe: timestamp('modifie_le', { withTimezone: true }).notNull().defaultNow(),
   },
@@ -217,4 +228,54 @@ export const reponses = pgTable(
     // compte pas deux fois dans le total attendu.
     uniqueIndex('reponses_evenement_telephone').on(table.evenementId, table.telephone),
   ],
+)
+
+export const messagesLivreOr = pgTable(
+  'messages_livre_or',
+  {
+    id: identifiant(),
+    evenementId: text('evenement_id')
+      .notNull()
+      .references(() => evenements.id, { onDelete: 'cascade' }),
+    auteur: text('auteur').notNull(),
+    message: text('message').notNull(),
+    statut: statutModerationEnum('statut').notNull().default('publie'),
+    creeLe: timestamp('cree_le', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index('livre_or_evenement').on(table.evenementId, table.statut)],
+)
+
+export const photos = pgTable(
+  'photos',
+  {
+    id: identifiant(),
+    evenementId: text('evenement_id')
+      .notNull()
+      .references(() => evenements.id, { onDelete: 'cascade' }),
+    deposantNom: text('deposant_nom'),
+    url: text('url').notNull(),
+    statut: statutModerationEnum('statut').notNull().default('publie'),
+    creeLe: timestamp('cree_le', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index('photos_evenement').on(table.evenementId, table.statut)],
+)
+
+export const participations = pgTable(
+  'participations',
+  {
+    id: identifiant(),
+    evenementId: text('evenement_id')
+      .notNull()
+      .references(() => evenements.id, { onDelete: 'cascade' }),
+    contributeur: text('contributeur').notNull(),
+    telephone: text('telephone'),
+    montant: integer('montant').notNull(),
+    message: text('message'),
+    /** Référence de la session de paiement : la clé d'idempotence. */
+    reference: text('reference').notNull().unique(),
+    statut: statutPaiementEnum('statut').notNull().default('en_attente'),
+    creeLe: timestamp('cree_le', { withTimezone: true }).notNull().defaultNow(),
+    confirmeeLe: timestamp('confirmee_le', { withTimezone: true }),
+  },
+  (table) => [index('participations_evenement').on(table.evenementId, table.statut)],
 )
