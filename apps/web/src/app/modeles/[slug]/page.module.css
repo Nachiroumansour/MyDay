@@ -1,3 +1,28 @@
+.bandeau {
+  position: relative;
+  overflow: hidden;
+  margin: 0 calc(var(--marge-laterale) * -1);
+  padding: clamp(28px, 4vw, 40px) var(--marge-laterale);
+  background: var(--teinte);
+}
+
+.bandeauInterieur {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.bandeauEmoji { font-size: 30px; line-height: 1; }
+
+.bandeauType {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--evenement);
+}
+
 .fiche {
   padding: 40px 0 0;
   display: grid;
@@ -6,14 +31,35 @@
 }
 
 .apercu { max-width: 460px; margin: 0 auto; width: 100%; }
-.apercu img { border: 1px solid var(--trait); }
+
+/* La carte est posée, pas collée : une inclinaison légère et une ombre de
+   papier, qui se redressent quand on la regarde de près. */
+.apercu img {
+  border: 1px solid var(--trait);
+  transform: rotate(-1.6deg);
+  box-shadow:
+    0 2px 4px rgba(20, 22, 29, 0.06),
+    0 12px 28px -8px rgba(20, 22, 29, 0.18),
+    0 32px 56px -24px rgba(20, 22, 29, 0.24);
+  transition:
+    transform 360ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.apercu:hover img {
+  transform: rotate(0deg) translateY(-8px);
+  box-shadow:
+    0 3px 6px rgba(20, 22, 29, 0.08),
+    0 20px 40px -8px rgba(20, 22, 29, 0.22),
+    0 46px 76px -28px rgba(20, 22, 29, 0.3);
+}
 
 .infos { display: flex; flex-direction: column; gap: 20px; }
 
 .nom { font-size: clamp(28px, 7vw, 38px); letter-spacing: -0.03em; }
 .auteur { font-size: 15px; color: var(--encre-douce); }
 
-.pastilles { display: flex; flex-wrap: wrap; gap: 8px; }
+.pastilles { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
 
 .pastille {
   padding: 6px 12px;
@@ -36,9 +82,13 @@
 
 .inclus li {
   font-size: 15px;
-  padding-left: 14px;
-  border-left: 2px solid var(--evenement);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--encre);
 }
+
+.inclusIcone { flex: none; color: var(--evenement); }
 
 .similaires {
   padding: 56px 0 0;
@@ -67,3 +117,12 @@
   .fiche { grid-template-columns: 460px 1fr; gap: 56px; align-items: start; }
   .apercu { margin: 0; }
 }
+
+.modele img {
+  box-shadow:
+    0 1px 2px rgba(20, 22, 29, 0.05),
+    0 6px 16px -6px rgba(20, 22, 29, 0.14);
+  transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.modele:hover img { transform: translateY(-5px); }

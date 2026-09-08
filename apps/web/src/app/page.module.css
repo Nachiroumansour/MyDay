@@ -1,122 +1,200 @@
+/* ------------------------------------------------------------------ *
+ * L'accueil.
+ *
+ * Le geste : trois grands panneaux de fête, chacun dans sa couleur, qui
+ * portent toute la couleur du site. Le reste de la page reste calme —
+ * la hardiesse se dépense à un seul endroit.
+ * ------------------------------------------------------------------ */
+
+.page { display: flex; flex-direction: column; }
+
+/* ---------- Héro ---------- */
+
 .hero {
-  padding: 56px 0 24px;
+  position: relative;
+  overflow: hidden;
+  padding: clamp(56px, 11vw, 128px) 0 clamp(40px, 7vw, 88px);
+}
+
+.heroInterieur {
+  position: relative;
+  z-index: 1;
+  max-width: var(--largeur-maximale);
+  margin: 0 auto;
+  padding: 0 var(--marge-laterale);
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: clamp(24px, 4vw, 40px);
 }
 
 .titre {
-  font-size: clamp(34px, 9vw, 52px);
-  line-height: 1.06;
-  letter-spacing: -0.035em;
+  font-size: clamp(46px, 11.5vw, 104px);
+  line-height: 0.94;
+  letter-spacing: -0.045em;
+  font-weight: 700;
+  max-width: 14ch;
 }
 
-.sous-titre {
-  font-size: 17px;
+.chapeau {
+  font-size: clamp(17px, 2.2vw, 20px);
   color: var(--encre-douce);
-  max-width: 46ch;
+  max-width: 44ch;
+  line-height: 1.55;
 }
 
-/* Trois vraies cartes du catalogue, inclinées comme des cartons qu'on tient
-   en main. Elles se posent en séquence à l'ouverture. */
-.cartes {
+/* ---------- Les trois fêtes ---------- */
+
+.fetes {
   list-style: none;
   margin: 0;
-  padding: 8px 0 0;
+  padding: 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  max-width: 660px;
+  grid-template-columns: 1fr;
 }
 
-.carte {
+.fete {
+  position: relative;
+  overflow: hidden;
+  display: block;
+  text-decoration: none;
+  color: #ffffff;
+  padding: clamp(36px, 6vw, 64px) var(--marge-laterale) clamp(40px, 6vw, 72px);
+  background: var(--fond-fete);
+  /* Les trois panneaux se posent en séquence à l'ouverture. */
+  animation: poser 520ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.fete:nth-child(1) { animation-delay: 60ms; }
+.fete:nth-child(2) { animation-delay: 120ms; }
+.fete:nth-child(3) { animation-delay: 180ms; }
+
+.feteInterieur {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  text-decoration: none;
-  animation: poser 460ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
-}
-
-.carte:nth-child(1) { animation-delay: 0ms; }
-.carte:nth-child(2) { animation-delay: 60ms; }
-.carte:nth-child(3) { animation-delay: 120ms; }
-
-.carte img {
-  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.carte:nth-child(1) img { transform: rotate(-2.2deg); }
-.carte:nth-child(2) img { transform: rotate(1deg); }
-.carte:nth-child(3) img { transform: rotate(2.6deg); }
-
-.carte:hover img,
-.carte:focus-visible img { transform: rotate(0deg) translateY(-4px); }
-
-.nom-type {
-  font-size: 15px;
-  font-weight: 600;
+  align-items: center;
+  gap: 18px;
   text-align: center;
 }
 
+.feteEmoji {
+  font-size: clamp(40px, 6vw, 56px);
+  line-height: 1;
+}
+
+.feteNom {
+  font-size: clamp(28px, 4.4vw, 38px);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+
+.feteCompte {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.66);
+}
+
+/* La carte est un objet qu'on tient : elle a une épaisseur et une ombre. */
+.feteCarte {
+  display: block;
+  width: min(74vw, 220px);
+  height: auto;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transform: rotate(var(--inclinaison));
+  box-shadow:
+    0 2px 4px rgba(8, 10, 18, 0.24),
+    0 14px 30px -8px rgba(8, 10, 18, 0.4),
+    0 34px 60px -28px rgba(8, 10, 18, 0.5);
+  transition:
+    transform 340ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 340ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.fete:hover .feteCarte,
+.fete:focus-visible .feteCarte {
+  transform: rotate(0deg) translateY(-10px) scale(1.03);
+  box-shadow:
+    0 4px 8px rgba(8, 10, 18, 0.28),
+    0 22px 44px -8px rgba(8, 10, 18, 0.46),
+    0 52px 84px -30px rgba(8, 10, 18, 0.56);
+}
+
+.fete:focus-visible { outline: 3px solid #ffffff; outline-offset: -6px; }
+
 @keyframes poser {
-  from { opacity: 0; transform: translateY(14px); }
+  from { opacity: 0; transform: translateY(18px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .carte { animation: none; }
-  .carte img { transition: none; }
-}
-
-/* ---------- Sections ---------- */
+/* ---------- Sections calmes ---------- */
 
 .section {
-  padding: 56px 0;
-  border-top: 1px solid var(--trait);
+  /* « margin: 0 auto » sur un enfant flex annule l'étirement : sans cette
+     largeur explicite, la section se réduit à son contenu. */
+  width: 100%;
+  max-width: var(--largeur-maximale);
+  margin: 0 auto;
+  padding: clamp(48px, 7vw, 80px) var(--marge-laterale);
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-.titre-section {
-  font-size: 26px;
-  letter-spacing: -0.025em;
+.sectionTitre {
+  font-size: clamp(24px, 3.4vw, 32px);
+  letter-spacing: -0.03em;
+  font-weight: 600;
 }
 
-.introduction {
-  color: var(--encre-douce);
-  max-width: 58ch;
-}
+.sectionTexte { color: var(--encre-douce); max-width: 56ch; }
 
-/* ---------- Collections ---------- */
+/* ---------- Par envie ---------- */
 
-.collections {
+.envies {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 12px;
-  align-items: stretch;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 10px;
 }
 
-.collections > li { display: flex; }
+.envies > li { display: flex; }
 
-.collection {
+.envie {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 18px;
-  border: 1px solid var(--trait);
+  gap: 6px;
+  padding: 22px 22px 24px;
+  background: var(--teinte);
   text-decoration: none;
-  transition: border-color var(--duree-courte);
+  border-left: 3px solid var(--accent);
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.collection:hover { border-color: var(--evenement); }
+.envie:hover, .envie:focus-visible { transform: translateY(-3px); }
 
-.collection strong { font-size: 16px; font-weight: 600; }
-.collection span { font-size: 14px; color: var(--encre-douce); }
+.envieEmoji { font-size: 26px; line-height: 1; }
+.envieNom { font-size: 16px; font-weight: 600; }
+.envieDetail { font-size: 14px; color: var(--encre-douce); }
+
+/* ---------- Comment ça marche ---------- */
+
+.etapes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 28px;
+}
+
+.etape { display: flex; flex-direction: column; gap: 8px; }
+.etapeIcone { color: var(--evenement); }
+.etapeNom { font-size: 18px; font-weight: 600; }
+.etapeTexte { font-size: 15px; color: var(--encre-douce); }
 
 /* ---------- Créateurs ---------- */
 
@@ -125,34 +203,34 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 28px;
 }
 
-.createur { display: flex; flex-direction: column; gap: 6px; }
-.createur strong { font-size: 17px; font-weight: 600; }
-.createur p { font-size: 15px; color: var(--encre-douce); }
-.createur span { font-size: 13px; color: var(--encre-douce); }
+.createur { display: flex; gap: 14px; align-items: flex-start; }
 
-/* ---------- Étapes ---------- */
-
-.etapes {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.createurPastille {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--evenement);
+  color: #ffffff;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 28px;
-  counter-reset: etape;
+  place-items: center;
+  font-weight: 700;
+  font-size: 17px;
 }
 
-.etape {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding-left: 16px;
-  border-left: 2px solid var(--trait);
+.createurNom { font-size: 17px; font-weight: 600; }
+.createurBio { font-size: 15px; color: var(--encre-douce); }
+.createurCompte { font-size: 13px; color: var(--encre-douce); }
+
+@media (min-width: 760px) {
+  .fetes { grid-template-columns: repeat(3, 1fr); }
 }
 
-.etape strong { font-size: 17px; font-weight: 600; }
-.etape p { font-size: 15px; color: var(--encre-douce); }
+@media (prefers-reduced-motion: reduce) {
+  .fete { animation: none; }
+  .feteCarte, .envie { transition: none; }
+}

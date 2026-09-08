@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation'
 import { formaterDateCourte } from '@/lib/dates'
 import { compterParCeremonie, resumeReponses } from '@/lib/statistiques'
+import { ChiffreAnime } from '@/composants/chiffre-anime'
+import { festivite } from '@/lib/festivite'
 import { brouillonParSecret } from '@/serveur/bdd/brouillons'
 import { reponsesPour } from '@/serveur/bdd/evenements'
 import editeur from '../editeur.module.css'
@@ -28,7 +30,9 @@ export default async function Reponses({
   return (
     <div className={editeur.formulaire} style={{ maxWidth: 'none' }}>
       <div>
-        <h1 className={editeur.titre}>Les réponses</h1>
+        <h1 className={editeur.titre}>
+          {festivite(brouillon.typeEvenement).emoji} Les réponses
+        </h1>
         <p className={editeur.introduction}>
           {brouillon.statut === 'publie'
             ? 'Mises à jour en direct, au fil des réponses de vos invités.'
@@ -38,19 +42,27 @@ export default async function Reponses({
 
       <div className={styles.chiffres}>
         <div className={styles.chiffre}>
-          <span className={styles.valeurAccent}>{resume.personnes}</span>
+          <span className={styles.valeurAccent}>
+            <ChiffreAnime valeur={resume.personnes} />
+          </span>
           <span className={styles.intitule}>personnes attendues</span>
         </div>
         <div className={styles.chiffre}>
-          <span className={styles.valeur}>{resume.presents}</span>
+          <span className={styles.valeur}>
+            <ChiffreAnime valeur={resume.presents} />
+          </span>
           <span className={styles.intitule}>réponses positives</span>
         </div>
         <div className={styles.chiffre}>
-          <span className={styles.valeur}>{resume.absents}</span>
+          <span className={styles.valeur}>
+            <ChiffreAnime valeur={resume.absents} />
+          </span>
           <span className={styles.intitule}>ne peuvent pas venir</span>
         </div>
         <div className={styles.chiffre}>
-          <span className={styles.valeur}>{resume.reponses}</span>
+          <span className={styles.valeur}>
+            <ChiffreAnime valeur={resume.reponses} />
+          </span>
           <span className={styles.intitule}>réponses au total</span>
         </div>
       </div>
