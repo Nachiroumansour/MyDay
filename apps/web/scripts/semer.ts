@@ -25,54 +25,116 @@ const racine = fileURLToPath(new URL('..', import.meta.url))
 interface Variante {
   suffixe: string
   nom: string
+  /** La couleur qui représente la variante dans le catalogue. */
   couleur: string
+  /**
+   * Les teintes à substituer dans le fichier source. Un modèle orné en
+   * compte plusieurs — l'encre, mais aussi les pétales — là où un modèle
+   * épuré n'en a qu'une.
+   */
+  remplacements: Record<string, string>
   etiquettes: string[]
 }
 
 interface Modele {
   fichier: string
   type: TypeEvenement
-  /** La couleur d'accent présente dans le fichier source. */
-  couleurOrigine: string
   variantes: Variante[]
 }
 
+/** L'encre des modèles ornés, et le blanc crème de leurs roses. */
+const ENCRE = '#1F4A32'
+const PETALE = { clair: '#FFFFFF', moyen: '#FBF6EA', fonce: '#E6DCC6', trait: '#D9CEB4' }
+
+function roses(clair: string, moyen: string, fonce: string, trait: string): Record<string, string> {
+  return {
+    [PETALE.clair]: clair,
+    [PETALE.moyen]: moyen,
+    [PETALE.fonce]: fonce,
+    [PETALE.trait]: trait,
+  }
+}
+
+const ROSES_BLANCHES: Record<string, string> = {}
+const ROSES_POUDREES = roses('#FFFAF8', '#FBECE9', '#EAD3CE', '#DCC0BA')
+const ROSES_CHAMPAGNE = roses('#FFFDF6', '#FAF1DC', '#E9D9B4', '#D8C69C')
+
+/** Les variantes ornées : l'encre change, l'or reste. */
+function ornees(): Variante[] {
+  return [
+    {
+      suffixe: 'imperial',
+      nom: 'Vert impérial',
+      couleur: ENCRE,
+      remplacements: { [ENCRE]: ENCRE, ...ROSES_BLANCHES },
+      etiquettes: ['traditionnel', 'dore', 'ornemente'],
+    },
+    {
+      suffixe: 'bordeaux',
+      nom: 'Bordeaux',
+      couleur: '#6E2233',
+      remplacements: { [ENCRE]: '#6E2233', ...ROSES_POUDREES },
+      etiquettes: ['traditionnel', 'ornemente', 'profond'],
+    },
+    {
+      suffixe: 'nuit',
+      nom: 'Bleu nuit',
+      couleur: '#1E2F52',
+      remplacements: { [ENCRE]: '#1E2F52', ...ROSES_BLANCHES },
+      etiquettes: ['traditionnel', 'ornemente', 'sobre'],
+    },
+    {
+      suffixe: 'casamance',
+      nom: 'Terre de Casamance',
+      couleur: '#7A3B2E',
+      remplacements: { [ENCRE]: '#7A3B2E', ...ROSES_CHAMPAGNE },
+      etiquettes: ['traditionnel', 'dore', 'contraste'],
+    },
+    {
+      suffixe: 'ivoire',
+      nom: 'Or et ivoire',
+      couleur: '#6B5320',
+      remplacements: { [ENCRE]: '#6B5320', ...ROSES_CHAMPAGNE },
+      etiquettes: ['dore', 'ornemente', 'clair'],
+    },
+  ]
+}
+
 const MODELES: Modele[] = [
+  { fichier: 'mariage-royal', type: 'mariage', variantes: ornees() },
+  { fichier: 'bapteme-royal', type: 'bapteme', variantes: ornees() },
+  { fichier: 'anniversaire-royal', type: 'anniversaire', variantes: ornees() },
+
+  // Les modèles épurés restent : sans eux, le guide n'aurait plus rien à
+  // proposer à qui cherche « moderne » ou « sobre ».
   {
     fichier: 'mariage-indigo',
     type: 'mariage',
-    couleurOrigine: '#2C3A80',
     variantes: [
-      { suffixe: 'indigo', nom: 'Indigo', couleur: '#2C3A80', etiquettes: ['moderne', 'sobre', 'profond'] },
-      { suffixe: 'or', nom: 'Or brûlé', couleur: '#8A6D3B', etiquettes: ['traditionnel', 'dore', 'ornemente'] },
-      { suffixe: 'terre', nom: 'Terre de Casamance', couleur: '#7A3B2E', etiquettes: ['traditionnel', 'profond', 'contraste'] },
-      { suffixe: 'amande', nom: 'Amande', couleur: '#5F7A63', etiquettes: ['moderne', 'clair', 'floral'] },
-      { suffixe: 'ardoise', nom: 'Ardoise', couleur: '#3D4450', etiquettes: ['moderne', 'sobre', 'contraste'] },
-      { suffixe: 'poudre', nom: 'Poudré', couleur: '#A8626E', etiquettes: ['clair', 'pastel', 'floral'] },
+      { suffixe: 'indigo', nom: 'Indigo', couleur: '#2C3A80', remplacements: { '#2C3A80': '#2C3A80' }, etiquettes: ['moderne', 'sobre', 'profond'] },
+      { suffixe: 'amande', nom: 'Amande', couleur: '#5F7A63', remplacements: { '#2C3A80': '#5F7A63' }, etiquettes: ['moderne', 'clair', 'floral'] },
+      { suffixe: 'ardoise', nom: 'Ardoise', couleur: '#3D4450', remplacements: { '#2C3A80': '#3D4450' }, etiquettes: ['moderne', 'sobre', 'contraste'] },
+      { suffixe: 'poudre', nom: 'Poudré', couleur: '#A8626E', remplacements: { '#2C3A80': '#A8626E' }, etiquettes: ['clair', 'pastel', 'floral'] },
     ],
   },
   {
     fichier: 'bapteme-vert',
     type: 'bapteme',
-    couleurOrigine: '#1F6B4A',
     variantes: [
-      { suffixe: 'feuille', nom: 'Feuille', couleur: '#1F6B4A', etiquettes: ['naturel', 'sobre', 'moderne'] },
-      { suffixe: 'ciel', nom: 'Ciel', couleur: '#4A6FA5', etiquettes: ['clair', 'pastel', 'enfantin'] },
-      { suffixe: 'sable', nom: 'Sable', couleur: '#8A7A5C', etiquettes: ['naturel', 'clair', 'traditionnel'] },
-      { suffixe: 'rose', nom: 'Rose thé', couleur: '#B0707C', etiquettes: ['pastel', 'enfantin', 'clair'] },
-      { suffixe: 'nuit', nom: 'Nuit douce', couleur: '#2F3B52', etiquettes: ['profond', 'sobre', 'moderne'] },
+      { suffixe: 'feuille', nom: 'Feuille', couleur: '#1F6B4A', remplacements: { '#1F6B4A': '#1F6B4A' }, etiquettes: ['naturel', 'sobre', 'moderne'] },
+      { suffixe: 'ciel', nom: 'Ciel', couleur: '#4A6FA5', remplacements: { '#1F6B4A': '#4A6FA5' }, etiquettes: ['clair', 'pastel', 'enfantin'] },
+      { suffixe: 'sable', nom: 'Sable', couleur: '#8A7A5C', remplacements: { '#1F6B4A': '#8A7A5C' }, etiquettes: ['naturel', 'clair', 'traditionnel'] },
+      { suffixe: 'rose', nom: 'Rose thé', couleur: '#B0707C', remplacements: { '#1F6B4A': '#B0707C' }, etiquettes: ['pastel', 'enfantin', 'clair'] },
     ],
   },
   {
     fichier: 'anniversaire-ambre',
     type: 'anniversaire',
-    couleurOrigine: '#C9700F',
     variantes: [
-      { suffixe: 'ambre', nom: 'Ambre', couleur: '#C9700F', etiquettes: ['festif', 'contraste', 'moderne'] },
-      { suffixe: 'prune', nom: 'Prune', couleur: '#6B3F6E', etiquettes: ['chic', 'profond', 'moderne'] },
-      { suffixe: 'corail', nom: 'Corail', couleur: '#C4553D', etiquettes: ['festif', 'contraste'] },
-      { suffixe: 'encre', nom: 'Encre', couleur: '#2B2B33', etiquettes: ['chic', 'sobre', 'profond'] },
-      { suffixe: 'menthe', nom: 'Menthe', couleur: '#3E8C7A', etiquettes: ['clair', 'festif', 'pastel'] },
+      { suffixe: 'ambre', nom: 'Ambre', couleur: '#C9700F', remplacements: { '#C9700F': '#C9700F' }, etiquettes: ['festif', 'contraste', 'moderne'] },
+      { suffixe: 'prune', nom: 'Prune', couleur: '#6B3F6E', remplacements: { '#C9700F': '#6B3F6E' }, etiquettes: ['chic', 'profond', 'moderne'] },
+      { suffixe: 'encre', nom: 'Encre', couleur: '#2B2B33', remplacements: { '#C9700F': '#2B2B33' }, etiquettes: ['chic', 'sobre', 'profond'] },
+      { suffixe: 'menthe', nom: 'Menthe', couleur: '#3E8C7A', remplacements: { '#C9700F': '#3E8C7A' }, etiquettes: ['clair', 'festif', 'pastel'] },
     ],
   },
 ]
@@ -113,9 +175,13 @@ async function main(): Promise<void> {
     const source = await readFile(`${racine}gabarits/${modele.fichier}.svg`, 'utf8')
 
     for (const variante of modele.variantes) {
-      const svg = source.replaceAll(modele.couleurOrigine, variante.couleur)
+      let svg = source
+      for (const [avant, apres] of Object.entries(variante.remplacements)) {
+        if (avant !== apres) svg = svg.replaceAll(avant, apres)
+      }
       const champs = analyserGabarit(analyserDocument(svg))
-      const slug = `${modele.type}-${variante.suffixe}`
+      // Le suffixe seul ne suffit plus : orné et épuré partagent les types.
+      const slug = `${modele.fichier}-${variante.suffixe}`
 
       const [gabarit] = await bdd
         .insert(gabarits)
@@ -145,12 +211,16 @@ async function main(): Promise<void> {
       secretBrouillon: crypto.randomUUID(),
       titre: 'Aminata & Ibrahima',
       typeEvenement: 'mariage',
-      gabaritId: poses.get('mariage-indigo')!,
+      gabaritId: poses.get('mariage-royal-imperial')!,
       valeursChamps: {
+        ceremonie: 'TAK DIACKA',
         nom_1: 'Aminata',
+        famille_1: 'DIALLO',
         nom_2: 'Ibrahima',
+        famille_2: 'NDIAYE',
         date: '14 mars 2027',
-        lieu: 'Grand Théâtre, Dakar',
+        lieu: 'GRAND THÉÂTRE, DAKAR',
+        mot_final: 'Unis pour la vie',
       },
       codeVestimentaire: 'Bazin et tons indigo',
       motDesHotes:

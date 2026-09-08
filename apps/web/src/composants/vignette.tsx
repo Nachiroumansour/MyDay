@@ -18,7 +18,7 @@ export function Vignette({
   priorite?: boolean
 }) {
   const parametres = versParametres(identite)
-  const source = `/modeles/${gabarit.slug}/vignette.png?l=${largeur}${
+  const source = `/modeles/${gabarit.slug}/vignette.webp?l=${largeur}${
     parametres ? `&${parametres}` : ''
   }`
 
@@ -30,7 +30,7 @@ export function Vignette({
       alt={`Modèle ${gabarit.nom}`}
       loading={priorite ? 'eager' : 'lazy'}
       fetchPriority={priorite ? 'high' : 'auto'}
-      style={{ display: 'block', width: '100%', height: 'auto', border: '1px solid var(--trait)' }}
+      style={{ display: 'block', width: '100%', height: 'auto', border: '1px solid var(--surface-variante)' }}
     />
   )
 }

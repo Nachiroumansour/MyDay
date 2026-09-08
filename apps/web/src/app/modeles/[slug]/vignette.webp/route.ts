@@ -3,7 +3,7 @@ import { lireIdentite, valeursDepuisIdentite } from '@/lib/identite'
 import { gabaritParSlug } from '@/serveur/bdd/catalogue'
 import { largeurAdmise } from '@/serveur/carte'
 import { polices } from '@/serveur/polices'
-import { rendrePng } from '@myday/moteur'
+import { rendreWebp } from '@myday/moteur'
 
 /**
  * La vignette d'un modèle, portant les prénoms du visiteur.
@@ -32,11 +32,11 @@ export async function GET(
     filigrane: true,
   })
 
-  const png = await rendrePng(carte.svg, { largeurPx: largeurAdmise(parametres.get('l')) })
+  const image = await rendreWebp(carte.svg, { largeurPx: largeurAdmise(parametres.get('l')) })
 
-  return new Response(png as BodyInit, {
+  return new Response(image as BodyInit, {
     headers: {
-      'Content-Type': 'image/png',
+      'Content-Type': 'image/webp',
       'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
     },
   })

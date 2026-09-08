@@ -129,3 +129,18 @@ apps/web/
 brand/              Le logo et ses déclinaisons.
 docs/               Spec, plan et cahier de contraintes.
 ```
+
+## Les gabarits de démonstration
+
+Les trois modèles ornés (`mariage-royal`, `bapteme-royal`, `anniversaire-royal`)
+partagent un vocabulaire ornemental — roses, feuillage, filets d'or, écoinçons.
+Il vit dans `apps/web/gabarits/atelier/`, et les fichiers SVG livrés au moteur
+en sont assemblés :
+
+```sh
+cd apps/web && npx tsx scripts/composer-gabarits.ts
+```
+
+Ne modifiez pas `gabarits/*.svg` à la main : ils sont réécrits à chaque
+assemblage. Les gabarits venus d'un graphiste extérieur, eux, sont déposés
+tels quels par le back-office et n'ont rien à voir avec ce dossier.

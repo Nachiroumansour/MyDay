@@ -54,7 +54,7 @@ export default async function NouveauGabarit({
             <label className="etiquette-champ" htmlFor="slug">
               Identifiant d’URL
             </label>
-            <input id="slug" name="slug" className="saisie" placeholder="mariage-indigo" required />
+            <input id="slug" name="slug" className="saisie" placeholder="mariage-royal-imperial" required />
           </div>
 
           <div className={styles.champ}>

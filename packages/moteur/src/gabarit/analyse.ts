@@ -65,6 +65,7 @@ export function analyserGabarit(doc: Document): ChampGabarit[] {
       maxLongueur: nombre(element.getAttribute('data-max-longueur')),
       police: element.getAttribute('font-family') ?? undefined,
       tailleNominale: nombre(element.getAttribute('font-size')),
+      ...(element.getAttribute('data-facultatif') === '1' ? { facultatif: true } : {}),
     })
   }
 

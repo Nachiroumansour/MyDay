@@ -45,6 +45,11 @@ Chaque élément que le client peut modifier porte **trois attributs**.
 **`data-type`** prend l'une de ces quatre valeurs : `texte`, `texte_long`,
 `date`, `image`.
 
+**`data-facultatif="1"`** marque un champ que le client peut laisser vide —
+une devise, un âge. Sans lui, un champ vide empêche la publication : le
+client ne peut pas deviner que votre composition tient sans cette ligne, vous
+seul le savez.
+
 **`data-cadre`** s'écrit `x,y,largeur,hauteur`, en unités du `viewBox`. C'est
 la zone dans laquelle le texte doit rester. Notre moteur réduit
 automatiquement la taille du texte si le client saisit un nom long — jusqu'à

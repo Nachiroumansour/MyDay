@@ -73,3 +73,21 @@ describe('manquants', () => {
     expect(manquants(champs, { nom_1: '   ', date: '14 mars' })).toEqual(['nom_1'])
   })
 })
+
+describe('champs facultatifs', () => {
+  it('n’exige pas un champ déclaré facultatif', () => {
+    const champs = [
+      { id: 'nom_1', type: 'texte' as const },
+      { id: 'mot_final', type: 'texte' as const, facultatif: true },
+    ]
+    expect(manquants(champs, { nom_1: 'Awa', mot_final: '' })).toEqual([])
+  })
+
+  it('exige toujours les autres', () => {
+    const champs = [
+      { id: 'nom_1', type: 'texte' as const },
+      { id: 'mot_final', type: 'texte' as const, facultatif: true },
+    ]
+    expect(manquants(champs, { nom_1: '', mot_final: '' })).toEqual(['nom_1'])
+  })
+})

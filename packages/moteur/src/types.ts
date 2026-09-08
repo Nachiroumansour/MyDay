@@ -14,6 +14,12 @@ export interface ChampGabarit {
   maxLongueur?: number
   police?: string
   tailleNominale?: number
+  /**
+   * Un champ que l'on peut laisser vide. C'est l'auteur du gabarit qui le
+   * décide, avec `data-facultatif="1"` : lui seul sait si sa composition
+   * tient sans cette ligne.
+   */
+  facultatif?: boolean
 }
 
 export type ValeursChamps = Record<string, string>

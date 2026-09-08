@@ -13,11 +13,11 @@ export async function GET(
   if (!evenement) return new Response('Introuvable', { status: 404 })
 
   const largeur = largeurAdmise(new URL(requete.url).searchParams.get('l'))
-  const png = await rendreCarte(evenement, { largeurPx: largeur, filigrane: false })
+  const image = await rendreCarte(evenement, { largeurPx: largeur, filigrane: false, format: 'webp' })
 
-  return new Response(png as BodyInit, {
+  return new Response(image as BodyInit, {
     headers: {
-      'Content-Type': 'image/png',
+      'Content-Type': 'image/webp',
       'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
     },
   })

@@ -1,4 +1,4 @@
-import { composerCarte, rendrePng } from '@myday/moteur'
+import { composerCarte, rendreWebp } from '@myday/moteur'
 import { brouillonParSecret } from '@/serveur/bdd/brouillons'
 import { largeurAdmise } from '@/serveur/carte'
 import { lireMedia } from '@/serveur/stockage'
@@ -40,11 +40,11 @@ export async function GET(
     ...(photo ? { photo } : {}),
   })
 
-  const png = await rendrePng(carte.svg, {
+  const image = await rendreWebp(carte.svg, {
     largeurPx: largeurAdmise(new URL(requete.url).searchParams.get('l')),
   })
 
-  return new Response(png as BodyInit, {
-    headers: { 'Content-Type': 'image/png', 'Cache-Control': 'no-store' },
+  return new Response(image as BodyInit, {
+    headers: { 'Content-Type': 'image/webp', 'Cache-Control': 'no-store' },
   })
 }

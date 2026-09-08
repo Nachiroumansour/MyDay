@@ -1,4 +1,4 @@
-import { composerCarte, dimensionsPhysiques, analyserDocument, pixelsPourDpi, rendrePng, DPI_LIVRAISON } from '@myday/moteur'
+import { composerCarte, dimensionsPhysiques, analyserDocument, pixelsPourDpi, rendrePng, rendreWebp, DPI_LIVRAISON } from '@myday/moteur'
 import { polices } from './polices'
 import type { EvenementVue } from './bdd/evenements'
 
@@ -21,7 +21,7 @@ export function largeurAdmise(brut: string | null): LargeurCarte {
  */
 export async function rendreCarte(
   evenement: Pick<EvenementVue, 'gabarit' | 'valeursChamps' | 'photoUrl' | 'recadrage'>,
-  options: { largeurPx: number; filigrane: boolean },
+  options: { largeurPx: number; filigrane: boolean; format?: 'png' | 'webp' },
 ): Promise<Uint8Array> {
   const carte = composerCarte({
     gabaritSvg: evenement.gabarit.sourceSvg,
@@ -40,7 +40,9 @@ export async function rendreCarte(
       : {}),
   })
 
-  return rendrePng(carte.svg, { largeurPx: options.largeurPx })
+  return options.format === 'webp'
+    ? rendreWebp(carte.svg, { largeurPx: options.largeurPx })
+    : rendrePng(carte.svg, { largeurPx: options.largeurPx })
 }
 
 /** Proportions de la carte, pour réserver sa place avant qu'elle ne charge. */

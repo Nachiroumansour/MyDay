@@ -140,7 +140,7 @@ function Corps({
           <span className="carte-cadre">
             <img
               className="carte"
-              src={`/e/${slug}/carte.png?l=900`}
+              src={`/e/${slug}/carte.webp?l=900`}
               width={proportions.largeur}
               height={proportions.hauteur}
               alt={`Invitation de ${evenement.titre}`}

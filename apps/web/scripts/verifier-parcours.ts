@@ -84,7 +84,7 @@ async function parcoursClient(page: Page): Promise<void> {
   await page.goto(`${base}/?n1=Aminata&n2=Ibrahima`, { waitUntil: 'domcontentloaded' })
   verifier(
     'l’accueil montre une vraie carte du catalogue',
-    (await page.locator('img[src*="/vignette.png"]').count()) >= 1,
+    (await page.locator('img[src*="/vignette.webp"]').count()) >= 1,
   )
   verifier(
     'elle porte déjà les prénoms du visiteur',
@@ -93,7 +93,7 @@ async function parcoursClient(page: Page): Promise<void> {
 
   await page.getByRole('link', { name: 'Catalogue' }).first().click()
   await page.waitForURL('**/modeles*')
-  verifier('la galerie affiche le catalogue', (await page.locator('img[src*="/vignette.png"]').count()) > 8)
+  verifier('la galerie affiche le catalogue', (await page.locator('img[src*="/vignette.webp"]').count()) > 8)
 
   await page.getByRole('link', { name: 'Mariage (takk)' }).first().click()
   await page.waitForURL('**type=mariage**')
@@ -132,7 +132,7 @@ async function parcoursClient(page: Page): Promise<void> {
  * sans jamais créer de compte.
  */
 async function parcoursCreation(page: Page): Promise<void> {
-  await page.goto(`${base}/creer/bapteme-ciel?n1=Sokhna&d=2027-09-04`, {
+  await page.goto(`${base}/creer/bapteme-royal-imperial?n1=Sokhna&d=2027-09-04`, {
     waitUntil: 'domcontentloaded',
   })
   await page.waitForURL('**/brouillon/**')
@@ -145,9 +145,20 @@ async function parcoursCreation(page: Page): Promise<void> {
   )
   verifier('l’aperçu de la carte est affiché', await page.locator('img[alt="Aperçu de votre carte"]').isVisible())
 
+  // Le modèle orné demande davantage. « Petite phrase de fin » est déclarée
+  // facultative dans le gabarit : on la laisse vide exprès, la publication
+  // doit passer quand même.
+  await page.getByLabel('Nom de la cérémonie (Ngénte…)').fill('NGÉNTE')
+  await page.getByLabel('Nom de famille de l’enfant').fill('DIALLO')
+  await page.getByLabel('Les parents').fill('Awa & Ibrahima Diallo')
   await page.getByLabel('Lieu', { exact: true }).fill('Sacré-Cœur 3, Dakar')
   await page.getByRole('button', { name: 'Enregistrer', exact: true }).click()
   await page.waitForLoadState('networkidle')
+
+  verifier(
+    'un champ facultatif laissé vide ne bloque pas',
+    (await page.getByLabel('Petite phrase de fin').inputValue()) === '',
+  )
 
   // Le programme.
   await page.goto(`${base}/brouillon/${secret}/programme`, { waitUntil: 'domcontentloaded' })
@@ -197,13 +208,13 @@ async function parcoursCreation(page: Page): Promise<void> {
   )
   verifier(
     'la carte publiée ne porte plus de filigrane',
-    (await page.locator('img[src*="/carte.png"]').count()) === 1,
+    (await page.locator('img[src*="/carte.webp"]').count()) === 1,
   )
 }
 
 /** Les modules ouverts aux invités : liens nominatifs, livre d'or, galerie. */
 async function parcoursModules(page: Page): Promise<void> {
-  await page.goto(`${base}/creer/anniversaire-prune?n1=Sokhna&d=2027-10-10`, {
+  await page.goto(`${base}/creer/anniversaire-ambre-prune?n1=Sokhna&d=2027-10-10`, {
     waitUntil: 'domcontentloaded',
   })
   await page.waitForURL('**/brouillon/**')

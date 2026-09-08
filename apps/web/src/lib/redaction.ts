@@ -45,6 +45,21 @@ const LIBELLES: Record<string, Partial<Record<TypeEvenement, string>> & { defaut
     defaut: 'Premier prénom',
   },
   nom_2: { mariage: 'Prénom du marié', defaut: 'Second prénom' },
+  ceremonie: {
+    mariage: 'Nom de la cérémonie (Takk, Tak Diacka…)',
+    bapteme: 'Nom de la cérémonie (Ngénte…)',
+    anniversaire: 'Nom de la fête (Bésu juddu…)',
+    defaut: 'Nom de la cérémonie',
+  },
+  famille_1: {
+    mariage: 'Nom de famille de la mariée',
+    bapteme: 'Nom de famille de l’enfant',
+    defaut: 'Nom de famille',
+  },
+  famille_2: { mariage: 'Nom de famille du marié', defaut: 'Second nom de famille' },
+  parents: { defaut: 'Les parents' },
+  age: { defaut: 'Âge fêté' },
+  mot_final: { defaut: 'Petite phrase de fin' },
   date: { defaut: 'Date de l’événement' },
   lieu: { defaut: 'Lieu' },
   texte_intro: { defaut: 'Formule d’invitation' },
@@ -68,13 +83,17 @@ export function longueurConseillee(texte: string, maximum?: number): EtatLongueu
   return 'bon'
 }
 
-/** Ce qui reste à remplir. La photo n'est jamais exigée. */
+/**
+ * Ce qui reste à remplir. La photo n'est jamais exigée, ni les champs que le
+ * gabarit déclare facultatifs — une devise ou un âge se laissent volontiers
+ * de côté, et rien ne justifie de bloquer la publication pour eux.
+ */
 export function manquants(
-  champs: Pick<ChampGabarit, 'id' | 'type'>[],
+  champs: Pick<ChampGabarit, 'id' | 'type' | 'facultatif'>[],
   valeurs: ValeursChamps,
 ): string[] {
   return champs
-    .filter((champ) => champ.type !== 'image')
+    .filter((champ) => champ.type !== 'image' && !champ.facultatif)
     .filter((champ) => (valeurs[champ.id] ?? '').trim() === '')
     .map((champ) => champ.id)
 }

@@ -57,3 +57,22 @@ describe('analyserGabarit', () => {
     expect(() => analyserGabarit(analyserDocument(fautif))).toThrow(/cadre/)
   })
 })
+
+describe('champs facultatifs', () => {
+  it('retient data-facultatif quand il vaut 1', () => {
+    const champs = analyserGabarit(
+      analyserDocument(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+        <text data-champ="devise" data-type="texte" data-facultatif="1"
+              data-cadre="0,0,100,20">Unis pour la vie</text></svg>`),
+    )
+    expect(champs[0]!.facultatif).toBe(true)
+  })
+
+  it('ne rend rien de facultatif par défaut', () => {
+    const champs = analyserGabarit(
+      analyserDocument(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+        <text data-champ="lieu" data-type="texte" data-cadre="0,0,100,20">Dakar</text></svg>`),
+    )
+    expect(champs[0]!.facultatif).toBeUndefined()
+  })
+})

@@ -24,7 +24,7 @@ export function Apercu({ secret }: { secret: string }) {
       <div className={styles.apercuCadre}>
         <img
           className={styles.apercu}
-          src={`/brouillon/${secret}/apercu.png?l=480&v=${encodeURIComponent(version)}`}
+          src={`/brouillon/${secret}/apercu.webp?l=480&v=${encodeURIComponent(version)}`}
           width={1500}
           height={2250}
           alt="Aperçu de votre carte"
