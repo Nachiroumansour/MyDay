@@ -31,7 +31,7 @@ L'accueil est sur `http://localhost:3000`, l'invitation de démonstration sur
 ## Vérifier
 
 ```bash
-npm test                             # 220 tests unitaires + typage, à la racine
+npm test                             # 224 tests unitaires + typage, à la racine
 cd apps/web
 npm run verifier:parcours            # les quatre parcours, dans un vrai navigateur
 npm run mesurer /e/aminata-ibrahima  # le poids réseau, face au budget de la spec
