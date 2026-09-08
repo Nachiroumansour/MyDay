@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { identifiantAppelant, limiteurReponses } from '@/serveur/limitation'
 import { validerReponse } from '@/lib/rsvp'
 import { enregistrerReponse, evenementPublie } from '@/serveur/bdd/evenements'
 
@@ -18,6 +19,13 @@ export async function POST(
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params
+
+  // Un envoi en rafale sur un formulaire public est freiné avant d'atteindre
+  // la base.
+  if (!limiteurReponses.autorise(`${slug}:${identifiantAppelant(requete)}`)) {
+    redirect(`/e/${slug}?trop=1#rsvp`)
+  }
+
   const evenement = await evenementPublie(slug)
   if (!evenement) redirect(`/e/${slug}`)
 

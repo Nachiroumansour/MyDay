@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { identifiantAppelant, limiteurPhotos } from '@/serveur/limitation'
 import { evenementPublie } from '@/serveur/bdd/evenements'
 import { deposerPhoto } from '@/serveur/bdd/modules'
 import { enregistrerMedia } from '@/serveur/stockage'
@@ -8,6 +9,13 @@ export async function POST(
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params
+
+  // Un envoi en rafale sur un formulaire public est freiné avant d'atteindre
+  // la base.
+  if (!limiteurPhotos.autorise(`${slug}:${identifiantAppelant(requete)}`)) {
+    redirect(`/e/${slug}?trop=1#galerie`)
+  }
+
   const evenement = await evenementPublie(slug)
   if (!evenement?.galerieOuverte) redirect(`/e/${slug}`)
 

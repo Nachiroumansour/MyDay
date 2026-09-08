@@ -4,6 +4,7 @@
  *
  *   npx tsx scripts/verifier-parcours.ts [url-de-base] [slug]
  */
+import { readFile } from 'node:fs/promises'
 import { chromium, type Page } from 'playwright'
 
 const [, , base = 'http://localhost:3210', slug = 'aminata-ibrahima'] = process.argv
@@ -266,6 +267,72 @@ async function parcoursModules(page: Page): Promise<void> {
   )
 }
 
+/** Le back-office : garde d'entrée, dépôt d'un modèle, mise au catalogue. */
+async function parcoursAdmin(page: Page): Promise<void> {
+  await page.goto(`${base}/admin`, { waitUntil: 'domcontentloaded' })
+  verifier('l’administration est fermée sans session', page.url().includes('/admin/connexion'))
+
+  await page.getByLabel('Mot de passe').fill('mauvais-mot-de-passe')
+  await page.getByRole('button', { name: 'Entrer' }).click()
+  await page.waitForLoadState('networkidle')
+  verifier(
+    'un mauvais mot de passe est refusé',
+    (await page.getByText('Mot de passe incorrect.').count()) > 0,
+  )
+
+  await page.getByLabel('Mot de passe').fill('mot-de-passe-de-developpement')
+  await page.getByRole('button', { name: 'Entrer' }).click()
+  await page.waitForURL('**/admin')
+  verifier('le bon mot de passe ouvre l’administration', (await page.getByText('Les modèles').count()) > 0)
+
+  // Un gabarit sans champ personnalisable doit être refusé.
+  await page.goto(`${base}/admin/gabarits/nouveau`, { waitUntil: 'domcontentloaded' })
+  await page.getByLabel('Le fichier SVG').setInputFiles({
+    name: 'vide.svg',
+    mimeType: 'image/svg+xml',
+    buffer: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"/>'),
+  })
+  await page.getByLabel('Nom du modèle').fill('Test vide')
+  await page.getByLabel('Identifiant d’URL').fill('test-vide')
+  await page.getByRole('button', { name: 'Déposer et vérifier' }).click()
+  await page.waitForLoadState('networkidle')
+  verifier(
+    'un gabarit sans champ est refusé, avec la raison',
+    (await page.getByText('Aucun champ personnalisable').count()) > 0,
+  )
+
+  // Un gabarit valide passe.
+  const gabarit = await readFile(new URL('../gabarits/mariage-indigo.svg', import.meta.url), 'utf8')
+  await page.getByLabel('Le fichier SVG').setInputFiles({
+    name: 'essai.svg',
+    mimeType: 'image/svg+xml',
+    buffer: Buffer.from(gabarit),
+  })
+  const slugEssai = `mariage-essai-${Date.now().toString(36)}`
+  await page.getByLabel('Nom du modèle').fill('Essai')
+  await page.getByLabel('Identifiant d’URL').fill(slugEssai)
+  await page.getByLabel('Ambiances').fill('moderne, sobre')
+  await page.getByRole('button', { name: 'Déposer et vérifier' }).click()
+  // « **/admin** » matcherait aussi la page de dépôt : on attend le résultat.
+  await page.getByText('Modèle déposé').waitFor({ timeout: 15_000 })
+  verifier('un gabarit valide est accepté', true)
+
+  const ligne = page.locator('tr', { hasText: slugEssai })
+  verifier('il arrive en brouillon, pas au catalogue', (await ligne.getByText('brouillon').count()) > 0)
+
+  await ligne.getByRole('button', { name: 'Activer' }).click()
+  // Une action serveur ne navigue pas : on attend le nouvel état, pas le réseau.
+  await page
+    .locator('tr', { hasText: slugEssai })
+    .getByText('actif', { exact: true })
+    .waitFor({ timeout: 15_000 })
+  verifier('il paraît au catalogue une fois activé', true)
+
+  await page.getByRole('button', { name: 'Se déconnecter' }).click()
+  await page.waitForURL('**/admin/connexion')
+  verifier('la déconnexion referme l’administration', page.url().includes('/admin/connexion'))
+}
+
 async function main(): Promise<void> {
   const navigateur = await chromium.launch({ channel: 'chrome' })
   const contexte = await navigateur.newContext({
@@ -284,6 +351,7 @@ async function main(): Promise<void> {
     await parcoursClient(page)
     await parcoursCreation(page)
     await parcoursModules(page)
+    await parcoursAdmin(page)
   } finally {
     await navigateur.close()
   }
