@@ -49,12 +49,27 @@ export async function enregistrerMedia(octets: Uint8Array): Promise<MediaEnregis
   return { id, url: `/media/${id}`, type, dimensions }
 }
 
+/**
+ * Enregistre un fichier produit par le serveur — un rendu haute définition,
+ * un PDF. Aucune validation d'image : le contenu vient de nous, pas du client.
+ */
+export async function enregistrerFichier(
+  octets: Uint8Array,
+  extension: 'png' | 'pdf',
+): Promise<{ id: string; url: string }> {
+  const id = `${crypto.randomUUID()}.${extension}`
+  await mkdir(DOSSIER, { recursive: true })
+  await writeFile(join(DOSSIER, id), octets)
+  return { id, url: `/media/${id}` }
+}
+
 export async function lireMedia(id: string): Promise<{ octets: Uint8Array; type: string } | undefined> {
   // Aucun chemin ne doit pouvoir sortir du dossier des médias.
-  if (!/^[0-9a-f-]{36}\.(png|jpg|webp)$/.test(id)) return undefined
+  if (!/^[0-9a-f-]{36}\.(png|jpg|webp|pdf)$/.test(id)) return undefined
   try {
     const octets = new Uint8Array(await readFile(join(DOSSIER, id)))
-    return { octets, type: typeImage(octets) ?? 'application/octet-stream' }
+    const type = id.endsWith('.pdf') ? 'application/pdf' : typeImage(octets)
+    return { octets, type: type ?? 'application/octet-stream' }
   } catch {
     return undefined
   }
