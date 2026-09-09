@@ -156,7 +156,10 @@ Les points qui posent problème en pratique :
 ## 7. Ce qu'on vous demande de livrer, par modèle
 
 1. Le fichier `.svg`.
-2. Les fichiers de police `.ttf` ou `.otf` utilisés.
+2. Les fichiers de police `.ttf` ou `.otf` utilisés. Ils se déposent dans le
+   même formulaire que le modèle : le nom du fichier devient le
+   `font-family` du gabarit, et une police déjà déposée n'est jamais
+   remplacée — des modèles en ligne s'en servent.
 3. Une capture PNG du modèle tel que vous le voyez, pour comparaison.
 4. Le nom du modèle et deux ou trois mots d'ambiance (« moderne », « doré »,
    « traditionnel », « pastel ») pour le classement dans le catalogue.

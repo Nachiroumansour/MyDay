@@ -23,9 +23,9 @@ export default async function NouveauGabarit({
       <Onglets />
 
       <p className={styles.introduction}>
-        Le gabarit est vérifié à l’envoi : ses champs sont lus, il est composé avec des
-        valeurs d’exemple, et il est refusé si une police manque ou si un champ est mal
-        déclaré. Le cahier de contraintes est dans <code>docs/cahier-des-charges-graphistes.md</code>.
+        Le gabarit est vérifié à l’envoi : ses champs sont lus, ce que le rendu ignorerait
+        est refusé, et il est composé pour de vrai. Vous verrez l’épreuve juste après.
+        Le cahier de contraintes est dans <code>docs/cahier-des-charges-graphistes.md</code>.
       </p>
 
       {erreur && <p className={styles.erreur}>{erreur}</p>}
@@ -41,6 +41,26 @@ export default async function NouveauGabarit({
               Le fichier SVG
             </label>
             <input id="svg" name="svg" type="file" accept=".svg,image/svg+xml" className="saisie" required />
+          </div>
+
+          <div className={styles.champ}>
+            <label className="etiquette-champ" htmlFor="polices">
+              Les polices du modèle
+            </label>
+            <input
+              id="polices"
+              name="polices"
+              type="file"
+              accept=".ttf,.otf"
+              multiple
+              className="saisie"
+            />
+            <p className={styles.aide}>
+              Fichiers <code>.ttf</code> ou <code>.otf</code>, uniquement celles qui manquent
+              encore. Le nom du fichier devient le <code>font-family</code> du gabarit :
+              <code>GreatVibes.ttf</code> va avec <code>font-family="GreatVibes"</code>. Une
+              police déjà déposée n’est jamais remplacée.
+            </p>
           </div>
 
           <div className={styles.champ}>

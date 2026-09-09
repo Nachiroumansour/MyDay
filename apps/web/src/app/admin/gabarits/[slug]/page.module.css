@@ -1,0 +1,46 @@
+.deux {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 2.5rem;
+  align-items: start;
+}
+
+@media (max-width: 60rem) {
+  .deux { grid-template-columns: minmax(0, 1fr); }
+}
+
+.epreuve { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.carte {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--rayon-md);
+  border: 1px solid var(--surface-variante);
+  box-shadow: var(--ombre-levee);
+}
+
+.colonne { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.sousTitre {
+  font-family: var(--police-titre), Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0.5rem 0 0;
+}
+
+.champs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+
+.champ {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding: 0.75rem 1rem;
+  background: var(--surface-carte);
+  border: 1px solid var(--surface-variante);
+  border-radius: var(--rayon-md);
+}
+
+.champNom { font-weight: 600; font-size: 0.9375rem; }
+
+.decision { margin-top: 1rem; }

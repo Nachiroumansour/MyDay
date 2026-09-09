@@ -94,3 +94,29 @@ export async function listerCommandes() {
     .orderBy(desc(evenements.creeLe))
     .limit(200)
 }
+
+/**
+ * Un gabarit vu par l'administration : quel que soit son statut, contrairement
+ * à `gabaritParSlug` qui ne rend que les modèles actifs. C'est justement un
+ * modèle encore en brouillon que l'on vient inspecter.
+ */
+export async function gabaritAdminParSlug(slug: string) {
+  const [ligne] = await bdd
+    .select({
+      id: gabarits.id,
+      slug: gabarits.slug,
+      nom: gabarits.nom,
+      typeEvenement: gabarits.typeEvenement,
+      statut: gabarits.statut,
+      prix: gabarits.prix,
+      etiquettes: gabarits.etiquettes,
+      sourceSvg: gabarits.sourceSvg,
+      graphisteNom: graphistes.nom,
+      creeLe: gabarits.creeLe,
+    })
+    .from(gabarits)
+    .innerJoin(graphistes, eq(graphistes.id, gabarits.graphisteId))
+    .where(eq(gabarits.slug, slug))
+    .limit(1)
+  return ligne
+}

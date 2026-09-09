@@ -29,7 +29,6 @@ export default async function AdminModeles({
 
       <Onglets />
 
-      {requete.depose && <p className={styles.succes}>Modèle déposé. Il est en brouillon : activez-le pour qu’il paraisse au catalogue.</p>}
 
       <div className={styles.tableau}>
         <table>
@@ -83,8 +82,8 @@ export default async function AdminModeles({
                         </button>
                       </form>
                     )}
-                    <a className={styles.lienAction} href={`/modeles/${modele.slug}`}>
-                      Voir
+                    <a className={styles.lienAction} href={`/admin/gabarits/${modele.slug}`}>
+                      Épreuve
                     </a>
                   </div>
                 </td>

@@ -308,7 +308,11 @@ async function parcoursAdmin(page: Page): Promise<void> {
   await page.getByLabel('Le fichier SVG').setInputFiles({
     name: 'vide.svg',
     mimeType: 'image/svg+xml',
-    buffer: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"/>'),
+    // Les dimensions physiques sont présentes : sans elles le refus porterait
+    // sur elles, et non sur ce que ce cas veut éprouver.
+    buffer: Buffer.from(
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" data-largeur-mm="127" data-hauteur-mm="190.5"/>',
+    ),
   })
   await page.getByLabel('Nom du modèle').fill('Test vide')
   await page.getByLabel('Identifiant d’URL').fill('test-vide')
@@ -317,6 +321,51 @@ async function parcoursAdmin(page: Page): Promise<void> {
   verifier(
     'un gabarit sans champ est refusé, avec la raison',
     (await page.getByText('Aucun champ personnalisable').count()) > 0,
+  )
+
+  // Le cahier des charges interdit le bitmap hors zone photo.
+  await page.goto(`${base}/admin/gabarits/nouveau`, { waitUntil: 'domcontentloaded' })
+  await page.getByLabel('Le fichier SVG').setInputFiles({
+    name: 'avec-image.svg',
+    mimeType: 'image/svg+xml',
+    buffer: Buffer.from(
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900" data-largeur-mm="127" data-hauteur-mm="190.5">
+         <image href="data:image/png;base64,iVBORw0KGgo=" x="0" y="0" width="60" height="60"/>
+         <text data-champ="nom_1" data-type="texte" data-cadre="0,0,600,80" font-family="Marcellus" font-size="40">Awa</text>
+       </svg>`,
+    ),
+  })
+  await page.getByLabel('Nom du modèle').fill('Test image')
+  await page.getByLabel('Identifiant d’URL').fill('test-image')
+  await page.getByRole('button', { name: 'Déposer et vérifier' }).click()
+  await page.waitForLoadState('networkidle')
+  verifier(
+    'une image intégrée est refusée',
+    (await page.getByText('image intégrée').count()) > 0,
+  )
+
+  // Une police manquante est signalée, et le champ pour la livrer existe.
+  await page.goto(`${base}/admin/gabarits/nouveau`, { waitUntil: 'domcontentloaded' })
+  verifier(
+    'le graphiste peut livrer ses polices avec le modèle',
+    (await page.getByLabel('Les polices du modèle').count()) === 1,
+  )
+  await page.getByLabel('Le fichier SVG').setInputFiles({
+    name: 'police-absente.svg',
+    mimeType: 'image/svg+xml',
+    buffer: Buffer.from(
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900" data-largeur-mm="127" data-hauteur-mm="190.5">
+         <text data-champ="nom_1" data-type="texte" data-cadre="0,0,600,80" font-family="PoliceAbsente" font-size="40">Awa</text>
+       </svg>`,
+    ),
+  })
+  await page.getByLabel('Nom du modèle').fill('Test police')
+  await page.getByLabel('Identifiant d’URL').fill('test-police')
+  await page.getByRole('button', { name: 'Déposer et vérifier' }).click()
+  await page.waitForLoadState('networkidle')
+  verifier(
+    'une police manquante est nommée, avec le moyen de la fournir',
+    (await page.getByText('Polices absentes : PoliceAbsente').count()) > 0,
   )
 
   // Un gabarit valide passe.
@@ -331,10 +380,19 @@ async function parcoursAdmin(page: Page): Promise<void> {
   await page.getByLabel('Identifiant d’URL').fill(slugEssai)
   await page.getByLabel('Ambiances').fill('moderne, sobre')
   await page.getByRole('button', { name: 'Déposer et vérifier' }).click()
-  // « **/admin** » matcherait aussi la page de dépôt : on attend le résultat.
-  await page.getByText('Modèle déposé').waitFor({ timeout: 15_000 })
+  // Le dépôt mène à l'épreuve, pas à la liste : on attend cette page-là.
+  await page.waitForURL(`**/admin/gabarits/${slugEssai}`, { timeout: 15_000 })
   verifier('un gabarit valide est accepté', true)
+  verifier(
+    'son épreuve est montrée avant toute mise en ligne',
+    await page.locator('img[alt^="Épreuve"]').isVisible(),
+  )
+  verifier(
+    'les champs lus sont détaillés',
+    (await page.getByText('Les champs lus').count()) === 1,
+  )
 
+  await page.goto(`${base}/admin`, { waitUntil: 'domcontentloaded' })
   const ligne = page.locator('tr', { hasText: slugEssai })
   verifier('il arrive en brouillon, pas au catalogue', (await ligne.getByText('brouillon').count()) > 0)
 
@@ -345,6 +403,14 @@ async function parcoursAdmin(page: Page): Promise<void> {
     .getByText('actif', { exact: true })
     .waitFor({ timeout: 15_000 })
   verifier('il paraît au catalogue une fois activé', true)
+
+  // Le parcours ne laisse pas son gabarit d'essai dans le catalogue de démonstration.
+  await page.locator('tr', { hasText: slugEssai }).getByRole('button', { name: 'Retirer du catalogue' }).click()
+  await page
+    .locator('tr', { hasText: slugEssai })
+    .getByText('archive', { exact: true })
+    .waitFor({ timeout: 15_000 })
+  verifier('le parcours range son gabarit d’essai', true)
 
   await page.getByRole('button', { name: 'Se déconnecter' }).click()
   await page.waitForURL('**/admin/connexion')
