@@ -16,6 +16,8 @@ export interface CeremonieBrouillon {
   repere: string | null
   codeVestimentaire: string | null
   note: string | null
+  latitude: number | null
+  longitude: number | null
 }
 
 export interface Brouillon {
@@ -218,6 +220,8 @@ export interface EntreeCeremonie {
   repere: string | null
   codeVestimentaire: string | null
   note: string | null
+  latitude: number | null
+  longitude: number | null
 }
 
 export async function ajouterCeremonie(

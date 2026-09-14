@@ -229,3 +229,28 @@
   .coquille { grid-template-columns: 1fr 320px; gap: 48px; }
   .colonneApercu { order: 2; }
 }
+
+/* Le champ du point et son bouton : côte à côte tant que la place le permet. */
+.rangeePoint {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.rangeePoint .saisie,
+.rangeePoint input {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.rangeePoint button { flex: 0 0 auto; white-space: nowrap; }
+
+.pointTrouve {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--secondaire);
+}

@@ -102,6 +102,7 @@ function BlocCeremonie({
 
 function Corps({
   evenement,
+  origine,
   proportions,
   reponseEnvoyee,
   champsFautifs,
@@ -115,7 +116,8 @@ function Corps({
   const slug = evenement.slug
   const premiere = evenement.ceremonies[0]
   const restant = premiere ? detaillerRestant(premiere.debuteLe) : null
-  const partage = `Une invitation pour vous — ${evenement.titre}`
+  // Le lien EST l'invitation : un partage sans lui n'envoie rien d'utile.
+  const partage = `Une invitation pour vous — ${evenement.titre}\n${origine}/e/${slug}`
   const type = evenement.typeEvenement
 
   return (

@@ -166,6 +166,14 @@ async function parcoursCreation(page: Page): Promise<void> {
   await page.getByLabel('Date', { exact: true }).fill('2027-09-04')
   await page.getByLabel('De', { exact: true }).fill('10:00')
   await page.getByLabel('Lieu', { exact: true }).fill('Maison familiale')
+  // Le point exact : c'est lui qui transforme « Itinéraire » en vraie
+  // navigation, au lieu d'une recherche sur le nom du lieu.
+  await page.getByLabel('Le point exact sur la carte').fill(
+    'https://www.google.com/maps/place/X/@14.7167,-17.4677,17z/data=!3d14.7167!4d-17.4677',
+  )
+  // Le champ marche sans JavaScript ; la confirmation, elle, attend l'hydratation.
+  await page.getByText('Point enregistré').waitFor({ timeout: 10_000 })
+  verifier('le point collé est reconnu', true)
   await page.getByLabel('Pour trouver').fill('portail vert, après la boulangerie')
   await page.getByRole('button', { name: 'Ajouter cette cérémonie' }).click()
   await page.waitForLoadState('networkidle')
@@ -198,13 +206,25 @@ async function parcoursCreation(page: Page): Promise<void> {
     (await page.getByRole('link', { name: 'PDF imprimable' }).count()) === 1,
   )
 
-  const lien = await page.locator('a[href^="/e/"]').first().getAttribute('href')
-  verifier('un lien d’invitation est donné', Boolean(lien))
+  // Le lien donné à l'hôte est absolu : c'est celui qu'il colle dans WhatsApp.
+  const lien = await page.locator('a[href*="/e/"]').first().getAttribute('href')
+  verifier('un lien d’invitation est donné', Boolean(lien?.startsWith('http')))
+  verifier(
+    'le partage WhatsApp emporte ce lien',
+    await page
+      .locator(`a[href^="https://wa.me/"][href*="${encodeURIComponent(lien!).replace(/"/g, '')}"]`)
+      .count()
+      .then((n) => n > 0),
+  )
 
-  await page.goto(`${base}${lien}`, { waitUntil: 'domcontentloaded' })
+  await page.goto(lien!, { waitUntil: 'domcontentloaded' })
   verifier(
     'la page publiée porte le programme saisi',
     (await page.getByText('portail vert, après la boulangerie').count()) > 0,
+  )
+  verifier(
+    'l’itinéraire vise le point exact, pas une recherche par nom',
+    (await page.locator('a[href*="destination=14.7167%2C-17.4677"]').count()) > 0,
   )
   verifier(
     'la carte publiée ne porte plus de filigrane',

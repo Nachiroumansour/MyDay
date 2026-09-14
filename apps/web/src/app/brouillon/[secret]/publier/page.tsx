@@ -32,7 +32,10 @@ export default async function EtapePublier({
       .where(eq(evenements.id, brouillon.id))
       .limit(1)
 
-    const lien = `/e/${brouillon.slug}`
+    // Absolu, et non `/e/slug` : c'est ce lien-là que l'hôte colle dans un
+    // groupe WhatsApp, et un chemin relatif n'y mène nulle part.
+    const base = process.env.NEXT_PUBLIC_ORIGINE ?? ''
+    const lien = `${base}/e/${brouillon.slug}`
 
     return (
       <div className={styles.formulaire}>
@@ -49,7 +52,7 @@ export default async function EtapePublier({
           <a
             className="bouton"
             href={`https://wa.me/?text=${encodeURIComponent(
-              `Une invitation pour vous — ${brouillon.titre}`,
+              `Une invitation pour vous — ${brouillon.titre}\n${lien}`,
             )}`}
             target="_blank"
             rel="noreferrer"

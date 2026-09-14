@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation'
 import { formaterDateLongue, formaterPlage } from '@/lib/dates'
 import { brouillonParSecret } from '@/serveur/bdd/brouillons'
 import { sauverCeremonie, supprimerCeremonie } from '../actions'
+import { formaterPoint } from '@/lib/localisation'
+import { PointCarte } from '../point-carte'
 import styles from '../editeur.module.css'
 
 /** Suggestions de cérémonies, propres à chaque type de fête. */
@@ -183,6 +185,14 @@ export default async function EtapeProgramme({
             placeholder="Boulevard Martin Luther King, Dakar"
           />
         </div>
+
+        <PointCarte
+          valeurInitiale={
+            enCours?.latitude != null && enCours?.longitude != null
+              ? formaterPoint({ latitude: enCours.latitude, longitude: enCours.longitude })
+              : ''
+          }
+        />
 
         <div className={styles.champ}>
           <label className="etiquette-champ" htmlFor="repere">

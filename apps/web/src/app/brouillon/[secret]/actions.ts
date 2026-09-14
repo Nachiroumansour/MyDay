@@ -13,6 +13,7 @@ import {
   retirerCeremonie,
 } from '@/serveur/bdd/brouillons'
 import { enregistrerMedia, ErreurMedia } from '@/serveur/stockage'
+import { resoudrePoint } from '@/serveur/localisation'
 
 function texte(donnees: FormData, cle: string): string {
   return String(donnees.get(cle) ?? '').trim()
@@ -92,6 +93,10 @@ export async function sauverCeremonie(donnees: FormData): Promise<void> {
     redirect(`/brouillon/${secret}/programme?erreur=incomplet`)
   }
 
+  // Un lien court de partage ne porte pas le point : il faut le déplier ici,
+  // là où l'on peut sortir sur le réseau.
+  const point = await resoudrePoint(texte(donnees, 'point'))
+
   const entree = {
     nom,
     debuteLe,
@@ -101,6 +106,8 @@ export async function sauverCeremonie(donnees: FormData): Promise<void> {
     repere: texteOuNul(donnees, 'repere'),
     codeVestimentaire: texteOuNul(donnees, 'codeVestimentaire'),
     note: texteOuNul(donnees, 'note'),
+    latitude: point?.latitude ?? null,
+    longitude: point?.longitude ?? null,
   }
 
   const ceremonieId = texte(donnees, 'ceremonieId')
