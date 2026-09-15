@@ -56,8 +56,10 @@ export function Champ({
     placeholder: exemple ?? undefined,
   }
 
+  const rempli = valeur.trim() !== ''
+
   return (
-    <div className={styles.champ}>
+    <div className={rempli ? `${styles.champ} ${styles.champRempli}` : styles.champ}>
       <label className="etiquette-champ" htmlFor={identifiant}>
         {libelleChamp(champ.id, type)}
         {champ.facultatif && <span className={styles.facultatif}>facultatif</span>}
