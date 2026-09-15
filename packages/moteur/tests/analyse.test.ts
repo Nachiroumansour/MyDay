@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { analyserDocument } from '../src/dom'
-import { analyserGabarit, ErreurGabarit } from '../src/gabarit/analyse'
+import { analyserGabarit, ErreurGabarit, exemplesGabarit } from '../src/gabarit/analyse'
 
 const gabarit = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900">
   <text data-champ="nom_1" data-type="texte" data-cadre="60,200,480,70"
@@ -74,5 +74,29 @@ describe('champs facultatifs', () => {
         <text data-champ="lieu" data-type="texte" data-cadre="0,0,100,20">Dakar</text></svg>`),
     )
     expect(champs[0]!.facultatif).toBeUndefined()
+  })
+})
+
+describe('exemplesGabarit', () => {
+  it('rend le texte d’exemple de chaque champ', () => {
+    const doc = analyserDocument(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <text data-champ="nom_1" data-type="texte" data-cadre="0,0,100,20">Moussa</text>
+      <text data-champ="lieu" data-type="texte" data-cadre="0,20,100,20">NAFFAR</text></svg>`)
+    expect(exemplesGabarit(doc)).toEqual({ nom_1: 'Moussa', lieu: 'NAFFAR' })
+  })
+
+  it('normalise les espaces et les retours à la ligne', () => {
+    const doc = analyserDocument(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <text data-champ="mot" data-type="texte" data-cadre="0,0,100,20">
+        Unis   pour
+        la vie
+      </text></svg>`)
+    expect(exemplesGabarit(doc)).toEqual({ mot: 'Unis pour la vie' })
+  })
+
+  it('ignore un champ sans texte, comme la zone photo', () => {
+    const doc = analyserDocument(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <rect data-champ="zone_photo" data-type="image" x="0" y="0" width="10" height="10"/></svg>`)
+    expect(exemplesGabarit(doc)).toEqual({})
   })
 })

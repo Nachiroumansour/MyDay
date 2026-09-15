@@ -6,7 +6,11 @@
 .bandeau {
   border-bottom: 1px solid var(--surface-variante);
   background: var(--surface-basse);
-  padding: 20px 0;
+  padding: 0.75rem 0;
+}
+
+@media (min-width: 48rem) {
+  .bandeau { padding: 1.25rem 0; }
 }
 
 .bandeauInterieur {
@@ -17,8 +21,16 @@
   gap: 16px;
 }
 
+/* L'étiquette est de la décoration : elle cède la place sur un petit écran. */
 .bandeauEtiquette {
-  display: inline-flex;
+  display: none;
+}
+
+@media (min-width: 48rem) {
+  .bandeauEtiquette { display: inline-flex; }
+}
+
+.bandeauEtiquette {
   align-items: center;
   gap: 8px;
   padding: 4px 12px;
@@ -33,9 +45,13 @@
 
 .bandeauTitre {
   font-family: var(--police-titre), serif;
-  font-size: clamp(20px, 3vw, 26px);
+  font-size: clamp(1.0625rem, 3vw, 1.625rem);
   font-weight: 600;
-  margin-top: 8px;
+  margin: 0;
+}
+
+@media (min-width: 48rem) {
+  .bandeauTitre { margin-top: 0.5rem; }
 }
 
 .bandeauActions { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -44,25 +60,31 @@
 
 .etapes {
   list-style: none;
-  margin: 24px 0 0;
-  padding: 6px;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 4px;
-  background: var(--surface-teintee);
-  border-radius: var(--rayon-lg);
+  margin: 1rem calc(-1 * var(--marge-laterale)) 0;
+  padding: 0.25rem var(--marge-laterale);
+  display: flex;
+  gap: 0.375rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
 }
 
+.etapes::-webkit-scrollbar { display: none; }
+
+/* Au téléphone, chaque étape tient sur une pastille : la grille de six tuiles
+   occupait la moitié de l'écran avant le premier champ. */
 .etape {
-  display: flex;
-  flex-direction: column;
+  flex: none;
+  scroll-snap-align: start;
+  display: inline-flex;
   align-items: center;
-  gap: 2px;
-  padding: 10px 8px;
-  border-radius: var(--rayon-md);
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: var(--rayon-plein);
+  background: var(--surface-teintee);
   text-decoration: none;
   color: var(--encre-douce);
-  text-align: center;
+  white-space: nowrap;
   transition: background var(--court), color var(--court);
 }
 
@@ -70,57 +92,146 @@
 
 .etapeActive {
   composes: etape;
-  background: var(--surface-carte);
-  color: var(--primaire);
-  box-shadow: 0 1px 3px rgba(28, 28, 24, 0.08);
+  background: var(--primaire);
+  color: var(--sur-primaire);
 }
 
-.etapeNumero { font-size: 12px; font-weight: 600; opacity: 0.7; }
-.etapeLibelle { font-size: 13px; font-weight: 500; }
+.etapeNumero { font-size: 0.6875rem; font-weight: 700; opacity: 0.65; }
+.etapeLibelle { font-size: 0.8125rem; font-weight: 500; }
 
 /* ---------- Coquille ---------- */
 
+/* Au téléphone, une seule colonne : l'aperçu se colle en haut, réduit, et les
+   champs défilent dessous. À pleine taille il occupait tout le premier écran
+   et repoussait le formulaire hors de vue — on ne voyait jamais ensemble ce
+   que l'on écrit et ce que ça donne. */
 .coquille {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 28px;
-  padding: 28px 0 72px;
+  gap: 0;
+  padding: 0 0 6rem;
   align-items: start;
 }
 
 .colonneApercu {
   position: sticky;
-  top: 88px;
+  top: 0;
+  z-index: 20;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0;
+  margin: 0 calc(-1 * var(--marge-laterale));
+  padding-left: var(--marge-laterale);
+  padding-right: var(--marge-laterale);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--surface-variante);
 }
 
 .apercuTitre {
+  order: 2;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.125rem;
+  font-size: 0.875rem;
   font-weight: 600;
+  min-width: 0;
 }
 
-.apercuPoint { width: 8px; height: 8px; border-radius: 50%; background: var(--primaire); }
+.apercuPoint,
+.apercuPointEchec {
+  display: none;
+}
 
-/* Le cadre de téléphone de la maquette. */
+.apercuStatut {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--encre-douce);
+  min-height: 1em;
+}
+
+/* La vignette collée : assez grande pour reconnaître sa carte, assez petite
+   pour laisser la place au champ que l'on remplit. */
 .apercuCadre {
-  padding: 14px;
-  border-radius: 28px;
-  background: var(--surface-teintee);
+  order: 1;
+  position: relative;
+  flex: none;
+  width: 4.25rem;
+  padding: 0;
+  border: 1px solid var(--surface-variante);
+  border-radius: var(--rayon-md);
+  background: var(--surface-carte);
   box-shadow: var(--ombre-carte);
+  cursor: pointer;
+  overflow: hidden;
+  appearance: none;
 }
 
 .apercu {
   display: block;
   width: 100%;
   height: auto;
-  border-radius: 18px;
   background: var(--surface-carte);
 }
+
+.apercuLoupe {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 0.125rem 0;
+  font-size: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(28, 28, 24, 0.55);
+}
+
+/* La carte en grand, dans la couche supérieure du navigateur. */
+.fenetreApercu {
+  border: none;
+  padding: 1.5rem;
+  max-width: 100vw;
+  max-height: 100vh;
+  width: 100%;
+  height: 100%;
+  background: none;
+  overflow: hidden;
+}
+
+.fenetreApercu[open] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.fenetreApercu::backdrop { background: rgba(28, 28, 24, 0.82); }
+
+.apercuGrand {
+  max-width: min(100%, 26rem);
+  max-height: 78vh;
+  width: auto;
+  height: auto;
+  border-radius: var(--rayon-md);
+  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.6);
+}
+
+.fermerApercu {
+  appearance: none;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--rayon-plein);
+  background: var(--surface);
+  color: var(--encre);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.colonneChamps { min-width: 0; padding-top: 1.5rem; }
 
 /* ---------- Formulaires ---------- */
 
@@ -221,10 +332,6 @@
 .curseur input[type='range'] { flex: 1; accent-color: var(--primaire); }
 .curseur input[type='checkbox'] { accent-color: var(--primaire); width: 17px; height: 17px; }
 
-@media (min-width: 620px) {
-  .etapes { grid-template-columns: repeat(6, 1fr); }
-}
-
 @media (min-width: 1000px) {
   .coquille { grid-template-columns: 1fr 320px; gap: 48px; }
   .colonneApercu { order: 2; }
@@ -253,4 +360,138 @@
   font-size: 0.8125rem;
   font-weight: 500;
   color: var(--secondaire);
+}
+
+/* ---------- L'étape « carte » ---------- */
+
+.etapeCarte { display: flex; flex-direction: column; gap: 1.75rem; }
+
+.enTeteEtape {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.progression { display: flex; flex-direction: column; gap: 0.375rem; min-width: 9rem; }
+
+.progressionCompte,
+.progressionFinie {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.progressionFinie { color: var(--secondaire); }
+
+.jauge {
+  height: 0.375rem;
+  border-radius: var(--rayon-plein);
+  background: var(--surface-variante);
+  overflow: hidden;
+}
+
+.jaugeRemplie {
+  display: block;
+  height: 100%;
+  border-radius: var(--rayon-plein);
+  background: var(--primaire);
+  transition: width 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.groupe { display: flex; flex-direction: column; gap: 0.875rem; }
+
+.groupeTitre {
+  font-family: var(--police-titre), Georgia, serif;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--surface-variante);
+}
+
+.groupeCorps { display: flex; flex-direction: column; gap: 1rem; }
+
+.rangeeSimple { display: block; }
+
+/* Prénom et nom de famille se lisent d'un seul tenant : une seule ligne dès
+   que l'écran le permet. */
+.rangeeDouble {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 30rem) {
+  .rangeeDouble { grid-template-columns: 1fr 1fr; }
+}
+
+.facultatif {
+  margin-left: 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--contour);
+}
+
+.compteurProche { font-size: 0.75rem; color: var(--secondaire); font-variant-numeric: tabular-nums; }
+.saisieLongue { border-color: var(--erreur); }
+
+/* ---------- À partir de la tablette ---------- */
+
+@media (min-width: 62.5rem) {
+  .coquille {
+    grid-template-columns: minmax(0, 1fr) 20rem;
+    gap: 3rem;
+    padding-top: 1.75rem;
+  }
+
+  /* L'aperçu redevient une vraie carte, à droite, qui suit le défilement. */
+  .colonneApercu {
+    order: 2;
+    position: sticky;
+    top: 5.5rem;
+    z-index: 1;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.625rem;
+    margin: 0;
+    padding: 0;
+    background: none;
+    backdrop-filter: none;
+    border-bottom: none;
+  }
+
+  .apercuTitre {
+    order: 0;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .apercuPoint,
+  .apercuPointEchec {
+    display: block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--primaire);
+  }
+
+  .apercuPointEchec { background: var(--erreur); }
+
+  .apercuStatut { margin-left: auto; }
+
+  .apercuCadre {
+    width: 100%;
+    padding: 0.875rem;
+    border-radius: 1.75rem;
+    background: var(--surface-teintee);
+    border: none;
+  }
+
+  .apercu { border-radius: 1.125rem; }
+  .apercuLoupe { inset: auto 0.875rem 0.875rem 0.875rem; border-radius: 0 0 1.125rem 1.125rem; }
+  .colonneChamps { padding-top: 0; }
 }

@@ -71,3 +71,21 @@ export function analyserGabarit(doc: Document): ChampGabarit[] {
 
   return champs
 }
+
+/**
+ * Les textes d'exemple que le graphiste a laissés dans son modèle.
+ *
+ * Ils servent de filigrane dans le formulaire : plutôt que d'expliquer ce
+ * qu'on attend dans un champ, on montre ce que l'auteur du modèle y avait
+ * mis. C'est la même chose que ce que l'aperçu affiche tant qu'on n'a rien
+ * écrit, donc les deux se répondent.
+ */
+export function exemplesGabarit(doc: Document): Record<string, string> {
+  const exemples: Record<string, string> = {}
+  for (const element of elementsDeChamp(doc)) {
+    const id = element.getAttribute('data-champ')!
+    const texte = (element.textContent ?? '').trim().replace(/\s+/g, ' ')
+    if (texte !== '') exemples[id] = texte
+  }
+  return exemples
+}

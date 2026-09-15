@@ -1,8 +1,10 @@
 import { notFound } from 'next/navigation'
+import { analyserDocument, exemplesGabarit } from '@myday/moteur'
 import { brouillonParSecret } from '@/serveur/bdd/brouillons'
-import { libelleChamp, manquants } from '@/lib/redaction'
+import { grouperChamps, manquants } from '@/lib/redaction'
 import { Champ } from './champs'
-import { retirerPhoto, sauverCarte, sauverPhoto } from './actions'
+import { Progression } from './progression'
+import { retirerPhoto, sauverPhoto } from './actions'
 import styles from './editeur.module.css'
 
 export default async function EtapeCarte({
@@ -18,44 +20,49 @@ export default async function EtapeCarte({
   if (!brouillon) notFound()
 
   const aRemplir = manquants(brouillon.champs, brouillon.valeursChamps)
+  const aSaisir = brouillon.champs.filter((champ) => champ.type !== 'image' && !champ.facultatif)
+  const faits = aSaisir.length - aRemplir.length
   const zonePhoto = brouillon.champs.find((champ) => champ.type === 'image')
   const erreur = typeof requete.erreur === 'string' ? requete.erreur : undefined
 
+  const groupes = grouperChamps(brouillon.champs)
+  const exemples = exemplesGabarit(analyserDocument(brouillon.gabarit.sourceSvg))
+
   return (
-    <div className={styles.formulaire}>
-      <div>
-        <h1 className={styles.titre}>Votre carte</h1>
-        <p className={styles.introduction}>
-          Tout se met à jour dans l’aperçu. Rien n’est définitif : vous pourrez revenir
-          autant de fois que vous voulez.
-        </p>
+    <div className={styles.etapeCarte}>
+      <div className={styles.enTeteEtape}>
+        <div>
+          <h1 className={styles.titre}>Votre carte</h1>
+          <p className={styles.introduction}>
+            Écrivez, la carte suit. Tout s’enregistre tout seul — les prénoms affichés
+            sont ceux du modèle, ils s’effacent dès que vous écrivez les vôtres.
+          </p>
+        </div>
+        <Progression faits={faits} total={aSaisir.length} />
       </div>
 
-      {aRemplir.length > 0 && (
-        <p className={styles.rappel}>
-          Il reste à remplir :{' '}
-          {aRemplir.map((id) => libelleChamp(id, brouillon.typeEvenement).toLowerCase()).join(', ')}.
-        </p>
-      )}
-
-      <form action={sauverCarte} className={styles.formulaire}>
-        <input type="hidden" name="secret" value={secret} />
-        {brouillon.champs
-          .filter((champ) => champ.type !== 'image')
-          .map((champ) => (
-            <Champ
-              key={champ.id}
-              champ={champ}
-              type={brouillon.typeEvenement}
-              valeurInitiale={brouillon.valeursChamps[champ.id] ?? ''}
-            />
-          ))}
-        <div className={styles.actions}>
-          <button type="submit" className="bouton">
-            Enregistrer
-          </button>
-        </div>
-      </form>
+      {groupes.map((groupe) => (
+        <section key={groupe.titre} className={styles.groupe}>
+          <h2 className={styles.groupeTitre}>{groupe.titre}</h2>
+          <div className={styles.groupeCorps}>
+            {groupe.rangees.map((rangee) => (
+              <div
+                key={rangee.champs.map((c) => c.id).join('-')}
+                className={rangee.champs.length > 1 ? styles.rangeeDouble : styles.rangeeSimple}
+              >
+                {rangee.champs.map((champ) => (
+                  <Champ
+                    key={champ.id}
+                    champ={champ}
+                    type={brouillon.typeEvenement}
+                    {...(exemples[champ.id] ? { exemple: exemples[champ.id] } : {})}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
 
       {zonePhoto && (
         <section id="photo" className={styles.formulaire}>

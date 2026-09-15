@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { libelleEvenement } from '@/lib/evenements'
 import { brouillonParSecret } from '@/serveur/bdd/brouillons'
 import { Apercu } from './apercu'
+import { CarteVivante } from './carte-vivante'
 import { Etapes } from './etapes'
 import styles from './editeur.module.css'
 
@@ -36,10 +37,14 @@ export default async function EditeurLayout({
 
       <main className="contenu">
         <Etapes secret={secret} />
-        <div className={styles.coquille}>
-          <Apercu secret={secret} />
-          <div>{children}</div>
-        </div>
+        {/* L'aperçu et les champs vivent de part et d'autre de cette mise en
+            page : le contexte les relie sans rendre la page cliente. */}
+        <CarteVivante secret={secret} valeursInitiales={brouillon.valeursChamps}>
+          <div className={styles.coquille}>
+            <Apercu secret={secret} />
+            <div className={styles.colonneChamps}>{children}</div>
+          </div>
+        </CarteVivante>
       </main>
     </>
   )

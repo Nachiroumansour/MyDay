@@ -24,21 +24,6 @@ function texteOuNul(donnees: FormData, cle: string): string | null {
   return valeur === '' ? null : valeur
 }
 
-export async function sauverCarte(donnees: FormData): Promise<void> {
-  const secret = texte(donnees, 'secret')
-  const brouillon = await brouillonParSecret(secret)
-  if (!brouillon) return
-
-  const valeurs: ValeursChamps = {}
-  for (const champ of brouillon.champs) {
-    if (champ.type === 'image') continue
-    valeurs[champ.id] = texte(donnees, `champ-${champ.id}`)
-  }
-
-  await enregistrerCarte(secret, valeurs)
-  revalidatePath(`/brouillon/${secret}`)
-}
-
 export async function sauverPhoto(donnees: FormData): Promise<void> {
   const secret = texte(donnees, 'secret')
   const brouillon = await brouillonParSecret(secret)
@@ -135,3 +120,29 @@ export async function sauverDetails(donnees: FormData): Promise<void> {
   revalidatePath(`/brouillon/${secret}/details`)
 }
 
+
+/**
+ * Enregistre la carte pendant la frappe.
+ *
+ * Appelée directement depuis le navigateur avec les valeurs, sans passer par
+ * un envoi de formulaire : c'est ce qui permet à l'aperçu de suivre ce que
+ * l'on écrit plutôt que d'attendre un clic sur un bouton.
+ * Le chemin n'est pas revalidé — la page ne doit pas se recharger sous les
+ * doigts de qui est en train d'écrire ; l'aperçu se redemande tout seul.
+ */
+export async function enregistrerChamps(
+  secret: string,
+  valeurs: ValeursChamps,
+): Promise<{ enregistre: boolean }> {
+  const brouillon = await brouillonParSecret(secret)
+  if (!brouillon) return { enregistre: false }
+
+  const propres: ValeursChamps = {}
+  for (const champ of brouillon.champs) {
+    if (champ.type === 'image') continue
+    propres[champ.id] = String(valeurs[champ.id] ?? '').trim()
+  }
+
+  await enregistrerCarte(secret, propres)
+  return { enregistre: true }
+}

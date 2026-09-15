@@ -97,3 +97,75 @@ export function manquants(
     .filter((champ) => (valeurs[champ.id] ?? '').trim() === '')
     .map((champ) => champ.id)
 }
+
+/**
+ * Les champs, rangés pour être remplis plutôt que subis.
+ *
+ * Un modèle orné en compte huit. Présentés en une colonne, ils forment un mur
+ * de cases vides qu'on parcourt sans savoir où l'on en est. Groupés par sujet,
+ * et les paires évidentes mises côte à côte, ils tiennent en trois blocs
+ * courts — et sur un téléphone, ça change tout.
+ *
+ * L'ordre du gabarit reste la référence : un champ qu'aucun groupe ne nomme
+ * finit dans « Le reste », jamais oublié.
+ */
+export interface RangeeChamps<T> {
+  champs: T[]
+}
+
+export interface GroupeChamps<T> {
+  titre: string
+  rangees: RangeeChamps<T>[]
+}
+
+const GROUPES: { titre: string; champs: string[] }[] = [
+  { titre: 'La célébration', champs: ['ceremonie', 'texte_intro'] },
+  { titre: 'Les noms', champs: ['nom_1', 'famille_1', 'nom_2', 'famille_2', 'parents', 'age'] },
+  { titre: 'Quand et où', champs: ['date', 'lieu'] },
+  { titre: 'La touche finale', champs: ['mot_final'] },
+]
+
+/** Les couples qui se lisent d'un seul tenant et méritent une seule ligne. */
+const PAIRES: [string, string][] = [
+  ['nom_1', 'famille_1'],
+  ['nom_2', 'famille_2'],
+]
+
+export function grouperChamps<T extends { id: string; type: string }>(
+  champs: T[],
+): GroupeChamps<T>[] {
+  const restants = new Map(champs.filter((c) => c.type !== 'image').map((c) => [c.id, c]))
+  const groupes: GroupeChamps<T>[] = []
+
+  const enRangees = (pris: T[]): RangeeChamps<T>[] => {
+    const rangees: RangeeChamps<T>[] = []
+    const vus = new Set<string>()
+    for (const champ of pris) {
+      if (vus.has(champ.id)) continue
+      const paire = PAIRES.find(([a]) => a === champ.id)
+      const second = paire && pris.find((c) => c.id === paire[1])
+      if (second) {
+        rangees.push({ champs: [champ, second] })
+        vus.add(champ.id)
+        vus.add(second.id)
+      } else {
+        rangees.push({ champs: [champ] })
+        vus.add(champ.id)
+      }
+    }
+    return rangees
+  }
+
+  for (const groupe of GROUPES) {
+    const pris = groupe.champs.map((id) => restants.get(id)).filter((c): c is T => Boolean(c))
+    if (pris.length === 0) continue
+    for (const champ of pris) restants.delete(champ.id)
+    groupes.push({ titre: groupe.titre, rangees: enRangees(pris) })
+  }
+
+  if (restants.size > 0) {
+    groupes.push({ titre: 'Le reste', rangees: enRangees([...restants.values()]) })
+  }
+
+  return groupes
+}

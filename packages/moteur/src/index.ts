@@ -1,6 +1,6 @@
 export * from './types'
 export { analyserDocument, serialiserDocument } from './dom'
-export { analyserGabarit, ErreurGabarit } from './gabarit/analyse'
+export { analyserGabarit, exemplesGabarit, ErreurGabarit } from './gabarit/analyse'
 export { verifierDepot } from './gabarit/verification'
 
 export function versionMoteur(): string {

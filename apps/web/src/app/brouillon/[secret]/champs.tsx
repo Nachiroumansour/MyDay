@@ -1,64 +1,72 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef } from 'react'
 import type { ChampGabarit } from '@myday/moteur'
 import type { TypeEvenement } from '@/lib/evenements'
 import { formulesIntro, libelleChamp, longueurConseillee } from '@/lib/redaction'
+import { useCarte } from './carte-vivante'
 import styles from './editeur.module.css'
 
 /**
- * Un champ de la carte, avec son guidage.
+ * Un champ de la carte.
  *
- * C'est ici que les gens galèrent : ils ne savent pas quoi écrire, et ils ne
- * savent pas quand leur texte va déborder du cadre. On leur dit les deux.
+ * Ce que l'on tape part dans l'état partagé : l'aperçu suit, et le brouillon
+ * s'enregistre tout seul. Plus de bouton à trouver, plus de travail perdu
+ * parce qu'on a changé d'étape sans penser à enregistrer.
+ *
+ * Le compteur ne s'affiche qu'à l'approche de la limite. Un « 0 / 22 » sous
+ * une case vide n'apprend rien à personne et remplit l'écran de bruit ; c'est
+ * au moment de déborder que le chiffre compte.
+ *
+ * Le champ n'est pas contrôlé par React : sur un réseau lent, ce que l'on
+ * tape avant que le JavaScript n'arrive serait sinon effacé à l'hydratation.
+ * Le DOM garde la saisie, et on la reverse dans l'état au montage.
  */
 export function Champ({
   champ,
   type,
-  valeurInitiale,
+  exemple,
 }: {
   champ: ChampGabarit
   type: TypeEvenement
-  valeurInitiale: string
+  /** Le texte que le graphiste a mis dans son modèle, montré en filigrane. */
+  exemple?: string
 }) {
-  const [valeur, setValeur] = useState(valeurInitiale)
+  const { valeurs, changer } = useCarte()
+  const valeur = valeurs[champ.id] ?? ''
+  const saisie = useRef<HTMLInputElement | HTMLTextAreaElement>(null)
   const etat = longueurConseillee(valeur, champ.maxLongueur)
+
+  useEffect(() => {
+    const dejaTape = saisie.current?.value ?? ''
+    if (dejaTape !== valeur) changer(champ.id, dejaTape)
+    // Au montage seulement : ensuite c'est onChange qui mène.
+     
+  }, [])
   const identifiant = `champ-${champ.id}`
   const estLong = champ.type === 'texte_long'
   const propose = champ.id === 'texte_intro' ? formulesIntro(type) : []
 
-  const classeCompteur =
-    etat === 'trop-long'
-      ? styles.compteurLong
-      : etat === 'proche'
-        ? styles.compteurProche
-        : styles.compteur
+  const commun = {
+    id: identifiant,
+    name: identifiant,
+    className: etat === 'trop-long' ? `saisie ${styles.saisieLongue}` : 'saisie',
+    defaultValue: valeurs[champ.id] ?? '',
+    onChange: (e: { target: { value: string } }) => changer(champ.id, e.target.value),
+    placeholder: exemple ?? undefined,
+  }
 
   return (
     <div className={styles.champ}>
       <label className="etiquette-champ" htmlFor={identifiant}>
         {libelleChamp(champ.id, type)}
+        {champ.facultatif && <span className={styles.facultatif}>facultatif</span>}
       </label>
 
       {estLong ? (
-        <textarea
-          id={identifiant}
-          name={identifiant}
-          className="saisie"
-          rows={3}
-          value={valeur}
-          onChange={(e) => setValeur(e.target.value)}
-        />
+        <textarea {...commun} rows={3} ref={saisie as React.RefObject<HTMLTextAreaElement>} />
       ) : (
-        <input
-          id={identifiant}
-          name={identifiant}
-          className="saisie"
-          type={champ.type === 'date' ? 'text' : 'text'}
-          value={valeur}
-          onChange={(e) => setValeur(e.target.value)}
-          {...(champ.id === 'date' ? { placeholder: '14 mars 2027' } : {})}
-        />
+        <input {...commun} type="text" ref={saisie as React.RefObject<HTMLInputElement>} />
       )}
 
       {propose.length > 0 && (
@@ -68,7 +76,10 @@ export function Champ({
               key={formule.texte}
               type="button"
               className={styles.formule}
-              onClick={() => setValeur(formule.texte)}
+              onClick={() => {
+                if (saisie.current) saisie.current.value = formule.texte
+                changer(champ.id, formule.texte)
+              }}
             >
               {formule.texte}
               {formule.langue === 'wolof' ? ' · wolof' : ''}
@@ -77,11 +88,11 @@ export function Champ({
         </div>
       )}
 
-      {champ.maxLongueur && (
-        <p className={classeCompteur}>
+      {etat !== 'bon' && champ.maxLongueur && (
+        <p className={etat === 'trop-long' ? styles.compteurLong : styles.compteurProche}>
           {etat === 'trop-long'
-            ? `${valeur.length} caractères — au-delà de ${champ.maxLongueur}, le texte sera réduit pour tenir dans la carte.`
-            : `${valeur.length} / ${champ.maxLongueur} caractères`}
+            ? `${valeur.length} caractères : au-delà de ${champ.maxLongueur}, le texte sera réduit pour tenir.`
+            : `${valeur.length} / ${champ.maxLongueur}`}
         </p>
       )}
     </div>

@@ -152,8 +152,15 @@ async function parcoursCreation(page: Page): Promise<void> {
   await page.getByLabel('Nom de famille de l’enfant').fill('DIALLO')
   await page.getByLabel('Les parents').fill('Awa & Ibrahima Diallo')
   await page.getByLabel('Lieu', { exact: true }).fill('Sacré-Cœur 3, Dakar')
-  await page.getByRole('button', { name: 'Enregistrer', exact: true }).click()
-  await page.waitForLoadState('networkidle')
+
+  // Plus de bouton : la carte s'enregistre seule après une pause de frappe.
+  await page.getByText('Enregistré', { exact: true }).waitFor({ timeout: 15_000 })
+  verifier('la carte s’enregistre sans qu’on le demande', true)
+  verifier(
+    'l’aperçu suit ce que l’on écrit',
+    (await page.locator('img[alt="Aperçu de votre carte"]').getAttribute('src'))?.includes('v=') ===
+      true,
+  )
 
   verifier(
     'un champ facultatif laissé vide ne bloque pas',
@@ -251,8 +258,7 @@ async function parcoursModules(page: Page): Promise<void> {
 
   await page.goto(`${base}/brouillon/${secret}`, { waitUntil: 'domcontentloaded' })
   await page.getByLabel('Lieu', { exact: true }).fill('Dakar')
-  await page.getByRole('button', { name: 'Enregistrer', exact: true }).click()
-  await page.waitForLoadState('networkidle')
+  await page.getByText('Enregistré', { exact: true }).waitFor({ timeout: 15_000 })
 
   // Ouvrir le livre d'or et la galerie.
   await page.goto(`${base}/brouillon/${secret}/details`, { waitUntil: 'domcontentloaded' })

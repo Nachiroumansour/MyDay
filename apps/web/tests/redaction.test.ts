@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   formulesIntro,
+  grouperChamps,
   libelleChamp,
   longueurConseillee,
   manquants,
@@ -89,5 +90,70 @@ describe('champs facultatifs', () => {
       { id: 'mot_final', type: 'texte' as const, facultatif: true },
     ]
     expect(manquants(champs, { nom_1: '', mot_final: '' })).toEqual(['nom_1'])
+  })
+})
+
+describe('grouperChamps', () => {
+  const champ = (id: string, type = 'texte') => ({ id, type })
+
+  it('range les huit champs d’un modèle orné en quatre blocs', () => {
+    const groupes = grouperChamps([
+      champ('ceremonie'),
+      champ('nom_1'),
+      champ('famille_1'),
+      champ('nom_2'),
+      champ('famille_2'),
+      champ('date', 'date'),
+      champ('lieu'),
+      champ('mot_final'),
+    ])
+    expect(groupes.map((g) => g.titre)).toEqual([
+      'La célébration',
+      'Les noms',
+      'Quand et où',
+      'La touche finale',
+    ])
+  })
+
+  it('met prénom et nom de famille sur la même ligne', () => {
+    const groupes = grouperChamps([
+      champ('nom_1'),
+      champ('famille_1'),
+      champ('nom_2'),
+      champ('famille_2'),
+    ])
+    expect(groupes[0]!.rangees.map((r) => r.champs.map((c) => c.id))).toEqual([
+      ['nom_1', 'famille_1'],
+      ['nom_2', 'famille_2'],
+    ])
+  })
+
+  it('laisse un prénom seul sur sa ligne quand le nom manque', () => {
+    const groupes = grouperChamps([champ('nom_1'), champ('nom_2')])
+    expect(groupes[0]!.rangees.map((r) => r.champs.length)).toEqual([1, 1])
+  })
+
+  it('ignore la zone photo, que le formulaire traite à part', () => {
+    const groupes = grouperChamps([champ('nom_1'), champ('zone_photo', 'image')])
+    expect(groupes.flatMap((g) => g.rangees.flatMap((r) => r.champs.map((c) => c.id)))).toEqual([
+      'nom_1',
+    ])
+  })
+
+  it('n’oublie aucun champ inconnu', () => {
+    const groupes = grouperChamps([champ('nom_1'), champ('devise_secrete')])
+    const tous = groupes.flatMap((g) => g.rangees.flatMap((r) => r.champs.map((c) => c.id)))
+    expect(tous).toContain('devise_secrete')
+    expect(groupes.at(-1)!.titre).toBe('Le reste')
+  })
+
+  it('ne crée pas de bloc vide', () => {
+    const groupes = grouperChamps([champ('date', 'date')])
+    expect(groupes).toHaveLength(1)
+    expect(groupes[0]!.titre).toBe('Quand et où')
+  })
+
+  it('tient un gabarit sans aucun champ', () => {
+    expect(grouperChamps([])).toEqual([])
   })
 })
