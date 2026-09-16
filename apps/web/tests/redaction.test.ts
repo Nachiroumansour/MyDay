@@ -157,3 +157,13 @@ describe('grouperChamps', () => {
     expect(grouperChamps([])).toEqual([])
   })
 })
+
+describe('longueurConseillee, robustesse', () => {
+  it('traite une valeur absente comme un champ vide', () => {
+    expect(longueurConseillee(undefined, 16)).toBe('bon')
+  })
+
+  it('ne se plaint de rien sans limite déclarée', () => {
+    expect(longueurConseillee(undefined)).toBe('bon')
+  })
+})

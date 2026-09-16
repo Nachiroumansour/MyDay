@@ -76,10 +76,13 @@ export function libelleChamp(id: string, type: TypeEvenement): string {
 export type EtatLongueur = 'bon' | 'proche' | 'trop-long'
 
 /** Prévient avant que le moteur n'ait à réduire la taille du texte. */
-export function longueurConseillee(texte: string, maximum?: number): EtatLongueur {
+export function longueurConseillee(texte: string | undefined, maximum?: number): EtatLongueur {
+  // Un champ jamais saisi n'a pas de valeur : mieux vaut le traiter comme
+  // vide que faire tomber tout l'éditeur sur un `undefined.length`.
+  const longueur = texte?.length ?? 0
   if (!maximum) return 'bon'
-  if (texte.length > maximum) return 'trop-long'
-  if (texte.length >= maximum - 2) return 'proche'
+  if (longueur > maximum) return 'trop-long'
+  if (longueur >= maximum - 2) return 'proche'
   return 'bon'
 }
 
