@@ -249,8 +249,8 @@ export default async function EtapeProgramme({
       </form>
 
       <div className={styles.actions}>
-        <a className="bouton" href={`/brouillon/${secret}/details`}>
-          Passer aux détails
+        <a className="bouton" href={`/brouillon/${secret}`}>
+          Revenir à la carte
         </a>
       </div>
     </div>

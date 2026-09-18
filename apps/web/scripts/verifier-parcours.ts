@@ -214,7 +214,9 @@ async function parcoursCreation(page: Page): Promise<void> {
   )
 
   // Le lien donné à l'hôte est absolu : c'est celui qu'il colle dans WhatsApp.
-  const lien = await page.locator('a[href*="/e/"]').first().getAttribute('href')
+  // Le lien que la page donne à partager — pas celui du bandeau, qui sert à
+  // naviguer dans le site et peut rester relatif.
+  const lien = await page.getByRole('link', { name: 'Voir la page de mes invités' }).getAttribute('href')
   verifier('un lien d’invitation est donné', Boolean(lien?.startsWith('http')))
   verifier(
     'le partage WhatsApp emporte ce lien',

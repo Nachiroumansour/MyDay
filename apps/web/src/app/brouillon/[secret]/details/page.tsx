@@ -125,8 +125,8 @@ export default async function EtapeDetails({
       </form>
 
       <div className={styles.actions}>
-        <a className="bouton" href={`/brouillon/${secret}/publier`}>
-          Voir le résultat et publier
+        <a className="bouton" href={`/brouillon/${secret}`}>
+          Revenir à la carte
         </a>
       </div>
     </div>

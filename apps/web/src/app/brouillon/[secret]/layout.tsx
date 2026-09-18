@@ -53,15 +53,21 @@ export default async function EditeurLayout({
             </h1>
           </div>
           <div className={styles.bandeauActions}>
-            <a className="bouton-contour" href={`/brouillon/${secret}/publier`}>
-              Publier
-            </a>
+            {brouillon.statut === 'publie' ? (
+              <a className="bouton-contour" href={`/e/${brouillon.slug}`}>
+                Voir l’invitation
+              </a>
+            ) : (
+              <a className="bouton-contour" href={`/brouillon/${secret}/publier`}>
+                Partager
+              </a>
+            )}
           </div>
         </div>
       </div>
 
       <main className="contenu">
-        <Etapes secret={secret} />
+        <Etapes secret={secret} publie={brouillon.statut === 'publie'} />
         {/* L'aperçu et les champs vivent de part et d'autre de cette mise en
             page : le contexte les relie sans rendre la page cliente. */}
         <CarteVivante

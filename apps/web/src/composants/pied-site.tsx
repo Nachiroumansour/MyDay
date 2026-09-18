@@ -1,3 +1,7 @@
+'use client'
+
+import { usePathname } from 'next/navigation'
+
 const COLONNES = [
   {
     titre: 'Navigation',
@@ -18,6 +22,12 @@ const COLONNES = [
 ]
 
 export function PiedSite() {
+  const chemin = usePathname()
+  // Dans l'éditeur, on compose son invitation : le pied de page du site, avec
+  // son catalogue et ses liens, n'y est qu'une distraction de plus à faire
+  // défiler. L'en-tête masque déjà sa navigation pour la même raison.
+  if (chemin.startsWith('/brouillon') || chemin.startsWith('/admin')) return null
+
   return (
     <footer className="pied-site">
       <div className="contenu">
