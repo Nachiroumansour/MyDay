@@ -21,11 +21,27 @@ const PAUSE_MS = 650
 
 type Statut = 'repos' | 'frappe' | 'envoi' | 'enregistre' | 'echec'
 
+/** Ce qu'il faut savoir d'un champ pour l'éditer hors du formulaire. */
+export interface ChampEditable {
+  id: string
+  libelle: string
+  type: string
+  maxLongueur?: number
+  facultatif?: boolean
+  exemple?: string
+}
+
 interface Valeur {
   valeurs: ValeursChamps
   version: number
   statut: Statut
   changer: (id: string, valeur: string) => void
+  /** Les champs dans l'ordre où on lit la carte. */
+  champs: ChampEditable[]
+  /** Le champ ouvert depuis la carte, le cas échéant. */
+  actif: string | undefined
+  ouvrir: (id: string) => void
+  fermer: () => void
 }
 
 const Contexte = createContext<Valeur | undefined>(undefined)
@@ -39,15 +55,20 @@ export function useCarte(): Valeur {
 export function CarteVivante({
   secret,
   valeursInitiales,
+  champs,
   children,
 }: {
   secret: string
   valeursInitiales: ValeursChamps
+  champs: ChampEditable[]
   children: React.ReactNode
 }) {
   const [valeurs, setValeurs] = useState<ValeursChamps>(valeursInitiales)
   const [version, setVersion] = useState(0)
   const [statut, setStatut] = useState<Statut>('repos')
+  const [actif, setActif] = useState<string | undefined>(undefined)
+  const ouvrir = useCallback((id: string) => setActif(id), [])
+  const fermer = useCallback(() => setActif(undefined), [])
 
   const minuterie = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const dernieres = useRef(valeursInitiales)
@@ -81,6 +102,10 @@ export function CarteVivante({
   )
 
   return (
-    <Contexte.Provider value={{ valeurs, version, statut, changer }}>{children}</Contexte.Provider>
+    <Contexte.Provider
+      value={{ valeurs, version, statut, changer, champs, actif, ouvrir, fermer }}
+    >
+      {children}
+    </Contexte.Provider>
   )
 }

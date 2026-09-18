@@ -1,3 +1,4 @@
+import { origineDePage } from '@/serveur/origine'
 import { notFound } from 'next/navigation'
 import { messageInvitation } from '@/lib/invites'
 import { brouillonParSecret } from '@/serveur/bdd/brouillons'
@@ -17,7 +18,7 @@ export default async function Invites({
   if (!brouillon) notFound()
 
   const liste = await invitesPour(brouillon.id)
-  const base = process.env.NEXT_PUBLIC_ORIGINE ?? ''
+  const base = await origineDePage()
 
   return (
     <div className={styles.formulaire} style={{ maxWidth: 'none' }}>

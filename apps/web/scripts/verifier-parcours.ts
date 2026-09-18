@@ -141,16 +141,16 @@ async function parcoursCreation(page: Page): Promise<void> {
   const secret = page.url().split('/brouillon/')[1]!.split(/[?#]/)[0]!
   verifier(
     'l’identité saisie dans la galerie est reprise',
-    (await page.getByLabel('Prénom de l’enfant').inputValue()) === 'Sokhna',
+    (await page.getByLabel('Prénom de l’enfant', { exact: true }).inputValue()) === 'Sokhna',
   )
   verifier('l’aperçu de la carte est affiché', await page.locator('img[alt="Aperçu de votre carte"]').isVisible())
 
   // Le modèle orné demande davantage. « Petite phrase de fin » est déclarée
   // facultative dans le gabarit : on la laisse vide exprès, la publication
   // doit passer quand même.
-  await page.getByLabel('Nom de la cérémonie (Ngénte…)').fill('NGÉNTE')
-  await page.getByLabel('Nom de famille de l’enfant').fill('DIALLO')
-  await page.getByLabel('Les parents').fill('Awa & Ibrahima Diallo')
+  await page.getByLabel('Nom de la cérémonie (Ngénte…)', { exact: true }).fill('NGÉNTE')
+  await page.getByLabel('Nom de famille de l’enfant', { exact: true }).fill('DIALLO')
+  await page.getByLabel('Les parents', { exact: true }).fill('Awa & Ibrahima Diallo')
   await page.getByLabel('Lieu', { exact: true }).fill('Sacré-Cœur 3, Dakar')
 
   // Plus de bouton : la carte s'enregistre seule après une pause de frappe.
@@ -164,7 +164,7 @@ async function parcoursCreation(page: Page): Promise<void> {
 
   verifier(
     'un champ facultatif laissé vide ne bloque pas',
-    (await page.getByLabel('Petite phrase de fin').inputValue()) === '',
+    (await page.getByLabel(/^Petite phrase de fin/).inputValue()) === '',
   )
 
   // Le programme.

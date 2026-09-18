@@ -1,3 +1,4 @@
+import { origineDePage } from '@/serveur/origine'
 import { notFound } from 'next/navigation'
 import { formaterDateLongue } from '@/lib/dates'
 import { libelleChamp, manquants } from '@/lib/redaction'
@@ -34,7 +35,7 @@ export default async function EtapePublier({
 
     // Absolu, et non `/e/slug` : c'est ce lien-là que l'hôte colle dans un
     // groupe WhatsApp, et un chemin relatif n'y mène nulle part.
-    const base = process.env.NEXT_PUBLIC_ORIGINE ?? ''
+    const base = await origineDePage()
     const lien = `${base}/e/${brouillon.slug}`
 
     return (

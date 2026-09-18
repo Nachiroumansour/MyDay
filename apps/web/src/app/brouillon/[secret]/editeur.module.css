@@ -492,6 +492,149 @@
 .compteurProche { font-size: 0.75rem; color: var(--secondaire); font-variant-numeric: tabular-nums; }
 .saisieLongue { border-color: var(--erreur); }
 
+
+/* ---------- La carte qu'on touche ---------- */
+
+/* À l'étape « carte », la carte est l'écran : grande, en tête, et chacun de ses
+   textes se touche. Elle ne se réduit pas en vignette ici — c'est elle qu'on
+   édite. */
+.colonneApercuGrand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding-top: 1rem;
+}
+
+.carteEditable {
+  position: relative;
+  align-self: center;
+  width: min(100%, calc(68vh / 1.5));
+  border-radius: var(--rayon-lg);
+  overflow: hidden;
+  box-shadow: var(--ombre-levee);
+  background: var(--surface-carte);
+}
+
+.apercuPlein { display: block; width: 100%; height: auto; }
+
+/* Une zone ne se voit pas au repos : la carte doit rester la carte. Elle se
+   révèle au survol, au focus clavier, et une fois à l'arrivée pour apprendre
+   au regard qu'on peut toucher. */
+.zone {
+  position: absolute;
+  scroll-margin-top: 6rem;
+  padding: 0;
+  border: 1.5px dashed transparent;
+  border-radius: 0.375rem;
+  background: transparent;
+  cursor: text;
+  appearance: none;
+  transition: background var(--court), border-color var(--court);
+  animation: zone-invite 1400ms ease-in-out 900ms 1 both;
+}
+
+/* La cible dépasse un peu la boîte du graphiste : un nom de famille en
+   capitales fait vingt pixels de haut sur un téléphone, trop peu pour un
+   doigt. */
+.zone::before {
+  content: '';
+  position: absolute;
+  inset: -0.3rem -0.125rem;
+}
+
+.zone:hover,
+.zone:focus-visible {
+  border-color: var(--primaire);
+  background: rgba(159, 60, 22, 0.07);
+  outline: none;
+}
+
+.zoneActive {
+  border-color: var(--primaire);
+  background: rgba(159, 60, 22, 0.1);
+}
+
+@keyframes zone-invite {
+  0%, 100% { border-color: transparent; background: transparent; }
+  45%      { border-color: var(--primaire-vive); background: rgba(191, 84, 44, 0.08); }
+}
+
+/* Le champ amené sous les yeux depuis la carte, sur grand écran. */
+.champ[data-eclaire] {
+  background: var(--primaire-claire);
+  transition: background 600ms ease;
+}
+
+/* ---------- La feuille qui monte du bas ---------- */
+
+.feuille {
+  margin: auto 0 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  max-height: 85vh;
+  border: none;
+  border-radius: 1.25rem 1.25rem 0 0;
+  background: var(--surface-carte);
+  box-shadow: 0 -12px 40px -12px rgba(28, 28, 24, 0.35);
+}
+
+.feuille[open] { animation: feuille-monte 280ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.feuille::backdrop { background: rgba(28, 28, 24, 0.35); }
+
+@keyframes feuille-monte {
+  from { transform: translateY(100%); }
+  to   { transform: none; }
+}
+
+.feuilleCorps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom));
+}
+
+.feuillePoignee {
+  align-self: center;
+  width: 2.5rem;
+  height: 0.25rem;
+  border-radius: var(--rayon-plein);
+  background: var(--surface-variante);
+}
+
+.feuilleTete { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+
+.feuilleLibelle {
+  font-family: var(--police-titre), Georgia, serif;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.feuilleRang {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--contour);
+  font-variant-numeric: tabular-nums;
+}
+
+.feuilleCorps .saisie { font-size: 1.0625rem; padding: 0.75rem 0.875rem; }
+
+.feuilleAide { font-size: 0.8125rem; color: var(--encre-douce); margin: 0; min-height: 1.2em; }
+
+.feuilleActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.625rem;
+  margin-top: 0.25rem;
+}
+
+.feuilleActions > * { justify-content: center; text-align: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  .zone { animation: none; }
+  .feuille[open] { animation: none; }
+}
+
 /* ---------- À partir de la tablette ---------- */
 
 @media (min-width: 62.5rem) {
@@ -523,6 +666,15 @@
     align-items: center;
     gap: 0.5rem;
   }
+
+  .colonneApercuGrand {
+    order: 2;
+    position: sticky;
+    top: 5.25rem;
+    padding-top: 0;
+  }
+
+  .carteEditable { width: 100%; }
 
   .apercuPoint,
   .apercuPointEchec {

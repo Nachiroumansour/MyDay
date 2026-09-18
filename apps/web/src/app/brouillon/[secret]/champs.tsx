@@ -43,6 +43,16 @@ export function Champ({
     // Au montage seulement : ensuite c'est onChange qui mène.
      
   }, [])
+
+  // La même valeur s'édite aussi depuis la carte, dans la feuille qui monte du
+  // bas. Le champ n'étant pas contrôlé, on y reporte ce qui a changé ailleurs —
+  // sauf pendant qu'on y écrit, pour ne pas déplacer le curseur sous les doigts.
+  useEffect(() => {
+    const noeud = saisie.current
+    if (noeud && document.activeElement !== noeud && noeud.value !== valeur) {
+      noeud.value = valeur
+    }
+  }, [valeur])
   const identifiant = `champ-${champ.id}`
   const estLong = champ.type === 'texte_long'
   const propose = champ.id === 'texte_intro' ? formulesIntro(type) : []
@@ -59,7 +69,10 @@ export function Champ({
   const rempli = valeur.trim() !== ''
 
   return (
-    <div className={rempli ? `${styles.champ} ${styles.champRempli}` : styles.champ}>
+    <div
+      className={rempli ? `${styles.champ} ${styles.champRempli}` : styles.champ}
+      data-champ-bloc
+    >
       <label className="etiquette-champ" htmlFor={identifiant}>
         {libelleChamp(champ.id, type)}
         {champ.facultatif && <span className={styles.facultatif}>facultatif</span>}
